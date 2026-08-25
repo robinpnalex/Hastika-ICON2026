@@ -86,26 +86,12 @@ Task A is scored over the two binary classes; Task B over the six categories.
 
 ---
 
-## Baseline
-
-`baseline/baseline.py` builds a simple majority-class submission from an input CSV:
-
-```bash
-# Task A
-python baseline/baseline.py --input data/binary_validation_inputs.csv --task a --out predictions.csv
-# Task B
-python baseline/baseline.py --input data/multiclass_validation_inputs.csv --task b --out predictions.csv
-```
-
-Replace it with your own model — this is only a format-correct starting point.
-
----
 
 ## Important dates
 
 | Date | Milestone |
 |------|-----------|
-| 20 Aug | Training data released (this repo) |
+| 25 Aug | Training data released (this repo) |
 | 20 Sep | Test inputs released |
 | 01 Oct | Final submission deadline |
 | 04 Oct | Results & rankings |
@@ -119,7 +105,18 @@ Replace it with your own model — this is only a format-correct starting point.
 ## Citation
 
 If you use this data or take part, please cite the HASTIKA dataset paper
-(Kavatagi and Rachh, 2025) and the shared task overview paper.
+
+@article{kavatagi2025hastika,
+  title={HASTIKA: hate speech and target identification in Kannada-English code-mixed text: S. Kavatagi, R. Rachh},
+  author={Kavatagi, Sanjana and Rachh, Rashmi},
+  journal={Language Resources and Evaluation},
+  volume={59},
+  number={3},
+  pages={2811--2856},
+  year={2025},
+  publisher={Springer}
+} 
+and the shared task overview paper.
 
 ## Contact
 
