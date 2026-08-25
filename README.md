@@ -55,7 +55,7 @@ id,label
 7417,Non-Hate
 958,Hate
 ```
-Accepted label values: `Hate`, `Non-Hate` (also `1` / `0`).
+Accepted label values: `Hate`, `Non-Hate`.
 
 **Task B — `predictions.csv`**
 ```
@@ -63,8 +63,7 @@ id,label
 958,Political
 4204,Political
 ```
-Accepted label values: `Gender`, `Political`, `Religion`, `Geo-political`, `Violence`, `Others`
-(abbreviations `GEN`, `POL`, `REL`, `GEO`, `VIO`, `OTH` are also accepted).
+Accepted label values: `Gender`, `Political`, `Religion`, `Geo-political`, `Violence`, `Others`.
 
 **Rules**
 - One row per `id` from the input file.
