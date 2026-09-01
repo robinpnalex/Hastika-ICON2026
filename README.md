@@ -95,6 +95,9 @@ and saves the model and tokenizer. The supplied
 `data/binary_validation_inputs.csv` file has no labels, so it is not used for
 early stopping or hyperparameter tuning.
 
+For a copy-paste walkthrough from environment setup through CodaBench submission,
+see [`TASK_A_GUIDE.md`](TASK_A_GUIDE.md).
+
 ### Installation
 
 The project uses [uv](https://docs.astral.sh/uv/) for Python, virtual-environment,
@@ -146,6 +149,30 @@ uv run --extra cu128 python finetune_task_a.py \
 The first run downloads the selected model from Hugging Face. Training progress
 reports loss, macro-F1, and accuracy for each epoch. The best model is written to
 the selected output directory, together with `training_metadata.json`.
+
+### Generate Task A predictions
+
+After training, load the saved checkpoint and generate predictions for the
+unlabeled Task A validation inputs:
+
+```bash
+uv run --extra cu128 python predict_task_a.py \
+  --model-dir checkpoints/muril_task_a \
+  --input-csv data/binary_validation_inputs.csv \
+  --output predictions.csv \
+  --fp16
+```
+
+The script automatically reuses the training run's text-cleaning setting and
+maximum sequence length from `training_metadata.json`. It preserves every input
+ID and writes the required `id,label` columns. Check the row count and label
+distribution printed at the end, then create the upload archive:
+
+```bash
+zip task_a_predictions.zip predictions.csv
+```
+
+Upload `task_a_predictions.zip` to the matching Task A phase on CodaBench.
 
 ### Useful options
 

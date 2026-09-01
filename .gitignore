@@ -2,3 +2,5 @@
 __pycache__/
 *.py[cod]
 checkpoints/
+/predictions.csv
+/task_a_predictions.zip
