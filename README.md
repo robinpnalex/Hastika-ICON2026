@@ -86,6 +86,74 @@ Task A is scored over the two binary classes; Task B over the six categories.
 
 ---
 
+## Task A Transformer Fine-Tuning
+
+`finetune_task_a.py` fine-tunes a Hugging Face sequence-classification model for
+binary hate-speech detection. It creates a stratified validation split from
+`data/binary_train.csv`, selects the checkpoint with the best validation macro-F1,
+and saves the model and tokenizer. The supplied
+`data/binary_validation_inputs.csv` file has no labels, so it is not used for
+early stopping or hyperparameter tuning.
+
+### Installation
+
+Create an environment and install the Python dependencies. Install a CUDA-enabled
+PyTorch build appropriate for your GPU if PyTorch is not already installed.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install torch transformers scikit-learn numpy
+```
+
+### Train with MuRIL
+
+MuRIL is the default model and is a good first choice for Kannada-English text.
+The command below enables FP16 mixed precision on a supported NVIDIA GPU.
+
+```bash
+python finetune_task_a.py \
+  --model google/muril-base-cased \
+  --output-dir checkpoints/muril_task_a \
+  --fp16
+```
+
+### Train with XLM-R
+
+```bash
+python finetune_task_a.py \
+  --model xlm-roberta-base \
+  --output-dir checkpoints/xlmr_task_a \
+  --fp16
+```
+
+The first run downloads the selected model from Hugging Face. Training progress
+reports loss, macro-F1, and accuracy for each epoch. The best model is written to
+the selected output directory, together with `training_metadata.json`.
+
+### Useful options
+
+```bash
+# Reduce GPU memory use
+--batch-size 8
+
+# Change sequence length
+--max-length 128
+
+# Try balanced loss weighting
+--class-weight balanced
+
+# Use the original comments without HTML/encoding cleanup
+--raw-text
+
+# Reproduce a different training split/seed
+--seed 123
+```
+
+For a reliable comparison, train MuRIL and XLM-R with the same seed and settings,
+then repeat the best configuration with several seeds. The competition’s primary
+metric is macro-F1, so use it—not accuracy—to choose checkpoints.
+
 
 ## Important dates
 
