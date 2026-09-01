@@ -97,13 +97,29 @@ early stopping or hyperparameter tuning.
 
 ### Installation
 
-Create an environment and install the Python dependencies. Install a CUDA-enabled
-PyTorch build appropriate for your GPU if PyTorch is not already installed.
+The project uses [uv](https://docs.astral.sh/uv/) for Python, virtual-environment,
+and dependency management. Choose one PyTorch accelerator extra and run it from
+the repository root. CUDA 12.8 is the recommended starting point for an NVIDIA
+GPU:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install torch transformers scikit-learn numpy
+# NVIDIA GPU using CUDA 12.8
+uv sync --extra cu128
+
+# Alternatives: newer CUDA 13.0 or CPU-only
+uv sync --extra cu130
+uv sync --extra cpu
+```
+
+`uv` reads `pyproject.toml` and `uv.lock`, creates `.venv`, installs the locked
+dependencies, and uses the Python version in `.python-version`. You do not need
+to activate the environment when commands are launched with `uv run`. Use the
+same accelerator extra for `uv sync` and every `uv run` command.
+
+Before training, confirm that PyTorch can see your GPU:
+
+```bash
+uv run --extra cu128 python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 ```
 
 ### Train with MuRIL
@@ -112,7 +128,7 @@ MuRIL is the default model and is a good first choice for Kannada-English text.
 The command below enables FP16 mixed precision on a supported NVIDIA GPU.
 
 ```bash
-python finetune_task_a.py \
+uv run --extra cu128 python finetune_task_a.py \
   --model google/muril-base-cased \
   --output-dir checkpoints/muril_task_a \
   --fp16
@@ -121,7 +137,7 @@ python finetune_task_a.py \
 ### Train with XLM-R
 
 ```bash
-python finetune_task_a.py \
+uv run --extra cu128 python finetune_task_a.py \
   --model xlm-roberta-base \
   --output-dir checkpoints/xlmr_task_a \
   --fp16

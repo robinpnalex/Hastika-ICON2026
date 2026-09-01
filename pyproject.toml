@@ -1,0 +1,49 @@
+[project]
+name = "hastika-icon2026"
+version = "0.1.0"
+description = "HASTIKA at ICON-2026 training utilities"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "numpy>=1.26",
+    "scikit-learn>=1.4",
+    "sentencepiece>=0.2",
+    "transformers>=4.45,<5",
+]
+
+[project.optional-dependencies]
+cpu = ["torch>=2.2"]
+cu128 = ["torch>=2.2"]
+cu130 = ["torch>=2.2"]
+
+[tool.uv]
+package = false
+conflicts = [
+    [
+        { extra = "cpu" },
+        { extra = "cu128" },
+        { extra = "cu130" },
+    ],
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu128", extra = "cu128" },
+    { index = "pytorch-cu130", extra = "cu130" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true

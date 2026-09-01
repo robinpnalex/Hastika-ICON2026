@@ -283,7 +283,7 @@ def main():
         loss_fn = torch.nn.CrossEntropyLoss()
 
     use_amp = args.fp16 and device.type == "cuda"
-    scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
     best_f1 = -1.0
     best_state = None
     bad_epochs = 0
@@ -298,7 +298,7 @@ def main():
             labels_batch = batch.pop("labels")
 
             optimizer.zero_grad(set_to_none=True)
-            with torch.cuda.amp.autocast(enabled=use_amp):
+            with torch.amp.autocast(device_type=device.type, enabled=use_amp):
                 logits = model(**batch).logits
                 loss = loss_fn(logits, labels_batch)
 
