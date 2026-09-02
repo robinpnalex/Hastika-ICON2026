@@ -1,0 +1,14 @@
+# Install torch separately, matched to the target machine's CUDA version, e.g.
+#   pip install torch --index-url https://download.pytorch.org/whl/cu121
+# Deliberately not pinned here: a wheel index in this file makes every install
+# resolve to a +cuXXX local version and breaks on any other machine.
+transformers>=4.40
+tokenizers>=0.19
+sentencepiece
+scikit-learn
+pandas
+numpy
+ftfy
+emoji
+accelerate
+pillow>=10

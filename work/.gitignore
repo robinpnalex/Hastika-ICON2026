@@ -1,0 +1,9 @@
+# regenerable model outputs and caches
+__pycache__/
+*.pyc
+runs/*/oof_probs.npy
+runs/*/test_probs.npy
+runs/*/holdout_probs.npy
+*.log
+checkpoints/
+runs/*/predictions.zip
