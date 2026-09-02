@@ -19,5 +19,19 @@ This document tracks the experimental runs and their results for Task A (Binary 
 * **Output Directory:** `checkpoints/muril_task_a_demojized`
 * **Notes:** Converting emojis to their text equivalents yielded an improvement of ~0.9% in the macro F1 score.
 
+## Experiment 3: TF-IDF + LinearSVC Baseline
+* **Model:** `TfidfVectorizer` (Word + Char n-grams) + `LinearSVC`
+* **Preprocessing:** Default (HTML cleaning, mojibake repair)
+* **5-Fold CV Macro F1:** 0.8039
+* **Output Directory:** `work/runs/svm/`
+* **Notes:** Surprisingly outperformed Baseline MuRIL, establishing a strong floor.
+
+## Experiment 4: Demojized TF-IDF + LinearSVC Baseline
+* **Model:** `TfidfVectorizer` (Word + Char n-grams) + `LinearSVC`
+* **Preprocessing:** Default + Demojized (Emojis converted to English text descriptions)
+* **5-Fold CV Macro F1:** 0.8103
+* **Output Directory:** `work/runs/svm_demojize/`
+* **Notes:** Best performing model so far, outperforming both standard TF-IDF and Demojized MuRIL.
+
 ## Next Planned Experiments
-* **Experiment 3:** XLM-RoBERTa Base (`xlm-roberta-base`) with Demojized text.
+* **Experiment 5:** XLM-RoBERTa Base (`xlm-roberta-base`) with Demojized text.

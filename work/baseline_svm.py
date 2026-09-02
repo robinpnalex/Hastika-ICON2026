@@ -40,13 +40,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--C", type=float, default=0.5)
     ap.add_argument("--tag", default="svm")
+    ap.add_argument("--demojize", action="store_true")
     args = ap.parse_args()
 
     train = pd.read_csv(ROOT / "data" / "binary_train.csv")
     test = pd.read_csv(ROOT / "data" / "binary_validation_inputs.csv")
-    X = train["Comment"].map(clean).values
+    X = train["Comment"].map(lambda x: clean(x, demojize=args.demojize)).values
     y = (train["Label"] == "Hate").astype(int).values
-    X_test = test["Comment"].map(clean).values
+    X_test = test["Comment"].map(lambda x: clean(x, demojize=args.demojize)).values
 
     skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=SPLIT_SEED)
     oof = np.zeros((len(y), 2))
