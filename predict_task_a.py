@@ -15,7 +15,7 @@ from transformers import (
     DataCollatorWithPadding,
 )
 
-from finetune_task_a import ID2LABEL, LABEL2ID, clean_text
+from finetune_task_a import ID2LABEL, LABEL2ID, clean_text, demojize_text
 
 
 class InferenceDataset(Dataset):
@@ -66,6 +66,12 @@ def parse_args():
         choices=["auto", "clean", "raw"],
         default="auto",
         help="Auto reuses the cleaning setting stored during training.",
+    )
+    parser.add_argument(
+        "--emoji-mode",
+        choices=["auto", "preserve", "demojize"],
+        default="auto",
+        help="Auto reuses the emoji setting stored during training.",
     )
     parser.add_argument(
         "--fp16",
@@ -129,12 +135,18 @@ def main():
         use_clean_text = bool(metadata.get("cleaned_text", True))
     else:
         use_clean_text = args.text_mode == "clean"
+    if args.emoji_mode == "auto":
+        use_demojized_text = bool(metadata.get("demojized", False))
+    else:
+        use_demojized_text = args.emoji_mode == "demojize"
 
     rows, id_key, comment_key = read_rows(Path(args.input_csv))
     texts = [
         clean_text(row[comment_key]) if use_clean_text else row[comment_key]
         for row in rows
     ]
+    if use_demojized_text:
+        texts = [demojize_text(text) for text in texts]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
@@ -142,7 +154,8 @@ def main():
         print(f"GPU: {torch.cuda.get_device_name(0)}")
     print(
         f"Rows: {len(rows)}, max_length: {max_length}, "
-        f"text mode: {'clean' if use_clean_text else 'raw'}"
+        f"text mode: {'clean' if use_clean_text else 'raw'}, "
+        f"emoji mode: {'demojize' if use_demojized_text else 'preserve'}"
     )
 
     tokenizer = AutoTokenizer.from_pretrained(model_dir)

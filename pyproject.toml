@@ -5,6 +5,7 @@ description = "HASTIKA at ICON-2026 training utilities"
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [
+    "emoji>=2.14,<3",
     "numpy>=1.26",
     "scikit-learn>=1.4",
     "sentencepiece>=0.2",

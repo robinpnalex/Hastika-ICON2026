@@ -19,6 +19,7 @@ import random
 import re
 from pathlib import Path
 
+import emoji
 import numpy as np
 import torch
 from sklearn.metrics import accuracy_score, f1_score
@@ -62,6 +63,13 @@ def clean_text(text: str) -> str:
     text = re.sub(r"<[^>]+>", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
+
+
+def demojize_text(text: str) -> str:
+    """Convert emoji into English words that the model can tokenize."""
+    text = emoji.demojize(text, delimiters=(" ", " "), language="en")
+    text = text.replace("_", " ")
+    return re.sub(r"\s+", " ", text).strip()
 
 
 class CommentDataset(Dataset):
@@ -147,7 +155,7 @@ def evaluate(model, loader, device):
     }
 
 
-def parse_args():
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--model",
@@ -185,21 +193,31 @@ def parse_args():
         help="Use original comments instead of mojibake/HTML cleaning.",
     )
     parser.add_argument(
+        "--demojize",
+        action="store_true",
+        help="Convert emoji to English descriptions after text cleaning.",
+    )
+    parser.add_argument(
         "--fp16",
         action="store_true",
         help="Use CUDA mixed precision. Recommended on a supported NVIDIA GPU.",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
-def main():
-    args = parse_args()
+def main(argv=None):
+    args = parse_args(argv)
     set_seed(args.seed)
     random.seed(args.seed)
     np.random.seed(args.seed)
 
     if args.fp16 and not torch.cuda.is_available():
         raise SystemExit("--fp16 requires a CUDA GPU.")
+    if args.demojize and args.raw_text:
+        raise SystemExit(
+            "--demojize cannot be combined with --raw-text because emoji "
+            "mojibake must be repaired first."
+        )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
@@ -211,6 +229,13 @@ def main():
         row["Comment"] if args.raw_text else clean_text(row["Comment"])
         for row in rows
     ]
+    if args.demojize:
+        texts = [demojize_text(text) for text in texts]
+    print(
+        "Preprocessing: "
+        f"{'raw' if args.raw_text else 'clean'}, "
+        f"emoji={'demojized' if args.demojize else 'preserved'}"
+    )
     labels = [LABEL2ID[row["Label"]] for row in rows]
     indices = np.arange(len(rows))
 
@@ -351,6 +376,7 @@ def main():
         "seed": args.seed,
         "max_length": args.max_length,
         "cleaned_text": not args.raw_text,
+        "demojized": args.demojize,
         "best_macro_f1": best_f1,
         "history": history,
     }

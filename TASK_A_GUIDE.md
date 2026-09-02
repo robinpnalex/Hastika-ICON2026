@@ -88,6 +88,23 @@ uv run --extra cu128 python finetune_task_a.py \
 
 Keep different models in different output directories.
 
+### Optional demojized MuRIL comparison
+
+Run the separate demojized entry point with the same seed and hyperparameters as
+the original MuRIL run:
+
+```bash
+uv run --extra cu128 python finetune_task_a_demojized.py \
+  --model google/muril-base-cased \
+  --output-dir checkpoints/muril_task_a_demojized \
+  --fp16
+```
+
+This converts emoji such as `😂` into English descriptions such as
+`face with tears of joy`. Results are saved under
+`checkpoints/muril_task_a_demojized/`, leaving the original checkpoint untouched.
+Compare the two runs' `best_macro_f1` values before choosing a model.
+
 ## 5. Check the saved result
 
 The MuRIL output directory should contain:
@@ -128,8 +145,10 @@ uv run --extra cu128 python predict_task_a.py \
 ```
 
 The prediction script automatically reads `training_metadata.json` and reuses
-the training run's text-cleaning mode and maximum sequence length. It prints the
-number of rows and the predicted class distribution before finishing.
+the training run's text-cleaning mode, emoji mode, and maximum sequence length.
+It prints the number of rows and the predicted class distribution before
+finishing. To predict with the demojized model, change `--model-dir` to
+`checkpoints/muril_task_a_demojized`; no additional emoji flag is required.
 
 Expected final output resembles:
 

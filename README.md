@@ -146,6 +146,21 @@ uv run --extra cu128 python finetune_task_a.py \
   --fp16
 ```
 
+### Train a separate demojized MuRIL model
+
+This experiment converts emoji into English descriptions before tokenization and
+saves its best checkpoint separately from the original-text model:
+
+```bash
+uv run --extra cu128 python finetune_task_a_demojized.py \
+  --model google/muril-base-cased \
+  --output-dir checkpoints/muril_task_a_demojized \
+  --fp16
+```
+
+Use the same seed and hyperparameters as the original run for a fair macro-F1
+comparison. The saved `training_metadata.json` records `"demojized": true`.
+
 The first run downloads the selected model from Hugging Face. Training progress
 reports loss, macro-F1, and accuracy for each epoch. The best model is written to
 the selected output directory, together with `training_metadata.json`.
@@ -164,9 +179,10 @@ uv run --extra cu128 python predict_task_a.py \
 ```
 
 The script automatically reuses the training run's text-cleaning setting and
-maximum sequence length from `training_metadata.json`. It preserves every input
-ID and writes the required `id,label` columns. Check the row count and label
-distribution printed at the end, then create the upload archive:
+emoji mode, as well as its maximum sequence length, from
+`training_metadata.json`. It preserves every input ID and writes the required
+`id,label` columns. Check the row count and label distribution printed at the
+end, then create the upload archive:
 
 ```bash
 zip task_a_predictions.zip predictions.csv
