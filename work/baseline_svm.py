@@ -19,7 +19,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.pipeline import make_pipeline, make_union
 from sklearn.svm import LinearSVC
 
-from prep import clean
+from prep import clean, dedupe_index
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SPLIT_SEED = 42          # must match train_xlmr.py --seed for OOF alignment
@@ -41,10 +41,15 @@ def main():
     ap.add_argument("--C", type=float, default=0.5)
     ap.add_argument("--tag", default="svm")
     ap.add_argument("--demojize", action="store_true")
+    ap.add_argument("--no-dedupe", action="store_true",
+                    help="must match the setting used by every other run in the ensemble")
     args = ap.parse_args()
 
     train = pd.read_csv(ROOT / "data" / "binary_train.csv")
     test = pd.read_csv(ROOT / "data" / "binary_validation_inputs.csv")
+    if not args.no_dedupe:
+        train = train.iloc[dedupe_index(train["Comment"].tolist(),
+                                        train["Label"].tolist(), "task A")].reset_index(drop=True)
     X = train["Comment"].map(lambda x: clean(x, demojize=args.demojize)).values
     y = (train["Label"] == "Hate").astype(int).values
     X_test = test["Comment"].map(lambda x: clean(x, demojize=args.demojize)).values

@@ -51,3 +51,49 @@ def clean(s: str, demojize: bool = False, normalize: str = "") -> str:
         # "_"-fragmented junk.
         s = emoji_lib.demojize(s, delimiters=(" ", " ")).replace("_", " ")
     return WS.sub(" ", s).strip()
+
+
+def dedupe_index(comments, labels=None, name=""):
+    """Row indices to keep after collapsing comments with identical text.
+
+    The released files carry the same comment under several different ids: 35
+    groups / 42 redundant rows in binary_train, 12 / 14 in multiclass_train. Most
+    are byte-identical before any cleaning. Left in, they get double weight in the
+    loss and can straddle a fold boundary, which inflates OOF scores.
+
+    Groups whose labels DISAGREE are dropped whole rather than resolved by
+    first-wins or majority -- 3 such groups in binary_train (`Hate` vs `Non-Hate`
+    on the same string), 2 in multiclass_train. The disagreement is the annotation
+    telling you the comment is contestable without its thread; picking a side
+    teaches a boundary the annotators themselves could not agree on.
+
+    The key is clean() WITHOUT demojize, so every model gets the same indices
+    whatever its own emoji setting. That matters: ensemble.py stacks OOF arrays by
+    row position, so muril.py, baseline_svm.py and train_xlmr.py must drop exactly
+    the same rows or the blend silently misaligns.
+
+    Pass labels=None (validation/test inputs) and every row is kept -- submissions
+    need one row per released id, duplicates included.
+    """
+    if labels is None:
+        return list(range(len(comments)))
+
+    groups = {}
+    for i, c in enumerate(comments):
+        groups.setdefault(clean(c).casefold(), []).append(i)
+
+    keep, n_dup, n_conflict = [], 0, 0
+    for idxs in groups.values():
+        if len(idxs) == 1:
+            keep.append(idxs[0])
+        elif len({labels[i] for i in idxs}) > 1:
+            n_conflict += len(idxs)
+        else:
+            keep.append(idxs[0])
+            n_dup += len(idxs) - 1
+
+    keep.sort()
+    if n_dup or n_conflict:
+        print(f"dedupe{' ' + name if name else ''}: {len(comments)} -> {len(keep)} rows "
+              f"({n_dup} duplicate, {n_conflict} in label-conflict groups)", flush=True)
+    return keep

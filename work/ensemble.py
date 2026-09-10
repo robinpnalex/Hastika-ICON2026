@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score
 
-from prep import clean  # noqa: F401  (keeps the module import surface consistent)
+from prep import dedupe_index
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RUNS = ROOT / "work" / "runs"
@@ -56,6 +56,9 @@ def main():
 
     train = pd.read_csv(ROOT / "data" / "binary_train.csv")
     test_df = pd.read_csv(ROOT / "data" / "binary_validation_inputs.csv")
+    # the runs being blended dropped these rows, so their OOF arrays are this long
+    train = train.iloc[dedupe_index(train["Comment"].tolist(),
+                                    train["Label"].tolist(), "task A")].reset_index(drop=True)
     y = (train["Label"] == "Hate").astype(int).values
 
     # exclude our own output dir so a re-run does not try to blend the previous blend

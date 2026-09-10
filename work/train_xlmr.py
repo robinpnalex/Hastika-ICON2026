@@ -20,7 +20,7 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
 
-from prep import clean
+from prep import clean, dedupe_index
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "work" / "runs"
@@ -159,6 +159,9 @@ def main():
 
     train = pd.read_csv(ROOT / "data" / "binary_train.csv")
     test = pd.read_csv(ROOT / "data" / "binary_validation_inputs.csv")
+    if not args.no_dedupe:
+        train = train.iloc[dedupe_index(train["Comment"].tolist(),
+                                        train["Label"].tolist(), "task A")].reset_index(drop=True)
     prep_fn = lambda t: clean(t, demojize=args.demojize)
     X = train["Comment"].map(prep_fn).values
     y = (train["Label"] == "Hate").astype(int).values
