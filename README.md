@@ -1,238 +1,143 @@
-# HASTIKA @ ICON-2026 — Starting Kit
+# HASTIKA @ ICON-2026
 
-**Hate Speech and Target Category Identification in Kannada-English Code-Mixed Text**
+Kannada-English code-mixed hate-speech classification for the HASTIKA shared
+task. The current implementation work is focused on **Task A**, the binary
+`Hate` / `Non-Hate` classification problem.
 
-This repository contains the **training-phase** data, submission format, a baseline, and
-sample submissions for the HASTIKA shared task. Registration, submission, and the
-leaderboards are on CodaBench:
+## Start here
 
-➡️ **CodaBench:** https://www.codabench.org/competitions/17784/
+The supported Task A workflow is deliberately small:
 
----
+1. Create the environment with `uv`.
+2. Fine-tune MuRIL on a stratified split of the labeled training data.
+3. Generate predictions for the unlabeled validation or test CSV.
+4. Validate and zip the resulting submission.
 
-## Overview
+For copy-paste commands and troubleshooting, use
+[`docs/TASK_A_GUIDE.md`](docs/TASK_A_GUIDE.md).
 
-Social media in India is heavily **code-mixed** — native languages blended with English in a
-single utterance. HASTIKA targets hate speech detection in low-resource **Kannada-English
-(Kanglish)** text, using **8,058 manually annotated** YouTube comments.
+## Repository layout
 
-The task has two independent sub-tasks (**separate leaderboards** — you may enter either or both):
+```text
+.
+├── data/                         # Organizer-provided Task A and Task B CSVs
+├── scripts/
+│   ├── make_submission.py        # Validate and zip a prediction CSV
+│   └── task_a/
+│       ├── finetune.py           # Main MuRIL/XLM-R fine-tuning entry point
+│       ├── finetune_demojized.py # Demojized Task A experiment
+│       └── predict.py            # Inference on any compatible input split
+├── docs/
+│   ├── TASK_A_GUIDE.md           # Complete run guide
+│   ├── TRAINING_RESULTS.md       # Recorded experiment results
+│   ├── FORMAT.md                 # Submission format reference
+│   └── LICENSE_NOTE.md           # Dataset usage note
+├── work/                         # Advanced CV, SVM, and ensemble experiments
+├── baseline/                     # Original baseline supplied with the task
+├── starting_kit/                 # Organizer examples
+├── references/                   # Dataset paper and background material
+├── submissions/                  # Generated submission archives
+├── pyproject.toml                # Python dependencies and uv configuration
+└── uv.lock                       # Reproducible dependency lockfile
+```
 
-- **Task A — Binary Hate Speech Detection:** classify a comment as `Hate` or `Non-Hate`.
-- **Task B — Fine-Grained Hate Speech Classification:** classify a **hate** comment into one of
-  six target categories: `Gender`, `Political`, `Religion`, `Geo-political`, `Violence`, `Others`.
-
----
+The files under `scripts/task_a/` are the recommended starting point. The
+`work/` directory contains research experiments and is not required for a basic
+fine-tune-and-submit run. Generated checkpoints belong in `checkpoints/` and
+are ignored by Git.
 
 ## Data
 
-This repo provides the **training-phase** files (released 20 Aug). Test inputs are released
-on 20 Sep; test gold labels are never released — scoring happens on CodaBench.
+| File | Rows | Purpose |
+|---|---:|---|
+| `data/binary_train.csv` | 6,446 | Task A labeled training data |
+| `data/binary_validation_inputs.csv` | 806 | Task A unlabeled prediction input |
+| `data/multiclass_train.csv` | 3,159 | Task B labeled training data |
+| `data/multiclass_validation_inputs.csv` | 395 | Task B unlabeled prediction input |
 
-| File | Rows | Columns | Notes |
-|------|------|---------|-------|
-| `data/binary_train.csv` | 6,446 | `id, Comment, Label` | Task A training data (with labels) |
-| `data/binary_validation_inputs.csv` | 806 | `id, Comment` | Task A validation inputs (**no labels** — predict & submit) |
-| `data/multiclass_train.csv` | 3,159 | `id, Comment, Hate Category` | Task B training data (with labels) |
-| `data/multiclass_validation_inputs.csv` | 395 | `id, Comment` | Task B validation inputs (**no labels** — predict & submit) |
+Task A uses the labels `Hate` and `Non-Hate`. Task B uses `Gender`,
+`Political`, `Religion`, `Geo-political`, `Violence`, and `Others`. Preserve
+the supplied `id` values exactly.
 
-**Labels**
-- Task A `Label`: `Hate` / `Non-Hate`
-- Task B `Hate Category`: `Gender`, `Political`, `Religion`, `Geo-political`, `Violence`, `Others`
+## Environment setup
 
-> Note: keep the `id` column from the provided file **unchanged** in your submission — it is how
-> predictions are matched to the gold labels.
-
----
-
-## Submission format
-
-Submit a single **`predictions.csv`** (zipped) to the matching phase/task on CodaBench.
-
-**Task A — `predictions.csv`**
-```
-id,label
-7417,Non-Hate
-958,Hate
-```
-Accepted label values: `Hate`, `Non-Hate`.
-
-**Task B — `predictions.csv`**
-```
-id,label
-958,Political
-4204,Political
-```
-Accepted label values: `Gender`, `Political`, `Religion`, `Geo-political`, `Violence`, `Others`.
-
-**Rules**
-- One row per `id` from the input file.
-- Header must be `id,label`.
-- Zip **only** `predictions.csv` (no enclosing folder) before uploading. If your tool nests it in a
-  folder, that is handled, but a flat zip is safest.
-- UTF-8 encoding.
-
-See `starting_kit/` for ready-made sample submissions.
-
----
-
-## Evaluation
-
-- **Macro-averaged F1** — the **primary ranking metric** (weights every class equally, so rare
-  categories such as *Geo-political* count as much as frequent ones).
-- **Accuracy** — reported alongside.
-
-Task A is scored over the two binary classes; Task B over the six categories.
-
----
-
-## Task A Transformer Fine-Tuning
-
-`finetune_task_a.py` fine-tunes a Hugging Face sequence-classification model for
-binary hate-speech detection. It creates a stratified validation split from
-`data/binary_train.csv`, selects the checkpoint with the best validation macro-F1,
-and saves the model and tokenizer. The supplied
-`data/binary_validation_inputs.csv` file has no labels, so it is not used for
-early stopping or hyperparameter tuning.
-
-For a copy-paste walkthrough from environment setup through CodaBench submission,
-see [`TASK_A_GUIDE.md`](TASK_A_GUIDE.md).
-
-### Installation
-
-The project uses [uv](https://docs.astral.sh/uv/) for Python, virtual-environment,
-and dependency management. Choose one PyTorch accelerator extra and run it from
-the repository root. CUDA 12.8 is the recommended starting point for an NVIDIA
-GPU:
+Run everything from the repository root. For an NVIDIA GPU with CUDA 12.8:
 
 ```bash
-# NVIDIA GPU using CUDA 12.8
 uv sync --extra cu128
-
-# Alternatives: newer CUDA 13.0 or CPU-only
-uv sync --extra cu130
-uv sync --extra cpu
-```
-
-`uv` reads `pyproject.toml` and `uv.lock`, creates `.venv`, installs the locked
-dependencies, and uses the Python version in `.python-version`. You do not need
-to activate the environment when commands are launched with `uv run`. Use the
-same accelerator extra for `uv sync` and every `uv run` command.
-
-Before training, confirm that PyTorch can see your GPU:
-
-```bash
 uv run --extra cu128 python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 ```
 
-### Train with MuRIL
+Alternatives are `--extra cu130` for CUDA 13.0 and `--extra cpu` for a CPU-only
+environment. Use the same extra for `uv sync` and subsequent `uv run` commands.
 
-MuRIL is the default model and is a good first choice for Kannada-English text.
-The command below enables FP16 mixed precision on a supported NVIDIA GPU.
+## Train Task A
+
+Original-text MuRIL:
 
 ```bash
-uv run --extra cu128 python finetune_task_a.py \
+uv run --extra cu128 python scripts/task_a/finetune.py \
   --model google/muril-base-cased \
   --output-dir checkpoints/muril_task_a \
   --fp16
 ```
 
-### Train with XLM-R
+Demojized MuRIL, saved separately:
 
 ```bash
-uv run --extra cu128 python finetune_task_a.py \
-  --model xlm-roberta-base \
-  --output-dir checkpoints/xlmr_task_a \
-  --fp16
-```
-
-### Train a separate demojized MuRIL model
-
-This experiment converts emoji into English descriptions before tokenization and
-saves its best checkpoint separately from the original-text model:
-
-```bash
-uv run --extra cu128 python finetune_task_a_demojized.py \
+uv run --extra cu128 python scripts/task_a/finetune_demojized.py \
   --model google/muril-base-cased \
   --output-dir checkpoints/muril_task_a_demojized \
   --fp16
 ```
 
-Use the same seed and hyperparameters as the original run for a fair macro-F1
-comparison. The saved `training_metadata.json` records `"demojized": true`.
+Each run saves the best model, tokenizer, validation history, preprocessing
+settings, and best macro-F1 in its selected checkpoint directory.
 
-The first run downloads the selected model from Hugging Face. Training progress
-reports loss, macro-F1, and accuracy for each epoch. The best model is written to
-the selected output directory, together with `training_metadata.json`.
-
-### Generate Task A predictions
-
-After training, load the saved checkpoint and generate predictions for the
-unlabeled Task A validation inputs:
+## Predict and package
 
 ```bash
-uv run --extra cu128 python predict_task_a.py \
-  --model-dir checkpoints/muril_task_a \
+uv run --extra cu128 python scripts/task_a/predict.py \
+  --model-dir checkpoints/muril_task_a_demojized \
   --input-csv data/binary_validation_inputs.csv \
   --output predictions.csv \
   --fp16
+
+uv run --extra cu128 python scripts/make_submission.py \
+  --pred predictions.csv \
+  --task a \
+  --out submissions/task_a_predictions.zip
 ```
 
-The script automatically reuses the training run's text-cleaning setting and
-emoji mode, as well as its maximum sequence length, from
-`training_metadata.json`. It preserves every input ID and writes the required
-`id,label` columns. Check the row count and label distribution printed at the
-end, then create the upload archive:
+`predict.py` reads `training_metadata.json`, so it automatically applies the
+same cleaning, emoji handling, and maximum sequence length used during
+training. It works with a future test split as long as the CSV contains an ID
+column and a `Comment` column; pass that file through `--input-csv`.
 
-```bash
-zip task_a_predictions.zip predictions.csv
+The archive contains one file named `predictions.csv` with exactly these
+columns:
+
+```csv
+id,label
+7417,Non-Hate
+958,Hate
 ```
 
-Upload `task_a_predictions.zip` to the matching Task A phase on CodaBench.
+Macro-F1 is the primary model-selection metric. Accuracy is useful as a
+secondary diagnostic, but it should not determine the winning checkpoint.
 
-### Useful options
+## Results
 
-```bash
-# Reduce GPU memory use
---batch-size 8
+Recorded Task A experiments are in
+[`docs/TRAINING_RESULTS.md`](docs/TRAINING_RESULTS.md). The best currently
+recorded score is the demojized TF-IDF + LinearSVC experiment at **0.8103
+five-fold CV macro-F1**. The demojized MuRIL run reached **0.8023 holdout
+macro-F1**. These values use different evaluation protocols and therefore are
+not a direct model ranking; compare future candidates on identical folds.
 
-# Change sequence length
---max-length 128
+## Dataset citation
 
-# Try balanced loss weighting
---class-weight balanced
-
-# Use the original comments without HTML/encoding cleanup
---raw-text
-
-# Reproduce a different training split/seed
---seed 123
-```
-
-For a reliable comparison, train MuRIL and XLM-R with the same seed and settings,
-then repeat the best configuration with several seeds. The competition’s primary
-metric is macro-F1, so use it—not accuracy—to choose checkpoints.
-
-
-## Important dates
-
-| Date | Milestone |
-|------|-----------|
-| 25 Aug | Training data released (this repo) |
-| 20 Sep | Test inputs released |
-| 01 Oct | Final submission deadline |
-| 04 Oct | Results & rankings |
-| 25 Oct | System paper deadline |
-| 10 Dec | Camera-ready working notes |
-
-*Tentative; deadlines 23:59 AoE unless noted. See CodaBench for the authoritative schedule.*
-
----
-
-## Citation
-
-If you use this data or take part, please cite the HASTIKA dataset paper
-
+```bibtex
 @article{kavatagi2025hastika,
   title={HASTIKA: hate speech and target identification in Kannada-English code-mixed text: S. Kavatagi, R. Rachh},
   author={Kavatagi, Sanjana and Rachh, Rashmi},
@@ -242,9 +147,8 @@ If you use this data or take part, please cite the HASTIKA dataset paper
   pages={2811--2856},
   year={2025},
   publisher={Springer}
-} 
-and the shared task overview paper.
+}
+```
 
-## Contact
-
-shankar.biradar@manipal.edu · sanjana.kavatagi@manipal.edu
+See [`docs/LICENSE_NOTE.md`](docs/LICENSE_NOTE.md) before redistributing the
+dataset or derived artifacts.

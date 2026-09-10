@@ -3,7 +3,7 @@
 
 import sys
 
-from finetune_task_a import main
+from finetune import main
 
 
 def option_present(arguments, option):

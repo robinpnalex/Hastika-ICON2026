@@ -1,23 +1,19 @@
-# Running the sweep on the GPU machine
+# Running the advanced sweep on a GPU machine
 
-Copy the whole repo (or just `data/` + `work/`) across, then:
+The repository uses one `uv` environment for both the supported scripts and
+these advanced experiments. From the repository root:
 
-```sh
-python -m venv .venv && . .venv/bin/activate
-
-# torch first, matched to that machine's CUDA. Check with nvidia-smi.
-pip install torch --index-url https://download.pytorch.org/whl/cu121
-pip install -r work/requirements.txt
-
-python -c "import torch; print(torch.cuda.get_device_name(0), torch.cuda.is_bf16_supported())"
+```bash
+uv sync --extra cu128
+uv run --extra cu128 python -c "import torch; print(torch.cuda.get_device_name(0), torch.cuda.is_bf16_supported())"
 ```
 
 Then:
 
-```sh
-PY=python bash work/run_all.sh          # full sweep + blend + zipped submission
-LARGE=0 bash work/run_all.sh            # base models only, ~1.5h
-FOLDS=0 EPOCHS=6 bash work/run_all.sh   # quick holdout pass to sanity-check the box
+```bash
+uv run --extra cu128 bash work/run_all.sh
+LARGE=0 uv run --extra cu128 bash work/run_all.sh
+FOLDS=0 EPOCHS=6 uv run --extra cu128 bash work/run_all.sh
 ```
 
 Output lands in `work/runs/<tag>/` and the final upload is
@@ -101,7 +97,7 @@ It is only applied if it beats 0.5 by more than 0.002.
 Smoke-test the recipe on a new machine before committing to a full run:
 
 ```sh
-python work/muril.py --tag smoke --limit 160 --folds 2 --epochs 1 \
+uv run --extra cu128 python work/muril.py --tag smoke --limit 160 --folds 2 --epochs 1 \
     --bs 8 --max-len 32 --threads 4
 rm -rf work/runs/smoke        # else ensemble.py will auto-discover it
 ```

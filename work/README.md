@@ -1,6 +1,8 @@
-# HASTIKA Task A — working directory
+# HASTIKA Task A — advanced experiments
 
-Untracked scratch dir for the binary hate-speech task. Env: `~/.venvs/hastika`.
+This directory contains the optional five-fold CV, SVM, transformer, and ensemble
+pipeline. The simpler supported workflow is documented in the repository root
+README and `docs/TASK_A_GUIDE.md`. Both workflows use the root `uv` environment.
 
 | File | What it does |
 |------|--------------|
@@ -9,17 +11,16 @@ Untracked scratch dir for the binary hate-speech task. Env: `~/.venvs/hastika`.
 | `muril.py` | **Primary model.** Dedicated MuRIL fine-tune: meanmax pooling, layer-wise LR decay, top-layer re-init, FGM adversarial training, EMA, multi-seed, OOF threshold tuning. Defaults are the tuned recipe. |
 | `train_xlmr.py` | Fine-tunes XLM-RoBERTa. Plain PyTorch loop (no `Trainer`), so it runs the same on transformers 4.x and 5.x, CPU or GPU. |
 | `ensemble.py` | Blends any runs that have OOF matrices, by Dirichlet weight search seeded with the single-model corners. |
-| `make_submission.py` | Validates a `predictions.csv` against the task rules and writes a flat zip. |
+| `scripts/make_submission.py` | Validates a `predictions.csv` against the task rules and writes a flat zip. |
 
 ## Usage
 
-```sh
-V=~/.venvs/hastika/bin/python
-
-$V work/baseline_svm.py                       # floor
-$V work/train_xlmr.py --tag xlmr-holdout      # 15% holdout, 3 epochs
-$V work/train_xlmr.py --folds 5 --tag xlmr-cv # full CV, averages fold probs
-$V work/make_submission.py --pred work/runs/xlmr-cv/predictions.csv --task a
+```bash
+uv run --extra cu128 python work/baseline_svm.py
+uv run --extra cu128 python work/train_xlmr.py --tag xlmr-holdout
+uv run --extra cu128 python work/train_xlmr.py --folds 5 --tag xlmr-cv
+uv run --extra cu128 python scripts/make_submission.py \
+  --pred work/runs/xlmr-cv/predictions.csv --task a
 ```
 
 Each run writes to `work/runs/<tag>/`: `predictions.csv`, `test_probs.npy`

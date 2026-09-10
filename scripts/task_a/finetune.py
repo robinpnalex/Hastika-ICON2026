@@ -3,7 +3,7 @@
 Fine-tune MuRIL or XLM-R for HASTIKA Task A.
 
 Example:
-    python finetune_task_a.py \
+    python scripts/task_a/finetune.py \
         --model google/muril-base-cased \
         --output-dir checkpoints/muril_task_a
 

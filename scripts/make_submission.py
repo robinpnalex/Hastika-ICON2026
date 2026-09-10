@@ -32,6 +32,7 @@ def main():
     assert not extra, f"{len(extra)} ids not in the input file"
 
     out = pathlib.Path(a.out or pathlib.Path(a.pred).with_suffix(".zip"))
+    out.parent.mkdir(parents=True, exist_ok=True)
     # arcname must be a bare predictions.csv -- no enclosing folder
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         z.write(a.pred, "predictions.csv")

@@ -55,7 +55,7 @@ when using the CPU environment.
 ## 4. Fine-tune MuRIL
 
 ```bash
-uv run --extra cu128 python finetune_task_a.py \
+uv run --extra cu128 python scripts/task_a/finetune.py \
   --model google/muril-base-cased \
   --output-dir checkpoints/muril_task_a \
   --fp16
@@ -80,7 +80,7 @@ Saved best model to checkpoints/muril_task_a
 ### Optional XLM-R comparison
 
 ```bash
-uv run --extra cu128 python finetune_task_a.py \
+uv run --extra cu128 python scripts/task_a/finetune.py \
   --model xlm-roberta-base \
   --output-dir checkpoints/xlmr_task_a \
   --fp16
@@ -94,7 +94,7 @@ Run the separate demojized entry point with the same seed and hyperparameters as
 the original MuRIL run:
 
 ```bash
-uv run --extra cu128 python finetune_task_a_demojized.py \
+uv run --extra cu128 python scripts/task_a/finetune_demojized.py \
   --model google/muril-base-cased \
   --output-dir checkpoints/muril_task_a_demojized \
   --fp16
@@ -137,7 +137,7 @@ Your value will depend on the model, seed, and hyperparameters.
 Use the saved checkpoint with the unlabeled Task A validation inputs:
 
 ```bash
-uv run --extra cu128 python predict_task_a.py \
+uv run --extra cu128 python scripts/task_a/predict.py \
   --model-dir checkpoints/muril_task_a \
   --input-csv data/binary_validation_inputs.csv \
   --output predictions.csv \
@@ -177,15 +177,19 @@ id,label
 Only `Hate` and `Non-Hate` are valid Task A labels. The inference script also
 checks that it produced exactly one prediction for every input row.
 
-## 8. Zip and submit
+## 8. Validate, zip, and submit
 
 ```bash
-zip task_a_predictions.zip predictions.csv
-unzip -l task_a_predictions.zip
+uv run --extra cu128 python scripts/make_submission.py \
+  --pred predictions.csv \
+  --task a \
+  --out submissions/task_a_predictions.zip
+unzip -l submissions/task_a_predictions.zip
 ```
 
-The archive should contain only `predictions.csv`. Upload
-`task_a_predictions.zip` to the matching Task A phase on CodaBench.
+The packaging script verifies the header, labels, IDs, and row coverage before
+creating a flat archive containing only `predictions.csv`. Upload
+`submissions/task_a_predictions.zip` to the matching Task A phase on CodaBench.
 
 ## Useful training options
 
@@ -209,7 +213,7 @@ The archive should contain only `predictions.csv`. Upload
 Example for a smaller GPU:
 
 ```bash
-uv run --extra cu128 python finetune_task_a.py \
+uv run --extra cu128 python scripts/task_a/finetune.py \
   --model google/muril-base-cased \
   --output-dir checkpoints/muril_task_a_batch8 \
   --batch-size 8 \
@@ -233,7 +237,7 @@ training.
 ### Checkpoint directory does not exist
 
 Confirm that training ended with `Saved best model to ...` and pass the same path
-to `predict_task_a.py --model-dir`.
+to `scripts/task_a/predict.py --model-dir`.
 
 ### Re-running an experiment
 

@@ -15,7 +15,7 @@ from transformers import (
     DataCollatorWithPadding,
 )
 
-from finetune_task_a import ID2LABEL, LABEL2ID, clean_text, demojize_text
+from finetune import ID2LABEL, LABEL2ID, clean_text, demojize_text
 
 
 class InferenceDataset(Dataset):

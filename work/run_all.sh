@@ -37,4 +37,4 @@ fi
 echo; echo "=== per-model OOF ==="; grep -H "OOF macro-F1" work/*.log || true
 echo; echo "=== blend ==="; "$PY" work/ensemble.py
 echo; echo "=== package ==="
-"$PY" work/make_submission.py --pred work/runs/ensemble/predictions.csv --task a
+"$PY" scripts/make_submission.py --pred work/runs/ensemble/predictions.csv --task a
