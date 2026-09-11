@@ -88,7 +88,10 @@ def main():
     ap.add_argument("--out", default=None, help="default: ensemble / ensemble_b")
     ap.add_argument("--no-dedupe", action="store_true",
                     help="must match the runs being blended")
+    ap.add_argument("--no-nested", action="store_true",
+                    help="skip the nested honesty check; it costs a second weight search")
     a = ap.parse_args()
+    args_no_nested = a.no_nested
     spec = TASKS[a.task]
     out = a.out or ("ensemble" if a.task == "a" else "ensemble_b")
     classes = spec["classes"]
@@ -126,13 +129,36 @@ def main():
     W = np.vstack([np.eye(m), np.full((1, m), 1.0 / m),
                    rng.dirichlet(np.ones(m), size=a.samples)])
 
-    scores = np.array([macro_f1(y, np.einsum("i,ijk->jk", w, P).argmax(1), k) for w in W])
-    i = int(scores.argmax())
-    f1, w = float(scores[i]), W[i]
+    def best_weights(P_sub, y_sub, W_sub=W):
+        s = np.array([macro_f1(y_sub, np.einsum("i,ijk->jk", w, P_sub).argmax(1), k)
+                      for w in W_sub])
+        j = int(s.argmax())
+        return W_sub[j], float(s[j])
+
+    w, f1 = best_weights(P, y)
     print(f"\nbest blend OOF macro-F1 {f1:.4f}  acc "
           f"{accuracy_score(y, np.einsum('i,ijk->jk', w, P).argmax(1)):.4f}")
     for n, wi in zip(names, w):
         print(f"  {n:16s} {wi:.2f}")
+
+    # That number is fitted on the rows it reports, so it is optimistic by however
+    # much a 20k-sample weight search can chase noise. Refitting the weights on 4/5
+    # of the rows and scoring the fifth says how much. Measured on four Task B CPU
+    # models: 0.6032 in-sample against a 0.5979 best member, 0.5925 nested -- the
+    # whole apparent gain was weight-fitting, and the blend actually lost. Compare
+    # the nested number with the best individual score above, not this one.
+    if not args_no_nested:
+        from sklearn.model_selection import StratifiedKFold
+        pred = np.zeros(len(y), dtype=int)
+        for tr, te in StratifiedKFold(5, shuffle=True, random_state=11).split(y, y):
+            wt, _ = best_weights(P[:, tr], y[tr])
+            pred[te] = np.einsum("i,ijk->jk", wt, P[:, te]).argmax(1)
+        nested = macro_f1(y, pred, k)
+        top = max(f1_score(y, oof[n].argmax(1), average="macro") for n in names)
+        verdict = "blending pays" if nested > top else "blending does NOT pay here"
+        print(f"\nnested estimate      {nested:.4f}  vs best single {top:.4f}  -- {verdict}")
+        if nested <= top:
+            print("  submit the best single run's predictions.csv instead")
 
     blend_test = np.einsum("i,ijk->jk", w, T)
     run = RUNS / out

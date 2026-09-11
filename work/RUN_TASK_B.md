@@ -31,6 +31,7 @@ contains HASTIKA labels.
 | quantity | value |
 |---|---|
 | TF-IDF + LinearSVC floor, 5-fold OOF macro-F1 | 0.5948 |
+| same, best of a 14-point hyperparameter sweep | 0.5979 |
 | training rows after dedupe | 3,143 |
 | optimizer steps per fold at `--bs 16 --epochs 6` | 942 |
 | MuRIL wordpieces per whitespace word | 2.28 |
@@ -40,9 +41,23 @@ contains HASTIKA labels.
 
 Everything here is romanized. Back-transliteration was measured and rejected in
 `work/SETUP.md`; light spelling normalization (`prep.clean(normalize=...)`)
-moves the SVM floor by +0.002, which is noise, so it stays off.
+moves the SVM floor by +0.002, which is noise, so it stays off. The SVM's own
+hyperparameters are at their plateau too -- the full sweep is in
+`work/baseline_svm.py`'s docstring, and the spread across fourteen settings is
+smaller than fold noise. The floor is not where the remaining points are.
+
+The failure mode is worth knowing before you tune anything. On the floor's
+confusion matrix, `Violence` loses 103 of its 221 rows to `Gender` and `Others`
+loses 282 of 447. Reading those rows explains why: gendered slurs are used as
+generic insults against TV channels and politicians, so the lexical cue points at
+`Gender` while the label follows the *target*. That is also why the gazetteer
+tags in `features.py` measured as noise. Task B is target identification wearing
+a slur-detection costume.
 
 ## 1. Kaggle
+
+`work/kaggle_task_b.ipynb` is this whole guide as a notebook: upload it, flip the
+switches in the second cell, Run All. The rest of this section is what it does.
 
 Notebook settings: **Accelerator** GPU T4 x2 or P100, **Internet** on. The
 training script uses one GPU whichever you pick. Neither card supports bfloat16,

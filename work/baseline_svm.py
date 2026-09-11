@@ -17,6 +17,19 @@ on inner folds and drags the scores back toward the class priors, undoing
 exactly the class_weight="balanced" correction the tail classes depend on.
 Softmax over the decision function leaves the argmax untouched, so the floor is
 the floor, and still gives ensemble.py something to blend.
+
+The defaults are at the plateau, so do not spend an evening re-tuning them.
+Swept 5-fold on multiclass_train, everything below is one run per setting:
+
+    C          0.1 0.5934 | 0.25 0.5975 | 0.5 0.5948 | 1.0 0.5845 | 2.0 0.5766
+    char range 2-4 0.5916 | 2-5 0.5948  | 2-6 0.5975 | 1-5 0.5923
+    min_df     1 0.5979   | 2 0.5948
+    word range 1-2 0.5948 | 1-3 0.5947
+    model      LinearSVC 0.5948 | LogReg C=2 0.5907 | SGD modified_huber 0.5653
+
+The whole spread above C=0.1 is 0.59 +/- 0.005, which is smaller than the
+fold-to-fold noise at 3143 rows. C=0.5 is kept because every existing run used
+it, not because 0.25 lost.
 """
 import argparse
 import pathlib
