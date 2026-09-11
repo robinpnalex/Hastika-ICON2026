@@ -58,8 +58,11 @@ STAGE1 = [
     ("b_hing",     ["--model", "l3cube-pune/hing-roberta"],    "romanized Indic social media"),
     ("b_focal",    ["--model", MURIL, "--loss", "focal"],      "spend capacity on the tail"),
     ("b_rdrop",    ["--model", MURIL, "--rdrop", "0.5"],       "variance, not capacity"),
-    ("b_large",    ["--model", "google/muril-large-cased",
-                    "--bs", "8", "--grad-accum", "2"],         "more capacity, 3x the time"),
+    # --no-fgm because FGM clones the embedding table every step and large's is
+    # 197285 x 1024; --lr below base's 3e-5 because large diverges at it.
+    ("b_large",    ["--model", "google/muril-large-cased", "--bs", "8",
+                    "--grad-accum", "2", "--no-fgm", "--lr", "1.5e-5"],
+                                                               "more capacity, 3x the time"),
 ]
 
 # Measured on this corpus: b_base took 1055s for a holdout on a T4.
