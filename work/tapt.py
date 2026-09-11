@@ -89,7 +89,16 @@ def main():
     ap.add_argument("--extra", nargs="*", default=[],
                     help="further in-domain CSVs; the Task A and test files are refused")
     ap.add_argument("--epochs", type=int, default=8)
-    ap.add_argument("--bs", type=int, default=16)
+    ap.add_argument("--bs", type=int, default=4,
+                    help="micro-batch. MuRIL's MLM head emits a bs x seq x 197285 "
+                         "logits tensor and cross-entropy upcasts it to fp32, so bs=16 "
+                         "at --max-len 192 asks for 2.26 GiB in a single allocation and "
+                         "a 16 GB T4 cannot hold it. Raise --grad-accum instead: the "
+                         "effective batch is --bs x --grad-accum")
+    ap.add_argument("--grad-accum", type=int, default=4,
+                    help="micro-batches per optimizer step")
+    ap.add_argument("--eval-bs", type=int, default=8,
+                    help="perplexity runs under no_grad but allocates the same logits")
     ap.add_argument("--lr", type=float, default=5e-5)
     ap.add_argument("--max-len", type=int, default=192)
     ap.add_argument("--mlm-prob", type=float, default=0.15)
@@ -123,10 +132,11 @@ def main():
 
     coll = DataCollatorForLanguageModeling(tok, mlm_probability=args.mlm_prob)
     tr = DataLoader(sets["train"], batch_size=args.bs, shuffle=True, collate_fn=coll)
-    va = DataLoader(sets["val"], batch_size=args.bs * 2, collate_fn=coll)
+    va = DataLoader(sets["val"], batch_size=args.eval_bs, collate_fn=coll)
 
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01, eps=1e-6)
-    steps = max(1, len(tr) * args.epochs)
+    accum = max(1, args.grad_accum)
+    steps = max(1, math.ceil(len(tr) / accum) * args.epochs)
     sched = get_cosine_schedule_with_warmup(opt, int(args.warmup * steps), steps)
     dtype = (None if device.type != "cuda" or args.amp == "off" else
              torch.bfloat16 if args.amp == "bf16" or
@@ -145,7 +155,10 @@ def main():
             n += len(b["input_ids"])
         return math.exp(tot / max(n, 1))
 
+    print(f"effective batch {args.bs} x {accum} = {args.bs * accum}, "
+          f"{math.ceil(len(tr) / accum)} optimizer steps/epoch", flush=True)
     print(f"held-out perplexity before {perplexity():.2f}", flush=True)
+    opt.zero_grad(set_to_none=True)
     for ep in range(1, args.epochs + 1):
         model.train()
         run_loss = 0.0
@@ -153,14 +166,17 @@ def main():
             b = {k: v.to(device) for k, v in b.items()}
             with torch.autocast("cuda", dtype=dtype, enabled=dtype is not None):
                 loss = model(**b).loss
-            scaler.scale(loss).backward()
+            run_loss += loss.item()
+            # scale by accum so the gradient matches one batch of bs*accum rows
+            scaler.scale(loss / accum).backward()
+            if step % accum and step != len(tr):
+                continue
             scaler.unscale_(opt)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             scaler.step(opt)
             scaler.update()
             sched.step()
             opt.zero_grad(set_to_none=True)
-            run_loss += loss.item()
         print(f"  epoch {ep}/{args.epochs} train loss {run_loss/len(tr):.4f} "
               f"held-out perplexity {perplexity():.2f}", flush=True)
 

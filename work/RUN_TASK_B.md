@@ -54,6 +54,31 @@ generic insults against TV channels and politicians, so the lexical cue points a
 tags in `features.py` measured as noise. Task B is target identification wearing
 a slur-detection costume.
 
+## 0. The overnight sweep (start here)
+
+`work/overnight_b.py` is the whole of this guide as one unattended run. Upload
+`work/kaggle_task_b.ipynb`, Save & Run All, read `RESULTS.md` in the Output tab
+the next morning, submit the zip its top row names.
+
+```bash
+python -u work/overnight_b.py --budget-hours 10.5 --out /kaggle/working
+```
+
+It ranks seven ideas on a 15% holdout, promotes the best four to 5-fold runs,
+blends everything with `ensemble.py`, fits a macro-F1-optimal decode on each
+run with `decode_b.py`, and writes a CodaBench zip per arm into
+`<out>/subs/`. `RESULTS.md` is rewritten after every arm, and `--budget-hours`
+is a wall clock: no new GPU work starts once the remaining time cannot fit the
+next stage, so Kaggle's 12-hour limit never cuts a fold in half.
+
+The arms are in `STAGE1` in that file, each with the reason it is there. The
+short version: the corpus is 0% Kannada script, so MuRIL's 197k Indic vocab is
+mostly dead weight and a Latin-heavy encoder is a real alternative rather than a
+tweak; and macro-F1 charges 1/6 of the score for `Violence`, which the floor
+scores 0.346 on, so the arms that matter are the ones that move the tail.
+
+The rest of this guide is the same pipeline run by hand, one stage at a time.
+
 ## 1. Kaggle
 
 `work/kaggle_task_b.ipynb` is this whole guide as a notebook: upload it, flip the
@@ -114,8 +139,16 @@ to see usually buys a point or two on small code-mixed sets.
 python -u work/tapt.py --out work/runs/tapt-muril 2>&1 | tee work/tapt.log
 ```
 
-Watch the held-out perplexity line. If it does not fall substantially, skip the
-`--model work/runs/tapt-muril` arm below.
+Watch the held-out perplexity line. It starts near 2709. If it does not fall
+substantially, skip the `--model work/runs/tapt-muril` arm below.
+
+This used to OOM on a T4 and the failure was invisible, because `cmd | tee`
+exits with `tee`'s status, which is always 0. The cause is structural rather
+than incidental: MuRIL's MLM head emits a `bs x seq x 197285` logits tensor and
+cross-entropy upcasts it to fp32, so `--bs 16 --max-len 192` is a single 2.26
+GiB allocation. `--bs` now defaults to 4 with `--grad-accum 4`, which holds the
+effective batch at 16. Lower `--bs` and raise `--grad-accum` by the same factor
+on a smaller card.
 
 ## 4. Choose the encoder
 
@@ -179,6 +212,7 @@ three times slower.
 
 | run | T4 estimate |
 |---|---|
+| the whole `overnight_b.py` sweep | 8-10 h |
 | smoke test | 2 min |
 | `work/tapt.py` | 10-15 min |
 | one `--folds 0` arm | 15-25 min |
