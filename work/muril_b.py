@@ -88,7 +88,13 @@ def main():
     ap.add_argument("--tag", default="muril_b")
     ap.add_argument("--no-dedupe", action="store_true",
                     help="keep repeated comments and label-conflict groups (prep.dedupe_index)")
-    ap.add_argument("--max-len", type=int, default=128)
+    ap.add_argument("--max-len", type=int, default=192,
+                    help="192, not muril.py's 128: Task B's comments are longer than Task "
+                         "A's. Measured on MuRIL wordpieces, p99 is 145 tokens in "
+                         "multiclass_train and 163 in multiclass_validation_inputs, so 128 "
+                         "truncates 1.4%% of training and 2.0%% of test rows against 0.5%% "
+                         "at 192. Padding is per batch, so the longer cap is only paid by "
+                         "the rare long batch")
     ap.add_argument("--no-demojize", action="store_true")
     ap.add_argument("--folds", type=int, default=N_SPLITS, help="0 = 15%% holdout")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42])
@@ -113,6 +119,11 @@ def main():
     ap.add_argument("--ema", action="store_true", default=True)
     ap.add_argument("--no-ema", dest="ema", action="store_false")
     ap.add_argument("--ema-decay", type=float, default=0.999)
+    ap.add_argument("--no-ema-bias-correct", dest="ema_bias_correct", action="store_false",
+                    default=True, help="restore the pre-fix EMA; for reproducing old runs only")
+    ap.add_argument("--select", choices=["best", "last"], default="best",
+                    help="checkpoint that supplies each fold's predictions; both scores are "
+                         "reported either way, see the OOF lines at the end")
     ap.add_argument("--rdrop", type=float, default=0.0)
     ap.add_argument("--amp", choices=["auto", "off", "fp16", "bf16"], default="auto")
     ap.add_argument("--class-weight", choices=["balanced", "none"], default="balanced")
@@ -187,6 +198,10 @@ def main():
 
     oof = np.zeros((len(y), len(LABELS)))
     test_probs = np.zeros((len(X_test), len(LABELS)))
+    # Same two matrices for the checkpoint --select did not take, so one run
+    # reports both the selected and the unselected OOF.
+    oof_alt = np.zeros_like(oof)
+    test_alt = np.zeros_like(test_probs)
     n_seeds = len(args.seeds)
 
     for seed in args.seeds:
@@ -200,6 +215,10 @@ def main():
                                            Xte, device, f"s{seed}f{k}")
                 oof[va_i] += p_va / n_seeds
                 test_probs += p_te / (args.folds * n_seeds)
+                alt = args.alt_fold
+                if alt["va"] is not None:
+                    oof_alt[va_i] += alt["va"] / n_seeds
+                    test_alt += alt["te"] / (args.folds * n_seeds)
         else:
             tr_i, va_i = train_test_split(np.arange(len(y)), test_size=0.15,
                                           stratify=y, random_state=SPLIT_SEED)
@@ -208,11 +227,22 @@ def main():
                                        Xte, device, f"s{seed}holdout")
             oof[va_i] += p_va / n_seeds
             test_probs += p_te / n_seeds
+            alt = args.alt_fold
+            if alt["va"] is not None:
+                oof_alt[va_i] += alt["va"] / n_seeds
+                test_alt += alt["te"] / n_seeds
 
+    other = "last" if args.select == "best" else "best"
     if args.folds and args.folds > 1:
         pred = oof.argmax(1)
         print(f"\nOOF macro-F1 {f1_score(y, pred, average='macro'):.4f} "
-              f"acc {accuracy_score(y, pred):.4f}\n")
+              f"acc {accuracy_score(y, pred):.4f}  (--select {args.select})")
+        if oof_alt.any():
+            print(f"OOF macro-F1 {f1_score(y, oof_alt.argmax(1), average='macro'):.4f} "
+                  f"with the {other} checkpoint instead. Trust the 'last' number: "
+                  f"'best' is chosen on these same rows.\n")
+        else:
+            print()
         print(classification_report(y, pred, target_names=LABELS, digits=3))
         print("confusion (rows=true, cols=pred):")
         print("%-15s" % "", " ".join("%6s" % l[:6] for l in LABELS))
@@ -225,9 +255,15 @@ def main():
         print(f"\nholdout macro-F1 {f1_score(y[mask], pred, average='macro'):.4f} "
               f"acc {accuracy_score(y[mask], pred):.4f}\n")
         print(classification_report(y[mask], pred, target_names=LABELS, digits=3))
+        if oof_alt.any():
+            m2 = oof_alt.any(1)
+            print(f"holdout macro-F1 {f1_score(y[m2], oof_alt[m2].argmax(1), average='macro'):.4f} "
+                  f"with the {other} checkpoint instead")
         np.save(run / "holdout_probs.npy", oof)
 
     np.save(run / "test_probs.npy", test_probs)
+    if test_alt.any():
+        np.save(run / f"test_probs_{other}.npy", test_alt)
     pd.DataFrame({"id": test["id"],
                   "label": [LABELS[i] for i in test_probs.argmax(1)]}
                  ).to_csv(run / "predictions.csv", index=False)

@@ -2,13 +2,20 @@
 # Task B ablation. Every arm shares folds, seed and preprocessing, so the only
 # difference between two lines is the flag named in its tag. Run from repo root.
 #
-#   bash work/sweep_b.sh            # 4 arms, 5-fold each
-#   FOLDS=0 bash work/sweep_b.sh    # 15% holdout, ~4x faster, for a first look
+#   bash work/sweep_b.sh                 # the arms worth running first, 5-fold
+#   FOLDS=0 bash work/sweep_b.sh         # 15% holdout, ~5x faster, for a first look
+#   ARMS=all bash work/sweep_b.sh        # adds the ones already measured as noise
+#   PY="python -u" bash work/sweep_b.sh  # on Kaggle, where uv is not used
+#
+# Arms are ordered by how much they are expected to move macro-F1, so a run that
+# is cut short has still tested the interesting things.
 set -euo pipefail
 PY=${PY:-"uv run --extra cu128 python"}
 FOLDS=${FOLDS:-5}
 EPOCHS=${EPOCHS:-6}
 SEEDS=${SEEDS:-42}
+ARMS=${ARMS:-core}
+ABUSIVE=Hate-speech-CNERG/kannada-codemixed-abusive-MuRIL
 
 run () {  # run <tag> <extra flags...>
   tag=$1; shift
@@ -17,11 +24,31 @@ run () {  # run <tag> <extra flags...>
       --seeds $SEEDS "$@" 2>&1 | tee "work/${tag}.log"
 }
 
-run b_base                                     # current tuned recipe + dedupe
-run b_tags   --tags                            # + gazetteer / mood / address tags
-run b_focal  --loss focal --focal-gamma 2.0    # + focal loss
-run b_both   --tags --loss focal --focal-gamma 2.0
+run b_base                                     # tuned recipe, fixed EMA, max-len 192
+
+# Warm starts. Both are external in-domain text with no HASTIKA labels in them,
+# which is the only kind of extra data Task B can legally use: 319 of the 395
+# Task B test ids also sit in binary_train.csv, so Task A's files are off limits.
+run b_abusive --model "$ABUSIVE"               # MuRIL already tuned on code-mixed Kannada abuse
+if [ -d work/runs/tapt-muril ]; then
+  run b_tapt  --model work/runs/tapt-muril     # MLM-adapted; run work/tapt.py first
+else
+  echo "skipping b_tapt: run 'python work/tapt.py' first to build work/runs/tapt-muril"
+fi
+
+# The two regularizers inherited from Task A and never measured on Task B. FGM is
+# also ~45% of the runtime, so a null result here buys back most of a sweep.
+run b_noema  --no-ema
+run b_nofgm  --no-fgm
+run b_emaold --no-ema-bias-correct             # the pre-fix EMA, to size the bug
+
+if [ "$ARMS" = "all" ]; then
+  run b_tags   --tags                          # gazetteer / mood / address tags
+  run b_focal  --loss focal --focal-gamma 2.0
+  run b_both   --tags --loss focal --focal-gamma 2.0
+  run b_len128 --max-len 128                   # the old cap, truncates 2% of test rows
+fi
 
 echo
-echo "=== macro-F1 by arm ==="
+echo "=== OOF macro-F1 by arm (both checkpoints; trust the 'last' line) ==="
 grep -H "OOF macro-F1" work/b_*.log || true

@@ -226,22 +226,47 @@ class FGM:
 
 
 class EMA:
-    """Exponential moving average of weights; evaluated instead of the raw model."""
+    """Exponential moving average of weights; evaluated instead of the raw model.
 
-    def __init__(self, model, decay=0.999):
+    Bias-corrected, Adam-style. Without the correction the shadow keeps a
+    d**t share of the *initialization* forever, and on a run this short that
+    share is not small: Task B trains 942 optimizer steps per fold, so at
+    decay 0.999 the evaluated weights are 39% random init (0.999**942 = 0.39).
+    Task A hides the problem because it takes ~2400 steps (0.09). Dividing by
+    1 - d**t makes the shadow a proper weighted average of the trajectory so
+    far, which is what "moving average of weights" was supposed to mean, and
+    leaves the long-run behaviour unchanged.
+    """
+
+    def __init__(self, model, decay=0.999, bias_correct=True):
         self.decay = decay
-        self.shadow = {k: v.detach().clone() for k, v in model.state_dict().items()
+        self.bias_correct = bias_correct
+        self.t = 0
+        self.shadow = {k: torch.zeros_like(v) if bias_correct else v.detach().clone()
+                       for k, v in model.state_dict().items()
                        if v.dtype.is_floating_point}
 
     @torch.no_grad()
     def update(self, model):
+        self.t += 1
         for k, v in model.state_dict().items():
             if k in self.shadow:
                 self.shadow[k].mul_(self.decay).add_(v.detach(), alpha=1 - self.decay)
 
     def state_dict_for_eval(self, model):
-        sd = copy.deepcopy(model.state_dict())
-        sd.update(self.shadow)
+        """Model's own state dict with every float tensor replaced by the shadow.
+
+        Deliberately not a deepcopy: load_state_dict copies into the model's
+        parameters, so the caller's separate raw snapshot is what preserves the
+        live weights. Copying the full 293M-parameter dict here as well was one
+        wasted gigabyte per evaluation, twelve times a fold.
+        """
+        sd = dict(model.state_dict())
+        if not self.bias_correct or self.t == 0:
+            sd.update(self.shadow)
+            return sd
+        scale = 1.0 / (1.0 - self.decay ** self.t)
+        sd.update({k: v * scale for k, v in self.shadow.items()})
         return sd
 
 
@@ -368,12 +393,20 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
     scaler = torch.amp.GradScaler("cuda", enabled=(dtype == torch.float16))
     criterion = make_loss(args)
     fgm = FGM(model, args.fgm_eps) if args.fgm else None
-    ema = EMA(model, args.ema_decay) if args.ema else None
+    ema = (EMA(model, args.ema_decay, getattr(args, 'ema_bias_correct', True))
+           if args.ema else None)
 
     # evaluate this many times per epoch -- epoch-level granularity is too coarse
     # given how sharply val F1 moves between epochs on this dataset
     eval_every = max(1, len(tr) // args.evals_per_epoch)
     best = {"f1": -1.0, "va": None, "te": None}
+    # The last evaluation is kept as well as the best one. Picking the best
+    # checkpoint by macro-F1 on the validation fold and then reporting that same
+    # fold as out-of-fold is selection on the test rows: the number it produces is
+    # optimistic by however much twelve draws of eval noise are worth. Carrying
+    # the final checkpoint costs one extra test-set prediction per fold and makes
+    # the size of that optimism visible in every run. --select last uses it.
+    last = {"f1": -1.0, "va": None, "te": None}
     step_i = 0
 
     for ep in range(1, args.epochs + 1):
@@ -419,15 +452,22 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
                     model.load_state_dict(ema.state_dict_for_eval(model))
                 p_va = predict(model, va, device, dtype)
                 f1 = f1_score(y_va, p_va.argmax(1), average="macro")
-                if f1 > best["f1"]:
-                    best = {"f1": f1, "va": p_va, "te": predict(model, te, device, dtype)}
-                    if return_state:
-                        # snapshot on CPU: an 8GB card has no room for a second copy
-                        best["state"] = {k: v.detach().cpu().clone()
-                                         for k, v in model.state_dict().items()}
-                    mark = " *"
-                else:
-                    mark = ""
+                final = (ep == args.epochs and step == len(tr))
+                improved = f1 > best["f1"]
+                if improved or final:
+                    p_te = predict(model, te, device, dtype)
+                    if improved:
+                        best = {"f1": f1, "va": p_va, "te": p_te}
+                        if return_state:
+                            # snapshot on CPU: an 8GB card has no room for a second copy
+                            best["state"] = {k: v.detach().cpu().clone()
+                                             for k, v in model.state_dict().items()}
+                    if final:
+                        last = {"f1": f1, "va": p_va, "te": p_te}
+                        if return_state:
+                            last["state"] = {k: v.detach().cpu().clone()
+                                             for k, v in model.state_dict().items()}
+                mark = " *" if improved else ""
                 if ema is not None:
                     model.load_state_dict(raw)
                 print(f"  [{tag}] ep{ep} {step}/{len(tr)} loss {loss.item():.4f} "
@@ -439,9 +479,16 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
     del model
     if device.type == "cuda":
         torch.cuda.empty_cache()
+    want_last = getattr(args, "select", "best") == "last" and last["va"] is not None
+    pick, alt = (last, best) if want_last else (best, last)
+    # The checkpoint that was not selected, kept so a single run can report both
+    # the optimistic and the unbiased OOF instead of needing two.
+    args.alt_fold = alt
+    print(f"  [{tag}] best {best['f1']:.4f}  last {last['f1']:.4f}  "
+          f"(selected: {getattr(args, 'select', 'best')})", flush=True)
     if return_state:
-        return best["f1"], best["va"], best["te"], best.get("state")
-    return best["f1"], best["va"], best["te"]
+        return pick["f1"], pick["va"], pick["te"], pick.get("state")
+    return pick["f1"], pick["va"], pick["te"]
 
 
 def with_external(X_tr, y_tr, X_ext, y_ext, args):
@@ -519,6 +566,14 @@ def main():
     ap.add_argument("--ema", action="store_true", default=True)
     ap.add_argument("--no-ema", dest="ema", action="store_false")
     ap.add_argument("--ema-decay", type=float, default=0.999)
+    ap.add_argument("--no-ema-bias-correct", dest="ema_bias_correct", action="store_false",
+                    default=True, help="restore the pre-fix EMA that never divides out "
+                                       "the initialization; for reproducing old runs only")
+    ap.add_argument("--select", choices=["best", "last"], default="best",
+                    help="which checkpoint supplies the fold's predictions. best picks the "
+                         "highest macro-F1 on the validation fold, which is the fold being "
+                         "reported, so its OOF is optimistic; last is unbiased. Both "
+                         "numbers are printed either way")
     ap.add_argument("--rdrop", type=float, default=0.0,
                     help="R-Drop KL weight; 0 disables. Try 0.3-1.0. Doubles cost, "
                          "and stacks with --fgm at ~2.8x baseline")
