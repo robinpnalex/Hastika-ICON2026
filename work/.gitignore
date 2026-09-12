@@ -8,3 +8,4 @@ runs/*/holdout_probs.npy
 *.log
 checkpoints/
 runs/*/predictions.zip
+work/runs/*/*.zip

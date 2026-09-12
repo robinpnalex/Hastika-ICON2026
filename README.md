@@ -214,6 +214,79 @@ then repeat the best configuration with several seeds. The competition’s prima
 metric is macro-F1, so use it—not accuracy—to choose checkpoints.
 
 
+## Task B Fine-Grained Classification
+
+Task B is the six-way target category over hate comments, scored on macro-F1.
+The full pipeline, the measurements it rests on, and a copy-paste run guide are
+in [`work/RUN_TASK_B.md`](work/RUN_TASK_B.md). The submitted run and its
+provenance are in [`submissions/`](submissions/).
+
+### Current result
+
+| model | macro-F1 | measured on |
+|---|---|---|
+| **domain-adapted MuRIL, 5-fold** | **0.6013** | 3,143 rows, out-of-fold |
+| weight-searched blend | 0.6002 | nested estimate |
+| TF-IDF + LinearSVC floor | 0.5948 | 3,143 rows, out-of-fold |
+| stock MuRIL, 5-fold | 0.5727 | 3,143 rows, out-of-fold |
+
+Every figure above is the unbiased number, taken from the `last` checkpoint
+rather than the `best` one. Selecting a checkpoint by macro-F1 on the rows you
+then report flatters a run by an amount that varies between runs, so the two are
+always printed side by side and only `last` is comparable across arms.
+
+### What moved the score, and what did not
+
+The only intervention that helped was **task-adaptive pretraining**: a masked-LM
+pass over in-domain text before any classifier exists, worth about +2.9 points
+over stock MuRIL on the same folds. Run it with `work/tapt.py`.
+
+Four encoder swaps were measured and none beat MuRIL. XLM-R scored 0.5561 and
+HingRoBERTa 0.5678 on a 15% holdout, despite the corpus being 0% Kannada script,
+which had suggested MuRIL's Indic vocabulary was dead weight here. mDeBERTa
+collapsed to 0.1002 at the shared learning rate. Focal loss and R-Drop both
+landed under stock MuRIL over five folds. Blending was weight-searched over
+every five-fold run plus the floor and its nested estimate came out below the
+best single model, so it was not submitted.
+
+### The open problem
+
+Macro-F1 charges a sixth of the score per class regardless of support, and the
+two weakest classes are where the remaining points are:
+
+| class | rows | recall | largest error |
+|---|---|---|---|
+| `Violence` | 221 | 0.29 | 29% go to `Gender` |
+| `Others` | 447 | 0.40 | 45% go to `Gender` |
+
+The cause is lexical. Gendered slurs are the ambient register of this corpus and
+appear across every category, while the label follows the **target** of the
+comment. A row carrying a gendered slur but aimed at a language group is
+`Geo-political`; the surface cue and the label disagree. Measured by
+over-representation against base rate, four classes have clean target markers
+(`pakistan` 11.3x, `hijab` 7.9x, `speaker` 5.7x, `btv` 3.9x) while `Violence`
+has none: its best marker covers 8 of its 221 rows. Task B is target
+identification wearing a slur-detection costume.
+
+### Running it
+
+```bash
+# the whole sweep, unattended, with a wall-clock budget
+python -u work/overnight_b.py --budget-hours 10.5 --out /kaggle/working
+
+# or just the winning configuration
+python -u work/tapt.py --out work/runs/tapt-muril
+python -u work/muril_b.py --tag b_tapt_5f --model work/runs/tapt-muril --folds 5
+python work/make_submission.py --task b \
+    --pred work/runs/b_tapt_5f/predictions.csv --out b_tapt_5f.zip
+```
+
+`work/kaggle_task_b.ipynb` runs the sweep on Kaggle and
+`work/kaggle_rebuild_winner.ipynb` runs only the winning arm, about two hours
+against the sweep's eight and a half.
+
+---
+
 ## Important dates
 
 | Date | Milestone |
