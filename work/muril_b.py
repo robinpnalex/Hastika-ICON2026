@@ -96,7 +96,9 @@ def main():
                          "at 192. Padding is per batch, so the longer cap is only paid by "
                          "the rare long batch")
     ap.add_argument("--no-demojize", action="store_true")
-    ap.add_argument("--folds", type=int, default=N_SPLITS, help="0 = 15%% holdout")
+    ap.add_argument("--folds", type=int, default=N_SPLITS,
+                    help="0 = 15%% holdout, 1 = fit every row with no "
+                         "validation and no score, >1 = k-fold OOF")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42])
     ap.add_argument("--epochs", type=int, default=6)
     ap.add_argument("--bs", type=int, default=16)
@@ -219,6 +221,17 @@ def main():
                 if alt["va"] is not None:
                     oof_alt[va_i] += alt["va"] / n_seeds
                     test_alt += alt["te"] / (args.folds * n_seeds)
+        elif args.folds == 1:
+            # Train on every labelled row. No held-out rows means no score: the
+            # run is unmeasurable by construction and prints nothing to compare.
+            print(f"===== seed {seed} FULL FIT, {len(y)} rows, no validation =====",
+                  flush=True)
+            Xtr, _, Xte = tag_split(args, X, y, np.arange(len(y)),
+                                    np.arange(0), X_test, verbose=True)
+            _, _, p_te = train_fold(args, tok, Xtr, y, np.array([], dtype=Xtr.dtype),
+                                    np.array([], dtype=y.dtype), Xte, device,
+                                    f"s{seed}full")
+            test_probs += p_te / n_seeds
         else:
             tr_i, va_i = train_test_split(np.arange(len(y)), test_size=0.15,
                                           stratify=y, random_state=SPLIT_SEED)
@@ -233,7 +246,17 @@ def main():
                 test_alt += alt["te"] / n_seeds
 
     other = "last" if args.select == "best" else "best"
-    if args.folds and args.folds > 1:
+    if args.folds == 1:
+        print(f"\nfull fit on {len(y)} rows. There is no score for this run and there "
+              f"cannot be one:\nevery labelled row was used for training. Compare it "
+              f"against a 5-fold run's\nOOF only by submitting both.")
+        print("\npredicted distribution on the test inputs vs the training prior:")
+        got = np.bincount(test_probs.argmax(1), minlength=len(LABELS))
+        prior = np.bincount(y, minlength=len(LABELS))
+        print(f"  {'class':16s} {'predicted':>10s} {'training':>10s}")
+        for i, l in enumerate(LABELS):
+            print(f"  {l:16s} {100*got[i]/got.sum():9.1f}% {100*prior[i]/prior.sum():9.1f}%")
+    elif args.folds and args.folds > 1:
         pred = oof.argmax(1)
         print(f"\nOOF macro-F1 {f1_score(y, pred, average='macro'):.4f} "
               f"acc {accuracy_score(y, pred):.4f}  (--select {args.select})")

@@ -379,6 +379,10 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
         if getattr(args, "external_reinit_head", True):
             nn.init.normal_(model.head.weight, std=0.02)
             nn.init.zeros_(model.head.bias)
+    # --folds 1 trains on every labelled row. There is then no held-out set to
+    # select a checkpoint against, so the final weights are taken and no score is
+    # reported. Nothing else in the file passes an empty validation set.
+    no_val = len(y_va) == 0
     collate = make_collate(tok, args.max_len, getattr(args, "remap", None))
     tr = DataLoader(Comments(X_tr, y_tr), batch_size=args.bs, shuffle=True,
                     collate_fn=collate, drop_last=True)
@@ -447,12 +451,17 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
                 step_i += 1
 
             if step % eval_every == 0 or step == len(tr):
+                final = (ep == args.epochs and step == len(tr))
+                if no_val and not final:
+                    continue          # nothing to score, and only the end matters
                 if ema is not None:
                     raw = copy.deepcopy(model.state_dict())
                     model.load_state_dict(ema.state_dict_for_eval(model))
-                p_va = predict(model, va, device, dtype)
-                f1 = f1_score(y_va, p_va.argmax(1), average="macro")
-                final = (ep == args.epochs and step == len(tr))
+                if no_val:
+                    p_va, f1 = None, float("nan")
+                else:
+                    p_va = predict(model, va, device, dtype)
+                    f1 = f1_score(y_va, p_va.argmax(1), average="macro")
                 improved = f1 > best["f1"]
                 if improved or final:
                     p_te = predict(model, te, device, dtype)
@@ -470,22 +479,29 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
                 mark = " *" if improved else ""
                 if ema is not None:
                     model.load_state_dict(raw)
+                shown = "  no val" if no_val else f"val {f1:.4f}{mark}"
                 print(f"  [{tag}] ep{ep} {step}/{len(tr)} loss {loss.item():.4f} "
-                      f"val {f1:.4f}{mark} ({(time.time()-t0)/step:.2f}s/step)", flush=True)
+                      f"{shown} ({(time.time()-t0)/step:.2f}s/step)", flush=True)
 
-        print(f"  [{tag}] ep{ep} done {(time.time()-t0)/60:.1f}min  best {best['f1']:.4f}",
-              flush=True)
+        tail = "no val" if no_val else f"best {best['f1']:.4f}"
+        print(f"  [{tag}] ep{ep} done {(time.time()-t0)/60:.1f}min  {tail}", flush=True)
 
     del model
     if device.type == "cuda":
         torch.cuda.empty_cache()
-    want_last = getattr(args, "select", "best") == "last" and last["va"] is not None
+    # with no validation set `best` was never filled, so `last` is the only option
+    want_last = no_val or (getattr(args, "select", "best") == "last"
+                           and last["va"] is not None)
     pick, alt = (last, best) if want_last else (best, last)
     # The checkpoint that was not selected, kept so a single run can report both
     # the optimistic and the unbiased OOF instead of needing two.
     args.alt_fold = alt
-    print(f"  [{tag}] best {best['f1']:.4f}  last {last['f1']:.4f}  "
-          f"(selected: {getattr(args, 'select', 'best')})", flush=True)
+    if no_val:
+        print(f"  [{tag}] trained on every row; final checkpoint taken, no score",
+              flush=True)
+    else:
+        print(f"  [{tag}] best {best['f1']:.4f}  last {last['f1']:.4f}  "
+              f"(selected: {getattr(args, 'select', 'best')})", flush=True)
     if return_state:
         return pick["f1"], pick["va"], pick["te"], pick.get("state")
     return pick["f1"], pick["va"], pick["te"]
