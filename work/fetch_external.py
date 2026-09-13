@@ -28,17 +28,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from prep import clean  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-BASE = ("https://huggingface.co/datasets/community-datasets/offenseval_dravidian"
-        "/resolve/refs%2Fconvert%2Fparquet/kannada")
+BASE_FMT = ("https://huggingface.co/datasets/community-datasets/offenseval_dravidian"
+            "/resolve/refs%2Fconvert%2Fparquet/{lang}")
 NAMES = ["Not_offensive", "Offensive_Untargetede", "Offensive_Targeted_Insult_Individual",
          "Offensive_Targeted_Insult_Group", "Offensive_Targeted_Insult_Other", "not-Kannada"]
 HATE = {"Offensive_Targeted_Insult_Individual", "Offensive_Targeted_Insult_Group",
         "Offensive_Targeted_Insult_Other"}
 
 
-def fetch(split):
+def fetch(split, lang="kannada"):
     import pyarrow.parquet as pq
-    url = f"{BASE}/{split}/0000.parquet"
+    url = f"{BASE_FMT.format(lang=lang)}/{split}/0000.parquet"
     with urllib.request.urlopen(url, timeout=180) as r:
         blob = r.read()
     t = pq.read_table(io.BytesIO(blob)).to_pydict()
@@ -61,7 +61,20 @@ def hastika_texts():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="data/external/offenseval_kn.csv")
+    ap.add_argument("--out", default=None,
+                    help="default: data/external/offenseval_<lang>.csv")
+    ap.add_argument("--lang", default="kannada",
+                    choices=["kannada", "tamil", "malayalam"],
+                    help="tamil and malayalam are the same romanized Dravidian register "
+                         "in the same script convention, and are far larger. They carry "
+                         "no HASTIKA labels, so they are legal external data usable only "
+                         "for masked-LM adaptation, never for supervision.")
+    ap.add_argument("--text-only", action="store_true",
+                    help="dump every comment and skip the label mapping entirely. NAMES "
+                         "below is the Kannada config's label schema and the other "
+                         "configs need not share it; masked-LM adaptation reads no "
+                         "labels, so for that purpose the mapping is dead weight and a "
+                         "source of avoidable breakage.")
     ap.add_argument("--min-words", type=int, default=2,
                     help="drop stubs; a 1-word comment carries no usable context")
     ap.add_argument("--keep-native-script", action="store_true",
@@ -70,21 +83,25 @@ def main():
                          "native script, and that is a distribution HASTIKA never shows.")
     args = ap.parse_args()
 
+    args.out = args.out or f"data/external/offenseval_{args.lang[:2]}.csv"
     blocked = hastika_texts()
     rows, stats = [], {"dropped_class": 0, "dup_hastika": 0, "dup_self": 0,
                        "too_short": 0, "native_script": 0}
     emitted = set()
 
     for split in ["train", "validation"]:
-        for text, idx in fetch(split):
-            name = NAMES[idx]
-            if name in HATE:
-                label = "Hate"
-            elif name == "Not_offensive":
-                label = "Non-Hate"
+        for text, idx in fetch(split, args.lang):
+            if args.text_only:
+                name, label = "-", "-"
             else:
-                stats["dropped_class"] += 1
-                continue
+                name = NAMES[idx]
+                if name in HATE:
+                    label = "Hate"
+                elif name == "Not_offensive":
+                    label = "Non-Hate"
+                else:
+                    stats["dropped_class"] += 1
+                    continue
             c = clean(text)
             key = c.casefold()
             native = sum(1 for ch in c if "\u0c80" <= ch <= "\u0cff")
