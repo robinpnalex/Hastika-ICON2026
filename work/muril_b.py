@@ -127,6 +127,12 @@ def main():
                     help="checkpoint that supplies each fold's predictions; both scores are "
                          "reported either way, see the OOF lines at the end")
     ap.add_argument("--rdrop", type=float, default=0.0)
+    ap.add_argument("--aux-weight", type=float, default=0.0,
+                    help="weight on an auxiliary head predicting whether the "
+                         "comment contains violent language (work/axes.py). 0 "
+                         "disables it. The act axis has 443 positives against "
+                         "the Violence class's 221, so this gives the encoder "
+                         "twice the signal for the concept Violence depends on")
     ap.add_argument("--amp", choices=["auto", "off", "fp16", "bf16"], default="auto")
     ap.add_argument("--class-weight", choices=["balanced", "none"], default="balanced")
     ap.add_argument("--loss", choices=["ce", "focal"], default="ce",

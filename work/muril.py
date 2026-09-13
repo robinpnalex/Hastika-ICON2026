@@ -40,6 +40,7 @@ from sklearn.model_selection import StratifiedKFold
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoConfig, AutoModel, AutoTokenizer, get_cosine_schedule_with_warmup
 
+import axes
 from prep import clean, dedupe_index
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -51,26 +52,31 @@ N_SPLITS = 5
 # ---------------------------------------------------------------- data
 
 class Comments(Dataset):
-    def __init__(self, texts, labels=None):
+    def __init__(self, texts, labels=None, aux=None):
         self.texts = list(texts)
         self.labels = None if labels is None else list(labels)
+        self.aux = None if aux is None else list(aux)      # auxiliary act-axis target
 
     def __len__(self):
         return len(self.texts)
 
     def __getitem__(self, i):
-        return self.texts[i], (-1 if self.labels is None else self.labels[i])
+        return (self.texts[i],
+                -1 if self.labels is None else self.labels[i],
+                -1 if self.aux is None else self.aux[i])
 
 
 def make_collate(tok, max_len, remap=None):
     """remap: LongTensor[orig_vocab] -> trimmed ids, or None to keep the full vocab."""
     def collate(batch):
-        texts, labels = zip(*batch)
+        texts, labels, aux = zip(*batch)
         enc = tok(list(texts), truncation=True, max_length=max_len,
                   padding=True, return_tensors="pt")
         if remap is not None:
             enc["input_ids"] = remap[enc["input_ids"]]
         enc["labels"] = torch.tensor(labels, dtype=torch.long)
+        if aux[0] != -1:
+            enc["aux_labels"] = torch.tensor(aux, dtype=torch.long)
         return enc
     return collate
 
@@ -87,7 +93,7 @@ class MurilClassifier(nn.Module):
     """
 
     def __init__(self, name, pooling="meanmax", dropout=0.1, reinit_layers=0, n_classes=2,
-                 keep_ids=None):
+                 keep_ids=None, n_aux=0):
         super().__init__()
         cfg = AutoConfig.from_pretrained(name)
         cfg.hidden_dropout_prob = dropout
@@ -102,6 +108,12 @@ class MurilClassifier(nn.Module):
         self.head = nn.Linear(width, n_classes)
         nn.init.normal_(self.head.weight, std=0.02)
         nn.init.zeros_(self.head.bias)
+        # Auxiliary head over the SAME pooled vector. It never touches the main
+        # logits; its only job is to push the encoder to represent the act axis.
+        self.aux_head = nn.Linear(width, n_aux) if n_aux else None
+        if self.aux_head is not None:
+            nn.init.normal_(self.aux_head.weight, std=0.02)
+            nn.init.zeros_(self.aux_head.bias)
         if reinit_layers:
             self._reinit_top(reinit_layers)
 
@@ -139,7 +151,8 @@ class MurilClassifier(nn.Module):
                     m.weight.data.fill_(1.0)
                     m.bias.data.zero_()
 
-    def forward(self, input_ids, attention_mask, token_type_ids=None, **_):
+    def forward(self, input_ids, attention_mask, token_type_ids=None,
+                return_aux=False, **_):
         kw = {"input_ids": input_ids, "attention_mask": attention_mask}
         if token_type_ids is not None:
             kw["token_type_ids"] = token_type_ids
@@ -158,7 +171,10 @@ class MurilClassifier(nn.Module):
         else:  # last4: concat [CLS] of the top four layers
             pooled = torch.cat([h[:, 0] for h in out.hidden_states[-4:]], dim=-1)
 
-        return self.head(self.dropout(pooled))
+        logits = self.head(self.dropout(pooled))
+        if return_aux and self.aux_head is not None:
+            return logits, self.aux_head(self.dropout(pooled))
+        return logits
 
 
 # ------------------------------------------------- training utilities
@@ -365,9 +381,11 @@ def load_external(path, demoji, drop_other=True):
 
 def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_state=False):
     torch.manual_seed(args.seed)
+    aux_w = float(getattr(args, "aux_weight", 0.0))
     model = MurilClassifier(args.model, args.pooling, args.dropout, args.reinit_layers,
                             n_classes=getattr(args, "n_classes", 2),
-                            keep_ids=getattr(args, "keep_ids", None)).to(device)
+                            keep_ids=getattr(args, "keep_ids", None),
+                            n_aux=2 if aux_w > 0 else 0).to(device)
 
     # Warm start from a previous stage. This overwrites the freshly re-initialized
     # top layers, which is the intent: that stage already trained them. The head is
@@ -384,7 +402,11 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
     # reported. Nothing else in the file passes an empty validation set.
     no_val = len(y_va) == 0
     collate = make_collate(tok, args.max_len, getattr(args, "remap", None))
-    tr = DataLoader(Comments(X_tr, y_tr), batch_size=args.bs, shuffle=True,
+    aux_tr = axes.aux_labels(X_tr) if aux_w > 0 else None
+    if aux_tr is not None:
+        print(f"  [{tag}] aux act-axis targets: {sum(aux_tr)}/{len(aux_tr)} positive, "
+              f"weight {aux_w}", flush=True)
+    tr = DataLoader(Comments(X_tr, y_tr, aux_tr), batch_size=args.bs, shuffle=True,
                     collate_fn=collate, drop_last=True)
     va = DataLoader(Comments(X_va, y_va), batch_size=args.eval_bs, collate_fn=collate)
     te = DataLoader(Comments(X_test), batch_size=args.eval_bs, collate_fn=collate)
@@ -419,9 +441,13 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
             model.train()
             batch = {k: v.to(device) for k, v in batch.items()}
             labels = batch.pop("labels")
+            aux_y = batch.pop("aux_labels", None)
 
             with torch.autocast("cuda", dtype=dtype, enabled=dtype is not None):
-                logits = model(**batch)
+                if aux_y is not None and model.aux_head is not None:
+                    logits, aux_logits = model(**batch, return_aux=True)
+                else:
+                    logits, aux_logits = model(**batch), None
                 loss = criterion(logits, labels)
                 if args.rdrop:
                     logits2 = model(**batch)
@@ -431,6 +457,11 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
                                 + F.kl_div(F.log_softmax(logits2, -1), F.softmax(logits, -1),
                                            reduction="batchmean"))
                     loss = loss + args.rdrop * kl
+                if aux_logits is not None:
+                    # weak supervision on the act axis: 443 positives against the
+                    # Violence class's 221, so the encoder gets twice the signal
+                    # for "a threat is present" without touching the main head
+                    loss = loss + aux_w * F.cross_entropy(aux_logits.float(), aux_y)
             scaler.scale(loss / args.grad_accum).backward()
 
             if fgm is not None and fgm.attack():
@@ -593,6 +624,12 @@ def main():
     ap.add_argument("--rdrop", type=float, default=0.0,
                     help="R-Drop KL weight; 0 disables. Try 0.3-1.0. Doubles cost, "
                          "and stacks with --fgm at ~2.8x baseline")
+    ap.add_argument("--aux-weight", type=float, default=0.0,
+                    help="weight on an auxiliary head predicting whether the "
+                         "comment contains violent language (work/axes.py). 0 "
+                         "disables it. The act axis has 443 positives against "
+                         "the Violence class's 221, so this gives the encoder "
+                         "twice the signal for the concept Violence depends on")
     ap.add_argument("--amp", choices=["auto", "off", "fp16", "bf16"], default="auto")
     ap.add_argument("--seed", type=int, default=42)   # set per-seed in the loop
     ap.add_argument("--threads", type=int, default=0)

@@ -37,12 +37,11 @@ from torch.utils.data import DataLoader
 from transformers import (AutoModelForMaskedLM, AutoTokenizer,
                           DataCollatorForLanguageModeling, get_cosine_schedule_with_warmup)
 
+import corpora
 from prep import clean
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_CORPUS = ["data/multiclass_train.csv", "data/external/offenseval_kn.csv"]
-FORBIDDEN = {"binary_train.csv", "binary_validation_inputs.csv",
-             "multiclass_validation_inputs.csv"}
 
 
 class Lines(torch.utils.data.Dataset):
@@ -56,27 +55,6 @@ class Lines(torch.utils.data.Dataset):
         return {k: v[i] for k, v in self.enc.items()}
 
 
-def load_corpus(paths, demoji):
-    texts = []
-    for p in paths:
-        name = pathlib.Path(p).name
-        if name in FORBIDDEN:
-            sys.exit(f"refusing {name}: see this module's docstring -- it overlaps the "
-                     f"Task B test inputs")
-        df = pd.read_csv(ROOT / p if not pathlib.Path(p).is_absolute() else p)
-        col = "Comment" if "Comment" in df.columns else df.columns[-1]
-        texts += [clean(t, demojize=demoji) for t in df[col].astype(str)]
-        print(f"  {p}: {len(df)} rows", flush=True)
-    texts = [t for t in texts if len(t.split()) >= 2]
-    seen, out = set(), []
-    for t in texts:                       # a repeated comment is not extra evidence
-        if t.casefold() not in seen:
-            seen.add(t.casefold())
-            out.append(t)
-    print(f"corpus: {len(out)} unique comments (from {len(texts)})", flush=True)
-    return out
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -86,8 +64,16 @@ def main():
                          "trains a fresh MLM head over its encoder -- allowed, but use a "
                          "lower --lr if you do")
     ap.add_argument("--out", default="work/runs/tapt-muril")
+    ap.add_argument("--corpus", nargs="*", default=None,
+                    help="sources to adapt on; defaults to the Task B train file plus "
+                         "the external Kannada corpus. Accepts CSVs, globs, .txt, "
+                         ".jsonl, or @manifest -- see work/corpora.py")
     ap.add_argument("--extra", nargs="*", default=[],
-                    help="further in-domain CSVs; the Task A and test files are refused")
+                    help="sources to ADD to the default corpus")
+    ap.add_argument("--allow-transductive", action="store_true",
+                    help="permit the three files carrying Task B test comments. No "
+                         "labels are read either way; this is a rules decision and it "
+                         "is printed into the log when used")
     ap.add_argument("--epochs", type=int, default=8)
     ap.add_argument("--bs", type=int, default=4,
                     help="micro-batch. MuRIL's MLM head emits a bs x seq x 197285 "
@@ -116,7 +102,10 @@ def main():
     torch.manual_seed(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"device={device} model={args.model}", flush=True)
-    texts = load_corpus(DEFAULT_CORPUS + args.extra, not args.no_demojize)
+    demoji = not args.no_demojize
+    texts = corpora.load((args.corpus or DEFAULT_CORPUS) + args.extra,
+                         clean_fn=lambda t: clean(t, demojize=demoji),
+                         allow_transductive=args.allow_transductive)
     if args.limit:
         texts = texts[:args.limit]
         print(f"LIMIT: {len(texts)} comments (smoke test)", flush=True)

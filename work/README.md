@@ -63,3 +63,43 @@ Each run writes to `work/runs/<tag>/`: `predictions.csv`, `test_probs.npy`, and
   upcasts to fp32. At `--bs 16 --max-len 192` that is a single 2.26 GiB
   allocation and it will not fit a T4. `tapt.py` defaults to `--bs 4
   --grad-accum 4`, same effective batch.
+
+## Added for the next round
+
+| File | What it does |
+|------|--------------|
+| `corpora.py` | One loader for every unlabelled-text source. CSVs, globs, `.txt`, `.jsonl`, or `@manifest`. Auto-detects the text column. Gates the three files carrying Task B test comments behind `--allow-transductive` and prints what it admitted, so a rules decision lands in the run log instead of being made silently in code. |
+| `extend_vocab.py` | Adds the corpus's frequent word-forms to MuRIL's tokenizer, initializing each new embedding as the mean of the pieces it currently decomposes into. Feed the output to `tapt.py`. |
+| `axes.py` | The act and target lexicons, with the measurements behind them. `act()` is weak supervision for the auxiliary head, not a classifier. |
+| `split_b.py` | Materializes the fixed 472-row holdout as labelled CSVs under `data/holdout/`. |
+
+Three levers, usable separately or together:
+
+```sh
+# 1. more adaptation data -- the only intervention ever measured to help
+$V work/tapt.py --extra 'data/external/*.csv' scraped/comments.txt
+$V work/tapt.py --allow-transductive --extra data/binary_train.csv   # rules call
+
+# 2. a tokenizer that fits this register
+$V work/extend_vocab.py --min-freq 5 --out work/runs/muril-extended
+$V work/tapt.py --model work/runs/muril-extended --out work/runs/tapt-extended
+
+# 3. an auxiliary head on the act axis
+$V work/muril_b.py --tag b_aux --aux-weight 0.3
+```
+
+### Why these three and not others
+
+Measured on this corpus, all within the one-point fold noise and therefore dead:
+per-class decode weights (-0.009 nested), the OOV spelling resolver (+0.003),
+explicit conjunction features (-0.003). Feature-level interventions do not move
+this problem, because 72% of word types appear exactly once and character
+n-grams already capture whatever lexical signal exists. Only the adaptation pass
+has ever helped, at +2.9, and it works at the representation level. All three
+levers above are representation-level for that reason.
+
+Supporting numbers: 25.8% of validation tokens never appear in training; MuRIL
+carries 197,258 subwords and this corpus emits 7,078 of them (3.6%) while
+splitting each word into 2.17 pieces; 91% of comments contain no English
+function word, so this is romanized Kannada rather than code-mixed text, which
+is why XLM-R lost to MuRIL.
