@@ -5,3 +5,4 @@ checkpoints/
 /predictions.csv
 /task_a_predictions.zip
 data/external/offenseval_ta.csv
+data/external/offenseval_ma.csv
