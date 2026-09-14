@@ -91,7 +91,12 @@ def main():
     ap.add_argument("--warmup", type=float, default=0.06)
     ap.add_argument("--val-frac", type=float, default=0.05,
                     help="held out to report MLM perplexity, which is the only honest "
-                         "signal that this pass did anything")
+                         "signal that this pass did anything. 0 trains on every comment "
+                         "and skips the perplexity report")
+    ap.add_argument("--min-words", type=int, default=2,
+                    help="drop comments shorter than this many words. 1 keeps all of them")
+    ap.add_argument("--no-dedupe", action="store_true",
+                    help="keep repeated comments instead of collapsing identical text")
     ap.add_argument("--no-demojize", action="store_true")
     ap.add_argument("--amp", choices=["auto", "off", "fp16", "bf16"], default="auto")
     ap.add_argument("--seed", type=int, default=42)
@@ -105,7 +110,8 @@ def main():
     demoji = not args.no_demojize
     texts = corpora.load((args.corpus or DEFAULT_CORPUS) + args.extra,
                          clean_fn=lambda t: clean(t, demojize=demoji),
-                         allow_transductive=args.allow_transductive)
+                         allow_transductive=args.allow_transductive,
+                         min_words=args.min_words, dedupe=not args.no_dedupe)
     if args.limit:
         texts = texts[:args.limit]
         print(f"LIMIT: {len(texts)} comments (smoke test)", flush=True)
@@ -144,9 +150,15 @@ def main():
             n += len(b["input_ids"])
         return math.exp(tot / max(n, 1))
 
+    print(f"MLM trains on {len(split['train'])} of {len(texts)} comments, "
+          f"{n_val} held out for perplexity", flush=True)
     print(f"effective batch {args.bs} x {accum} = {args.bs * accum}, "
           f"{math.ceil(len(tr) / accum)} optimizer steps/epoch", flush=True)
-    print(f"held-out perplexity before {perplexity():.2f}", flush=True)
+    # with nothing held out there is no perplexity to report, so the epoch
+    # lines show the training loss alone
+    ppl = (lambda: f" held-out perplexity {perplexity():.2f}") if n_val else (lambda: "")
+    if n_val:
+        print(f"held-out perplexity before {perplexity():.2f}", flush=True)
     opt.zero_grad(set_to_none=True)
     for ep in range(1, args.epochs + 1):
         model.train()
@@ -166,8 +178,8 @@ def main():
             scaler.update()
             sched.step()
             opt.zero_grad(set_to_none=True)
-        print(f"  epoch {ep}/{args.epochs} train loss {run_loss/len(tr):.4f} "
-              f"held-out perplexity {perplexity():.2f}", flush=True)
+        print(f"  epoch {ep}/{args.epochs} train loss {run_loss/len(tr):.4f}{ppl()}",
+              flush=True)
 
     out = ROOT / args.out
     out.mkdir(parents=True, exist_ok=True)
