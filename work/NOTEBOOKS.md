@@ -7,7 +7,7 @@ session dies with the browser tab and they all run for hours.
 
 | notebook | what it does | time | gives you a score? |
 |---|---|---|---|
-| `kaggle_tapt_full.ipynb` | `f_tapt` with TAPT on all 6,406 comments instead of 95% of them, then five seeds on all 3,143 rows. Checks both counts from the logs. | ~2 h | no |
+| `kaggle_tapt_100.ipynb` | 100% of the data: TAPT on all 6,406 comments, then five seeds on all 3,159 rows with no deduplication. Checks both counts from the logs. | ~2 h | no |
 | `kaggle_grid.ipynb` | Factorial over both data-processing levers, ten cells on the real holdout, then a five-seed full fit of the winner. | ~8.5 h | **yes**, every cell |
 | `kaggle_fullfit_sweep.ipynb` | Six ideas, five seeds each, all 3,143 rows per model. | ~9.5 h | no |
 | `kaggle_fullfit_single.ipynb` | One idea, all rows, one seed. The minimal full fit. | ~45 min | no |
