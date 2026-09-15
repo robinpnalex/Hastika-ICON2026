@@ -54,7 +54,40 @@ generic insults against TV channels and politicians, so the lexical cue points a
 tags in `features.py` measured as noise. Task B is target identification wearing
 a slur-detection costume.
 
-## 0. The overnight sweep (start here)
+## Current recipe (start here)
+
+Three Kaggle runs settled the recipe; the results are in `TRAINING_RESULTS.md` and the
+summary is in the README's Task B section. It is **`D0_V0_noaux`**: TAPT on Kannada text
+only (D0), MuRIL's tokenizer as shipped (V0), a plain six-way head (no aux). What remains
+is to train it on everything and let CodaBench score it.
+
+On Kaggle, upload `work/kaggle_d0v0_noaux_full.ipynb` and Save & Run All (~2 h). By hand:
+
+```bash
+# 1. TAPT on all 6,406 comments: nothing held out, one-word and repeated comments kept
+python -u work/tapt.py --model google/muril-base-cased \
+    --corpus data/multiclass_train.csv data/external/offenseval_kn.csv --epochs 8 \
+    --val-frac 0 --min-words 1 --no-dedupe --out work/runs/tapt-d0v0-100
+
+# 2. five seeds, each on all 3,159 rows, no auxiliary head
+python -u work/muril_b.py --tag b_d0v0_noaux_full --model work/runs/tapt-d0v0-100 \
+    --folds 1 --no-dedupe --aux-weight 0 --seeds 42 43 44 45 46 --epochs 6
+
+# 3. package, then upload to the Task B validation phase
+python work/make_submission.py --task b \
+    --pred work/runs/b_d0v0_noaux_full/predictions.csv --out d0v0_noaux_full.zip
+```
+
+Check the logs before uploading. TAPT should print `MLM trains on 6406 of 6406 comments,
+0 held out`, and each seed `FULL FIT, 3159 rows, no validation`. There is no local F1:
+the CodaBench validation score is the result. Record it in `TRAINING_RESULTS.md`, and
+read any gap under about three points against earlier submissions as noise, since that is
+the standard deviation of macro-F1 on 395 rows.
+
+Everything below is how the recipe was chosen: the same pipeline, one stage at a time,
+with the holdout and fold modes that give local scores.
+
+## 0. The overnight sweep
 
 `work/overnight_b.py` is the whole of this guide as one unattended run. Upload
 `work/kaggle_task_b.ipynb`, Save & Run All, read `RESULTS.md` in the Output tab
@@ -129,18 +162,20 @@ Then two minutes of GPU, exercising the paths a full run will use:
 python -u work/muril_b.py --tag b_smoke --folds 0 --epochs 1 --limit 300 --tags --loss focal
 ```
 
-## 3. Domain-adapt MuRIL (optional, ~10 min)
+## 3. Domain-adapt MuRIL (~25 min)
 
 MuRIL splits these comments into 2.28 wordpieces per word because it never saw
 this register. A masked-LM pass over the 6.4k in-domain comments it *is* allowed
-to see usually buys a point or two on small code-mixed sets.
+to see was worth +2.9 points over stock MuRIL on identical folds, the only gain
+this task has produced. It is not optional.
 
 ```bash
 python -u work/tapt.py --out work/runs/tapt-muril 2>&1 | tee work/tapt.log
 ```
 
-Watch the held-out perplexity line. It starts near 2709. If it does not fall
-substantially, skip the `--model work/runs/tapt-muril` arm below.
+Watch the held-out perplexity line. It starts near 2709 and should fall
+substantially. With `--val-frac 0` nothing is held out, so there is no
+perplexity line and the epoch lines show training loss only.
 
 This used to OOM on a T4 and the failure was invisible, because `cmd | tee`
 exits with `tee`'s status, which is always 0. The cause is structural rather
@@ -151,6 +186,9 @@ effective batch at 16. Lower `--bs` and raise `--grad-accum` by the same factor
 on a smaller card.
 
 ## 4. Choose the encoder
+
+Already decided: TAPT MuRIL beat every alternative, including XLM-R, HingRoBERTa,
+mDeBERTa and the abusive checkpoint below. Kept for reproducing that comparison.
 
 Three candidates, one flag apart. The second is a MuRIL already fine-tuned on
 code-mixed Kannada abusive speech (Das et al., ACM HT 2022) whose vocabulary is
@@ -214,9 +252,10 @@ three times slower.
 |---|---|
 | the whole `overnight_b.py` sweep | 8-10 h |
 | smoke test | 2 min |
-| `work/tapt.py` | 10-15 min |
+| `work/tapt.py` | ~25 min |
 | one `--folds 0` arm | 15-25 min |
 | full 5-fold run | 1.5-2 h |
+| `--folds 1`, five seeds | ~95 min |
 | `sweep_b.sh`, 5 core arms | 7-10 h |
 
 ## Out of memory
@@ -237,14 +276,24 @@ In order of how much they buy:
 | `--model` | `google/muril-base-cased` | also takes the abusive checkpoint or a `tapt.py` output |
 | `--max-len` | 192 | not muril.py's 128; Task B's comments are longer, see the table above |
 | `--select` | best | `last` gives an unbiased OOF; both are always printed |
-| `--folds` | 5 | `0` gives a 15% holdout; `ensemble.py` needs 5 |
+| `--folds` | 5 | `0` gives a 15% holdout, `1` trains on every row with no local score; `ensemble.py` needs 5 |
 | `--seeds` | 42 | space-separated list averages several runs |
 | `--ema-decay` | 0.999 | now bias-corrected; see `EMA` in `work/muril.py` |
 | `--no-ema-bias-correct` | off | reproduces pre-fix runs only |
 | `--tags` | off | gazetteer / mood / address tags, see `features.py` |
 | `--loss` | ce | `focal` down-weights already-correct rows |
 | `--class-weight` | balanced | leave on. It is also why per-class logit offsets do nothing: tuned against a balanced model the best prior exponent is 0.00 |
-| `--no-dedupe` | off | must match every other run you intend to blend |
+| `--no-dedupe` | off | keeps all 3,159 rows; must match every other run you intend to blend |
+| `--aux-weight` | 0 | auxiliary violent-act head; 0.3 measured as no gain in the grid |
+
+`work/tapt.py` flags for using every comment, all off by default:
+
+| Flag | Default | Why |
+|---|---|---|
+| `--val-frac` | 0.05 | `0` holds nothing back and skips the perplexity report |
+| `--min-words` | 2 | `1` keeps one-word comments |
+| `--no-dedupe` | off | keeps repeated comments |
+| `--corpus` | Task B train + OffensEval Kannada | the D0 corpus; adding Tamil and Malayalam (D1) measured as no gain |
 
 Everything else is inherited from the tuned Task A recipe in `work/muril.py`;
 see its module docstring for what each choice is justified by.
