@@ -7,9 +7,9 @@ The Task B submission. Domain-adapted MuRIL, five folds, six epochs.
 | unbiased OOF macro-F1 | **0.6013** |
 | selected (`best`) OOF macro-F1 | 0.6023 |
 | measured on | 3,143 training rows, 5-fold out-of-fold |
-| encoder | `google/muril-base-cased` after `work/tapt.py` |
+| encoder | `google/muril-base-cased` after `src/hastika/task_b/tapt.py` |
 | seeds | 42 (split seed 42) |
-| produced by | `work/overnight_b.py`, 2026-09-12, 8.44 h on a T4 |
+| produced by | `experiments/task_b/overnight.py`, 2026-09-12, 8.44 h on a T4 |
 
 ## Why this one
 
@@ -20,7 +20,7 @@ pass is worth about +2.9 points on its own. Nothing else helped: XLM-R scored
 and mDeBERTa collapsed to 0.1002 because the shared learning rate is too high
 for it.
 
-Blending did not pay either. `work/ensemble.py` weight-searched over every
+Blending did not pay either. `src/hastika/models/ensemble.py` weight-searched over every
 five-fold run plus the SVM and its nested estimate came out at 0.6002, below
 this single model.
 
@@ -42,12 +42,12 @@ its support, so that alone cost several points. This run tracks the prior:
 ## Reproduce
 
 ```bash
-python -u work/tapt.py --out work/runs/tapt-muril
-python -u work/muril_b.py --tag b_tapt_5f --model work/runs/tapt-muril \
+python -u -m hastika.task_b.tapt --out artifacts/runs/tapt-muril
+python -u -m hastika.task_b.train --tag b_tapt_5f --model artifacts/runs/tapt-muril \
     --folds 5 --seeds 42 --epochs 6
-python work/make_submission.py --task b \
-    --pred work/runs/b_tapt_5f/predictions.csv --out b_tapt_5f.zip
+python -m hastika.common.submission --task b \
+    --pred artifacts/runs/b_tapt_5f/predictions.csv --out b_tapt_5f.zip
 ```
 
 Roughly 25 minutes for the adaptation pass and 90 minutes for the five folds on
-a T4. `work/kaggle_rebuild_winner.ipynb` is these three commands as a notebook.
+a T4. `notebooks/task_b/01_rebuild_winner.ipynb` is these three commands as a notebook.

@@ -33,12 +33,12 @@ exact commands and the CodaBench score, and add its row above.
 
 ## Task A
 
-`task_a_predictions.zip` at the repo root, kept where it has always been.
+`submissions/task_a/task_a_predictions.zip` is the preserved Task A upload.
 
 ## Format
 
 CodaBench takes a zip containing one bare `predictions.csv` at the top level,
 header `id,label`, one row per id in the matching `*_validation_inputs.csv`.
-`work/make_submission.py` refuses to write unless all of that holds, so build
+`src/hastika/common/submission.py` refuses to write unless all of that holds, so build
 zips with it rather than by hand -- desktop zip tools wrap the file in a folder
 and the scorer then cannot find it.
