@@ -251,6 +251,30 @@ unzip -l artifacts/runs/task_a/submission.zip
 The archive should contain only `predictions.csv`. Upload
 `artifacts/runs/task_a/submission.zip` to the matching Task A phase on CodaBench.
 
+### Task-A TAPT notebook — created, not yet run
+
+The next experiment is [the Task A TAPT notebook](../../notebooks/task_a/01_tapt_demojized_muril.ipynb).
+Upload that notebook to Kaggle, enable GPU and Internet, and choose **Save Version ->
+Save & Run All**. It creates a fixed 85/15 classifier split, adapts MuRIL only on the
+85% training-side comments plus OffensEval Kannada text, then compares stock MuRIL with
+the TAPT checkpoint using the same demojized fine-tuning recipe. The classifier uses seed
+42, six epochs, two reinitialized encoder layers, FGM, EMA, and `--select last`; the TAPT
+stage uses eight MLM epochs and holds out 5% of its legal corpus for perplexity.
+
+It produces two validated files in the Kaggle output:
+
+```text
+task_a_muril_control.zip
+task_a_muril_tapt.zip
+```
+
+The TAPT ZIP is the experiment candidate. Use the holdout macro-F1 comparison to decide
+whether a later full-data TAPT fit is worth submitting against the current `0.8163`
+MuRIL result. The notebook intentionally excludes Task A validation inputs and Task B
+files from TAPT because those comments overlap with hidden evaluation data. Expected
+runtime is approximately 2--4 hours on a T4 or RTX 3070. The notebook has been checked
+for valid JSON and compilable code, but no experiment score has been recorded yet.
+
 ## Useful training options
 
 ```bash

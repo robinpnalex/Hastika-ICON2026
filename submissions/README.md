@@ -36,6 +36,10 @@ exact commands and the CodaBench score, and add its row above.
 
 `submissions/task_a/task_a_predictions.zip` is the preserved Task A upload.
 
+The latest reported MuRIL validation submission scored **0.8163 macro-F1** and **0.8164
+accuracy**. Its ZIP and unpacked CSV were uploaded from external Kaggle output and are not
+currently stored in this repository.
+
 ## Format
 
 CodaBench takes a zip containing one bare `predictions.csv` at the top level,

@@ -17,6 +17,7 @@ src/hastika/             reusable, installable Python package
   task_a/                Task A training and prediction commands
   task_b/                Task B training, TAPT and analysis commands
 experiments/              sweep and full-fit orchestration
+notebooks/task_a/         Task A GPU experiment entry points
 notebooks/task_b/         ordered Kaggle entry points
 data/raw/                 organizer-provided data
 data/external/            permitted external corpora
@@ -45,6 +46,16 @@ uv sync --extra cpu    # CPU-only
 Commands below assume they are run from the repository root.
 
 ## Task A
+
+The latest Task A validation submission used MuRIL and scored **`0.8163` macro-F1** with
+`0.8164` accuracy, beating the previous demojized TF-IDF + LinearSVC result (`0.8103`).
+The exact flags for that submitted MuRIL artifact are not yet recorded; see the experiment
+ledger before treating it as a reproducible recipe.
+
+The next Task A experiment is [the TAPT + demojized MuRIL notebook](notebooks/task_a/01_tapt_demojized_muril.ipynb).
+It compares stock MuRIL with a checkpoint adapted on the legal Task A training-side text
+and permitted OffensEval Kannada text, using a fixed 85/15 holdout. It is ready to run on
+Kaggle but has no result yet.
 
 ```bash
 uv run --extra cu128 hastika-task-a-train \

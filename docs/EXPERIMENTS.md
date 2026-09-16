@@ -12,10 +12,11 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 
 | item | current state |
 |---|---|
-| Best Task A result | Demojized TF-IDF + LinearSVC, `0.8103` five-fold macro-F1 |
+| Best Task A result | MuRIL, **`0.8163`** macro-F1 and `0.8164` accuracy on validation A |
 | Best Task B local result | One-layer reinitialization, `0.6102` five-fold OOF macro-F1, Run 5 |
 | Best recorded Task B CodaBench result | `b_reinit1_full`, **`0.6299`** — confirmed Run 8 |
 | Current Task B candidate | `b_reinit1_full`, one-layer reinitialization, five seeds on all data |
+| Next Task A experiment | TAPT + demojized MuRIL notebook, created and ready to run |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -29,6 +30,8 @@ choice, but they no longer block using the Run 8 recipe as the current candidate
 |---|---|---|---|---|
 | Task A 1--4 | completed | Task A training scripts | baseline, demojization, and TF-IDF comparisons | best: `0.8103` |
 | Task A 5 | pending | `experiments/task_a/run_rdrop.sh` | test R-Drop against the matched demojized MuRIL control | local OOF and validation submission |
+| Task A 6 | 2026-09-17, completed | MuRIL validation submission | compare MuRIL with the TF-IDF result on validation A | **0.8163 macro-F1, 0.8164 accuracy** |
+| Task A 7 | 2026-09-17, created; not run | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | local holdout and validation submissions |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -88,7 +91,14 @@ Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Tas
 * **Preprocessing:** Default + Demojized (Emojis converted to English text descriptions)
 * **5-Fold CV Macro F1:** 0.8103
 * **Output Directory:** `artifacts/runs/svm_demojize/`
-* **Notes:** Best performing model so far, outperforming both standard TF-IDF and Demojized MuRIL.
+* **Notes:** Previously best performing model. It has now been surpassed by the MuRIL validation submission recorded below.
+
+## Experiment 6: MuRIL validation submission, 2026-09-17
+* **Model:** MuRIL
+* **Evaluation:** Task A validation A on CodaBench
+* **Macro F1:** **0.8163**
+* **Accuracy:** **0.8164**
+* **Notes:** Best Task A result recorded so far, improving on demojized TF-IDF + LinearSVC (`0.8103`) by `0.0060` macro-F1. The exact flags for the submitted artifact were not provided, so this entry does not assume whether it used R-Drop or another variant.
 
 ## Task A follow-up
 
@@ -97,8 +107,32 @@ default because R-Drop adds a second stochastic forward pass, but trains both a
 matched `--rdrop 0` control and a `--rdrop 0.5` variant under identical five-fold
 splits. The script packages both validation predictions; only the stronger candidate
 should be submitted after comparing the local OOF scores. This is a model experiment,
-not a replacement for the current `0.8103` demojized TF-IDF + LinearSVC result until
-the local comparison supports it.
+not a replacement for the confirmed MuRIL validation result (`0.8163`) until the local
+comparison identifies whether it improves the same underlying recipe.
+
+## Experiment 7: Task-A-domain TAPT + demojized MuRIL, notebook created 2026-09-17
+
+[The Kaggle notebook](../notebooks/task_a/01_tapt_demojized_muril.ipynb) compares two
+matched Task A arms:
+
+| arm | encoder initialization | classifier fine-tuning |
+|---|---|---|
+| control | stock `google/muril-base-cased` | demojized MuRIL, two-layer reinitialization |
+| TAPT | MuRIL adapted with masked-LM training | the same demojized MuRIL recipe |
+
+The notebook recreates the fixed deduplicate-first, stratified 85/15 split with seed 42.
+TAPT sees only the 85% classifier-training-side comments plus permitted OffensEval Kannada
+text; the Task A holdout, Task A validation inputs, labels, and Task B files are excluded.
+Both arms use seed 42, six classifier epochs, effective batch size 16, FGM, EMA,
+`--select last`, and produce validated Task A submission ZIPs. The TAPT stage runs for
+eight MLM epochs with a 5% held-out perplexity check. Expected runtime is approximately
+2--4 hours on a T4 or RTX 3070.
+
+Outputs are `task_a_muril_control.zip`, `task_a_muril_tapt.zip`, logs, holdout
+probabilities, and `task_a_tapt_summary.csv` in the Kaggle Output tab. The experiment is
+created and code-validated, but has not been run yet. Its purpose is to decide whether
+TAPT is worth a later full-data submission against the current `0.8163` MuRIL result; it
+does not assume that the Task B TAPT gain transfers to Task A.
 
 ---
 

@@ -36,12 +36,25 @@ Output lands in `artifacts/runs/<tag>/` and the final upload is
 ## Expected numbers
 
 - TF-IDF char n-gram + LinearSVC floor: **0.803** OOF macro-F1 (measured, 8 seconds)
+- The latest MuRIL validation submission scored **0.8163 macro-F1** and **0.8164 accuracy**;
+  this is an official validation result, not directly comparable to local OOF numbers until
+  the exact training recipe is recorded.
 - XLM-R, 3 epochs, CPU: 0.566 → 0.716 → (epoch 3) — under the floor, too few epochs
 - MuRIL is the best single prior: its pretraining included transliterated Indic,
   which is what Kanglish is. Expect roughly +2–5 over XLM-R based on published
   DravidianLangTech code-mixed results.
 - The blend should beat every individual member; `ensemble.py` seeds the search
   with the single-model corners so it cannot come out worse.
+
+## Next experiment: Task-A-domain TAPT
+
+`notebooks/task_a/01_tapt_demojized_muril.ipynb` is the next controlled experiment. It
+compares stock MuRIL against MuRIL first adapted with masked-language modeling on only
+the classifier-training side of a fixed 85/15 Task A split, plus permitted OffensEval
+Kannada text. Both arms then use the same demojized MuRIL fine-tuning recipe. The holdout,
+Task A validation inputs, labels, and Task B files are excluded from TAPT. The notebook
+is ready for Kaggle, but no score has been recorded yet; compare its holdout result with
+the current official MuRIL result (`0.8163` macro-F1) before considering a full-data fit.
 
 ## Measured: why transliteration is NOT worth building
 
