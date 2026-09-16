@@ -66,30 +66,36 @@ The complete walkthrough is in [docs/task_a/GUIDE.md](docs/task_a/GUIDE.md).
 
 ## Task B
 
-The strongest tested recipe is task-adaptive pretraining of MuRIL followed by
-five-seed six-way fine-tuning. The full-data commands are:
+The strongest observed Task B recipe is task-adaptive pretraining of MuRIL followed by
+six-way fine-tuning with only the final encoder layer reinitialized. It scored `0.6102`
+five-fold OOF macro-F1 at seed 42; confirmation at seeds 43 and 44 is pending. The
+provisional full-data commands are:
 
 ```bash
 uv run --extra cu128 hastika-task-b-tapt \
   --model google/muril-base-cased \
   --corpus data/raw/multiclass_train.csv data/external/offenseval_kn.csv \
   --val-frac 0 --min-words 1 --no-dedupe \
-  --out artifacts/runs/tapt-d0v0-100
+  --out artifacts/runs/tapt-d0v0-reinit1-100
 
 uv run --extra cu128 hastika-task-b-train \
-  --tag b_d0v0_noaux_full \
-  --model artifacts/runs/tapt-d0v0-100 \
-  --folds 1 --no-dedupe --aux-weight 0 \
+  --tag b_reinit1_full \
+  --model artifacts/runs/tapt-d0v0-reinit1-100 \
+  --folds 1 --no-dedupe --reinit-layers 1 --aux-weight 0 \
   --seeds 42 43 44 45 46 --epochs 6
 
 uv run --extra cu128 hastika-submit \
   --task b \
-  --pred artifacts/runs/b_d0v0_noaux_full/predictions.csv \
-  --out artifacts/runs/b_d0v0_noaux_full/submission.zip
+  --pred artifacts/runs/b_reinit1_full/predictions.csv \
+  --out artifacts/runs/b_reinit1_full/submission.zip
 ```
 
 There is no local score for a full-data fit because every labelled row is used
 for training. Use the CodaBench validation phase to score its predictions.
+
+The complete experiment history and ordered next steps are in
+[docs/EXPERIMENTS.md](docs/EXPERIMENTS.md). The seed-confirmation notebooks should be
+run before treating one-layer reinitialization as final.
 
 - Commands and methodology: [docs/task_b/GUIDE.md](docs/task_b/GUIDE.md)
 - Notebook index: [docs/task_b/NOTEBOOKS.md](docs/task_b/NOTEBOOKS.md)

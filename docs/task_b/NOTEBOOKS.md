@@ -9,15 +9,43 @@ session dies with the browser tab and they all run for hours.
 
 | notebook | what it does | time | score |
 |---|---|---|---|
+| `08_full_data_fit_reinit1.ipynb` | Provisional final fit using one-layer reinitialization: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, inference on the 395 official validation inputs, and ZIP packaging. | ~2 h | CodaBench only |
 | `04_full_data_fit.ipynb` | The current recipe, `D0_V0_noaux`, on 100% of the data. TAPT on all 6,406 comments with nothing held out, then five seeds on all 3,159 rows with no deduplication and no auxiliary head. Reads its own logs and stops if either count is short. | ~2 h | CodaBench only |
 
 `D0_V0_noaux` means TAPT on Kannada text only (D0), MuRIL's tokenizer as shipped (V0),
-and a plain six-way head (no aux). It led the data-processing grid and is the recipe
-behind both CodaBench submissions so far.
+and a plain six-way head (no aux). It led the data-processing grid. The current
+provisional candidate adds `--reinit-layers 1`, based on Run 5's `0.6102` OOF result.
 
-Nothing is held out, so the notebook prints no F1. Upload `d0v0_noaux_full.zip` to the
-Task B validation phase on CodaBench; the macro-F1 it returns is the run's score. Record
-it in `docs/EXPERIMENTS.md` and `submissions/README.md`.
+Nothing is held out in either full-data notebook, so neither prints a local F1. Upload the
+ZIP from the selected candidate to the Task B validation phase on CodaBench; the macro-F1
+it returns is the run's score. Record it in `docs/EXPERIMENTS.md` and
+`submissions/README.md`.
+
+The `08_full_data_fit_reinit1.ipynb` candidate uses the same full-data protocol but sets
+`--reinit-layers 1`, based on the observed 0.6102 OOF result. Run it after the seed
+confirmation if you want the confirmed recipe; its ZIP is `b_reinit1_full.zip`.
+
+## Current ablation
+
+| notebook | what it does | time | score |
+|---|---|---|---|
+| `05_reinit_one_layer.ipynb` | Run 5. Reuses one TAPT checkpoint and compares the established top-two-layer reset with a top-one-layer reset using identical five-fold settings. | ~3--3.5 h | 0.6013 vs **0.6102** |
+| `06_reinit_confirmation.ipynb` | Run 6. Repeats both settings at model seeds 43 and 44, then compares individual and probability-averaged OOF scores. | ~6--7 h | pending |
+| `07_no_reinit_ablation.ipynb` | Run 7. Compares the current one-layer setting with no encoder-layer reinitialization at seeds 43 and 44. | ~6--7 h | pending |
+
+This is a local controlled experiment, not a submission notebook. It runs the TAPT pass
+once, then trains `b_tapt_reinit2_5f` and `b_tapt_reinit1_5f` with seed 42, five folds,
+six epochs and `--select last`. The completed run scored 0.6013 for two layers and
+0.6102 for one layer; the one-layer variant improved macro-F1 by 0.0089 and was
+particularly better on `Violence` and `Others`. The outputs belong under `artifacts/`;
+download the logs and probability matrices from Kaggle for review.
+
+Run 6 is the confirmation before changing the recommended recipe. It must show the
+one-layer setting winning at both seeds, or in the averaged-probability comparison,
+before it is used for a full-data fit.
+
+Run 7 asks the next nested question: after keeping layer 11, should we keep layer 12 as
+well? It compares `--reinit-layers 1` against `--reinit-layers 0` under the same protocol.
 
 ## Earlier runs, kept for reproducibility
 

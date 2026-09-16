@@ -1,9 +1,59 @@
 # Training Results Log
 
-This document tracks the experimental runs and their results.
+This is the experiment ledger for the project. It separates completed measurements,
+provisional findings, and planned runs. Local Task B scores are unbiased OOF macro-F1
+unless explicitly marked as a holdout or full fit; full-data fits have no local score.
 
-* **Task A** — Binary Classification: Hate vs Non-Hate. Experiments 1-4 below.
-* **Task B** — Fine-Grained six-way target category. Four Kaggle runs and the CodaBench scores, below.
+* **Task A** — binary `Hate` / `Non-Hate` classification.
+* **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
+  `Political`, `Religion`, and `Violence`.
+
+## Current status — 2026-09-16
+
+| item | current state |
+|---|---|
+| Best Task A result | Demojized TF-IDF + LinearSVC, `0.8103` five-fold macro-F1 |
+| Best Task B local result | One-layer reinitialization, `0.6102` five-fold OOF macro-F1, Run 5 |
+| Best recorded Task B CodaBench result | `f_tapt`, `0.6007` — inferred, not fully confirmed |
+| Current Task B candidate | `--reinit-layers 1`, full-data five-seed fit, Run 8 |
+| Current branch | `task-b` |
+| Official validation size | 395 rows with hidden labels; score via CodaBench |
+
+Task B's one-layer result is promising but has only been measured at model seed 42. The
+next decision is therefore not to submit immediately, but to confirm the reinitialization
+choice at seeds 43 and 44. The zero-layer ablation is also pending.
+
+## Experiment roadmap
+
+| run | date/status | notebook or runner | question | result/status |
+|---|---|---|---|---|
+| Task A 1--4 | completed | Task A training scripts | baseline, demojization, and TF-IDF comparisons | best: `0.8103` |
+| Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
+| Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
+| Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
+| Task B 4 | not run | `04_full_data_fit.ipynb` | original two-layer full-data fit | superseded by the one-layer candidate |
+| Task B 5 | 2026-09-16, completed | `05_reinit_one_layer.ipynb` | one versus two reinitialized layers | one layer: `0.6102` vs `0.6013` |
+| Task B 6 | pending | `06_reinit_confirmation.ipynb` | confirm one layer at seeds 43/44 | not run |
+| Task B 7 | pending | `07_no_reinit_ablation.ipynb` | compare one layer with no reinitialization | not run |
+| Task B 8 | pending | `08_full_data_fit_reinit1.ipynb` | train current candidate on all data and infer validation | CodaBench only |
+
+## Ordered next steps
+
+1. Run [Run 6](../notebooks/task_b/06_reinit_confirmation.ipynb) and compare one-layer
+   versus two-layer reinitialization at model seeds 43 and 44.
+2. Run [Run 7](../notebooks/task_b/07_no_reinit_ablation.ipynb) and compare one-layer
+   versus zero-layer reinitialization at the same seeds.
+3. Select the reinitialization setting using the individual seed scores and the
+   probability-averaged OOF score. Prefer a change only if the advantage is consistent.
+4. Run [Run 8](../notebooks/task_b/08_full_data_fit_reinit1.ipynb), or an equivalent
+   full-data notebook with the selected setting: TAPT on all 6,406 comments, five seeds
+   on all 3,159 labelled rows, and inference on the 395 official validation inputs.
+5. Upload the generated ZIP to CodaBench. Record the returned macro-F1, exact recipe,
+   commit, and output metadata in this ledger and `submissions/README.md`.
+
+Do not compare a full-data fit to a local OOF score as though they were the same
+measurement. A full-data fit has no local F1; its only evaluation is CodaBench. Also treat
+small differences on the 395-row official validation set cautiously.
 
 Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Task B is six, so 0.80 on one is not better than 0.60 on the other.
 
@@ -40,16 +90,19 @@ Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Tas
 * **Output Directory:** `artifacts/runs/svm_demojize/`
 * **Notes:** Best performing model so far, outperforming both standard TF-IDF and Demojized MuRIL.
 
-## Next Planned Experiments
-* **Experiment 5:** XLM-RoBERTa Base (`xlm-roberta-base`) with Demojized text.
+## Task A follow-up
+
+An XLM-RoBERTa comparison was previously noted as a possible Task A follow-up, but it is
+not part of the current Task B roadmap. The completed Task A results above remain the
+recorded Task A experiments.
 
 ---
 
 ## Task B
 
-Four Kaggle runs on a T4. Local figures are the unbiased `last`-checkpoint number; the
-CodaBench figures are the validation phase, 395 rows with hidden labels. The pipeline
-and the plan are in the README's Task B section.
+The completed Kaggle runs and follow-up ablations are listed below. Local figures are the
+unbiased `last`-checkpoint number; CodaBench figures are from the 395-row validation phase
+with hidden labels. The current status and ordered roadmap are at the top of this document.
 
 ### CodaBench validation scores
 
@@ -58,6 +111,7 @@ and the plan are in the README's Task B section.
 | `f_tapt` | 2 | TAPT MuRIL, 5 seeds on all 3,143 deduplicated rows | 0.6007¹ |
 | `b_tapt_5f` | 1 | TAPT MuRIL, five fold models averaged | 0.5922 |
 | `d0v0_noaux_full` | 4 | TAPT MuRIL, 5 seeds on all 3,159 rows, TAPT on every comment | not run yet |
+| `b_reinit1_full` | 8 | TAPT MuRIL, one-layer reinit, 5 seeds on all 3,159 rows | not run yet |
 
 ¹ Inferred, not confirmed: the `scoring_result.zip` reading 0.6007 was downloaded a few
 minutes after `f_tapt.zip`. Check the CodaBench submission list.
@@ -183,3 +237,93 @@ at either stage:
 | seeds | 42-46 | 42-46 |
 
 Its only score will be CodaBench's. Record it in the table at the top of this section.
+
+### Run 5 -- one-layer reinitialization ablation, 2026-09-16
+
+`notebooks/task_b/05_reinit_one_layer.ipynb` tests whether reinitializing only the final
+MuRIL encoder layer is better than the established two-layer reset. The notebook builds
+one shared TAPT checkpoint, then runs both classifier variants with the same deduplicated
+Task B data, five-fold split, split seed 42, model seed 42, six epochs, all existing
+regularization, no auxiliary head, and `--select last`. This isolates the
+`--reinit-layers` choice:
+
+| run | reinitialized layers | status |
+|---|---:|---|
+| `b_tapt_reinit2_5f` | 2 (control) | 0.6013 OOF macro-F1 |
+| `b_tapt_reinit1_5f` | 1 (ablation) | **0.6102 OOF macro-F1** |
+
+The run used one shared TAPT checkpoint (`6044` of `6362` cleaned comments, with `318`
+held out for MLM perplexity), the deduplicated 3,143-row Task B set, five folds, seed 42,
+six epochs, the existing regularization, no auxiliary head, and `--select last`. The
+one-layer variant improved macro-F1 by `+0.0089` and accuracy from `0.6557` to `0.6592`.
+Per-class F1 changed as follows:
+
+| class | two layers | one layer | delta |
+|---|---:|---:|---:|
+| Gender | 0.735 | 0.730 | -0.005 |
+| Geo-political | 0.592 | 0.590 | -0.002 |
+| Others | 0.454 | 0.476 | +0.022 |
+| Political | 0.783 | 0.797 | +0.014 |
+| Religion | 0.716 | 0.717 | +0.001 |
+| Violence | 0.328 | 0.352 | +0.024 |
+
+This is encouraging but is still one five-fold run with model seed 42. The notebook's
+independent comparison cell failed after training because the live kernel did not refresh
+`PYTHONPATH`; the training logs produced the scores above. The source notebook now inserts
+`src/` into the live kernel path. Confirm the one-layer result with seeds 43 and 44 before
+changing the recommended recipe. There is no CodaBench submission in this experiment.
+
+### Run 6 -- confirm one-layer reinitialization, not run yet
+
+`notebooks/task_b/06_reinit_confirmation.ipynb` repeats Run 5 at model seeds 43 and 44.
+It builds one shared TAPT checkpoint and runs four separate five-fold comparisons:
+
+| run | reinitialized layers | model seed | status |
+|---|---:|---:|---|
+| `b_tapt_reinit2_s43` | 2 (control) | 43 | not run yet |
+| `b_tapt_reinit1_s43` | 1 (ablation) | 43 | not run yet |
+| `b_tapt_reinit2_s44` | 2 (control) | 44 | not run yet |
+| `b_tapt_reinit1_s44` | 1 (ablation) | 44 | not run yet |
+
+All settings other than `--reinit-layers` match Run 5. The notebook reports each seed's
+OOF macro-F1, the mean of the two seed scores, and macro-F1 after averaging the two seeds'
+OOF probabilities. It also prints per-class reports. There is no submission in this run;
+the one-layer recipe should be promoted to the final full-data experiment only if its
+advantage survives this confirmation.
+
+### Run 7 -- no encoder-layer reinitialization ablation, not run yet
+
+`notebooks/task_b/07_no_reinit_ablation.ipynb` tests whether preserving the final encoder
+layer as well is better than the current one-layer setting. `--reinit-layers 1` is the
+control; `--reinit-layers 0` keeps both layers 11 and 12 from the TAPT checkpoint:
+
+| run | reinitialized layers | model seed | status |
+|---|---:|---:|---|
+| `b_tapt_reinit1_vs0_s43` | 1 (control) | 43 | not run yet |
+| `b_tapt_reinit0_s43` | 0 (ablation) | 43 | not run yet |
+| `b_tapt_reinit1_vs0_s44` | 1 (control) | 44 | not run yet |
+| `b_tapt_reinit0_s44` | 0 (ablation) | 44 | not run yet |
+
+All other settings match Runs 5 and 6: one shared TAPT checkpoint, deduplicated Task B
+data, fixed five-fold split with split seed 42, six epochs, existing regularization, no
+auxiliary head, and `--select last`. The notebook reports each seed, the mean seed score,
+the score after averaging OOF probabilities, and per-class F1. There is no submission in
+this run; use `--reinit-layers 0` for the final fit only if it consistently beats the
+one-layer control.
+
+### Run 8 -- full-data one-layer fit and official validation inference, not run yet
+
+`notebooks/task_b/08_full_data_fit_reinit1.ipynb` is the provisional final-fit notebook
+for the currently best observed recipe. It uses `--reinit-layers 1`, TAPT on all 6,406
+allowed comments, and five classifier seeds (`42--46`) trained on all 3,159 labelled Task
+B rows. It then averages the five validation probability matrices and predicts all 395
+rows in `data/raw/multiclass_validation_inputs.csv`.
+
+| output | purpose | status |
+|---|---|---|
+| `b_reinit1_full` | five-seed full-data predictions and probabilities | not run yet |
+| `b_reinit1_full.zip` | validated `id,label` payload for CodaBench | not run yet |
+
+This run has no local F1 by construction. Its score comes only from the CodaBench Task B
+validation phase. Run 8 should be used after Runs 6--7 if the confirmation evidence changes
+the selected reinitialization setting; otherwise this one-layer recipe is the candidate.
