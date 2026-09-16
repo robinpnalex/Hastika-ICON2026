@@ -28,6 +28,7 @@ choice at seeds 43 and 44. The zero-layer ablation is also pending.
 | run | date/status | notebook or runner | question | result/status |
 |---|---|---|---|---|
 | Task A 1--4 | completed | Task A training scripts | baseline, demojization, and TF-IDF comparisons | best: `0.8103` |
+| Task A 5 | pending | `experiments/task_a/run_rdrop.sh` | test R-Drop against the matched demojized MuRIL control | local OOF and validation submission |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -92,9 +93,13 @@ Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Tas
 
 ## Task A follow-up
 
-An XLM-RoBERTa comparison was previously noted as a possible Task A follow-up, but it is
-not part of the current Task B roadmap. The completed Task A results above remain the
-recorded Task A experiments.
+Run 5 tests whether R-Drop improves the demojized MuRIL model. It uses one seed by
+default because R-Drop adds a second stochastic forward pass, but trains both a
+matched `--rdrop 0` control and a `--rdrop 0.5` variant under identical five-fold
+splits. The script packages both validation predictions; only the stronger candidate
+should be submitted after comparing the local OOF scores. This is a model experiment,
+not a replacement for the current `0.8103` demojized TF-IDF + LinearSVC result until
+the local comparison supports it.
 
 ---
 

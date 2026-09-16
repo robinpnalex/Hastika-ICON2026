@@ -179,6 +179,68 @@ checks that it produced exactly one prediction for every input row.
 
 ## 8. Zip and submit
 
+### R-Drop experiment on an RTX 3070
+
+Use these commands on the GPU computer. They assume an NVIDIA driver with CUDA
+support and run from a clean checkout of the `task-b` branch:
+
+```bash
+# 1. Get the experiment code
+git clone -b task-b https://github.com/robinpnalex/Hastika-ICON2026.git
+cd Hastika-ICON2026
+
+# 2. Install the CUDA PyTorch environment
+uv sync --extra cu128
+source .venv/bin/activate
+
+# 3. Confirm that Python can see the RTX 3070
+python -c "import torch; print('CUDA:', torch.cuda.is_available()); print('GPU:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'none')"
+
+# 4. Run the matched control and R-Drop experiment
+PY=python FOLDS=5 EPOCHS=6 SEEDS=42 \
+  bash experiments/task_a/run_rdrop.sh
+```
+
+If the repository is already cloned, update it instead of cloning again:
+
+```bash
+cd /path/to/Hastika-ICON2026
+git switch task-b
+git pull --ff-only origin task-b
+uv sync --extra cu128
+source .venv/bin/activate
+PY=python FOLDS=5 EPOCHS=6 SEEDS=42 \
+  bash experiments/task_a/run_rdrop.sh
+```
+
+`FOLDS=5` is recommended because it gives a local OOF score and predictions
+from five models. `SEEDS=42` keeps this run small enough for a 3070; an optional
+two-seed run can be started later with `SEEDS="42 1337"`.
+
+The script uses demojized MuRIL, two reinitialized encoder layers, FGM, EMA,
+micro-batch 8 with gradient accumulation 2, and `--select last`. It trains the
+control with `--rdrop 0` and the experiment with `--rdrop 0.5`, then packages both
+prediction files against `binary_validation_inputs.csv`:
+
+```text
+artifacts/runs/task_a_muril_control/submission.zip
+artifacts/runs/task_a_muril_rdrop/submission.zip
+```
+
+Each ZIP contains exactly `predictions.csv` with `id,label` and the valid Task A
+labels `Hate` or `Non-Hate`. Check the results with:
+
+```bash
+grep -H "OOF macro-F1" artifacts/logs/task_a_muril_*.log
+unzip -l artifacts/runs/task_a_muril_rdrop/submission.zip
+head artifacts/runs/task_a_muril_rdrop/predictions.csv
+```
+
+Compare the OOF scores before choosing which ZIP to upload. The R-Drop arm costs
+more than the control because it performs a second stochastic forward pass during
+training; expect roughly 2--4 hours for one seed on a 3070, depending on the driver
+and batch throughput.
+
 ```bash
 uv run --extra cu128 hastika-submit --task a \
   --pred artifacts/runs/task_a/predictions.csv \
