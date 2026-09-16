@@ -67,9 +67,9 @@ The complete walkthrough is in [docs/task_a/GUIDE.md](docs/task_a/GUIDE.md).
 ## Task B
 
 The strongest observed Task B recipe is task-adaptive pretraining of MuRIL followed by
-six-way fine-tuning with only the final encoder layer reinitialized. It scored `0.6102`
-five-fold OOF macro-F1 at seed 42; confirmation at seeds 43 and 44 is pending. The
-provisional full-data commands are:
+six-way fine-tuning with only the final encoder layer reinitialized. Its five-fold OOF
+macro-F1 was `0.6102` at seed 42, and the five-seed full-data submission scored **`0.6299`**
+on CodaBench. The full-data commands are:
 
 ```bash
 uv run --extra cu128 hastika-task-b-tapt \

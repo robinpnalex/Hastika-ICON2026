@@ -8,20 +8,20 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 * **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
   `Political`, `Religion`, and `Violence`.
 
-## Current status — 2026-09-16
+## Current status — 2026-09-17
 
 | item | current state |
 |---|---|
 | Best Task A result | Demojized TF-IDF + LinearSVC, `0.8103` five-fold macro-F1 |
 | Best Task B local result | One-layer reinitialization, `0.6102` five-fold OOF macro-F1, Run 5 |
-| Best recorded Task B CodaBench result | `f_tapt`, `0.6007` — inferred, not fully confirmed |
-| Current Task B candidate | `--reinit-layers 1`, full-data five-seed fit, Run 8 |
+| Best recorded Task B CodaBench result | `b_reinit1_full`, **`0.6299`** — confirmed Run 8 |
+| Current Task B candidate | `b_reinit1_full`, one-layer reinitialization, five seeds on all data |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
-Task B's one-layer result is promising but has only been measured at model seed 42. The
-next decision is therefore not to submit immediately, but to confirm the reinitialization
-choice at seeds 43 and 44. The zero-layer ablation is also pending.
+Run 8 is now the strongest confirmed Task B submission: the one-layer full-data fit scored
+`0.6299` on CodaBench. Runs 6 and 7 remain useful scientific checks of the reinitialization
+choice, but they no longer block using the Run 8 recipe as the current candidate.
 
 ## Experiment roadmap
 
@@ -36,7 +36,7 @@ choice at seeds 43 and 44. The zero-layer ablation is also pending.
 | Task B 5 | 2026-09-16, completed | `05_reinit_one_layer.ipynb` | one versus two reinitialized layers | one layer: `0.6102` vs `0.6013` |
 | Task B 6 | pending | `06_reinit_confirmation.ipynb` | confirm one layer at seeds 43/44 | not run |
 | Task B 7 | pending | `07_no_reinit_ablation.ipynb` | compare one layer with no reinitialization | not run |
-| Task B 8 | pending | `08_full_data_fit_reinit1.ipynb` | train current candidate on all data and infer validation | CodaBench only |
+| Task B 8 | 2026-09-17, completed | `08_full_data_fit_reinit1.ipynb` | train current candidate on all data and infer validation | **0.6299 CodaBench** |
 
 ## Ordered next steps
 
@@ -46,11 +46,10 @@ choice at seeds 43 and 44. The zero-layer ablation is also pending.
    versus zero-layer reinitialization at the same seeds.
 3. Select the reinitialization setting using the individual seed scores and the
    probability-averaged OOF score. Prefer a change only if the advantage is consistent.
-4. Run [Run 8](../notebooks/task_b/08_full_data_fit_reinit1.ipynb), or an equivalent
-   full-data notebook with the selected setting: TAPT on all 6,406 comments, five seeds
-   on all 3,159 labelled rows, and inference on the 395 official validation inputs.
-5. Upload the generated ZIP to CodaBench. Record the returned macro-F1, exact recipe,
-   commit, and output metadata in this ledger and `submissions/README.md`.
+4. If either ablation is consistently better, train that alternative on all data and
+   submit it as a controlled follow-up to Run 8; otherwise retain `b_reinit1_full`.
+5. Preserve the Run 8 score, exact recipe, commit, and output metadata in
+   `submissions/README.md` and compare future submissions against `0.6299`.
 
 Do not compare a full-data fit to a local OOF score as though they were the same
 measurement. A full-data fit has no local F1; its only evaluation is CodaBench. Also treat
@@ -116,7 +115,7 @@ with hidden labels. The current status and ordered roadmap are at the top of thi
 | `f_tapt` | 2 | TAPT MuRIL, 5 seeds on all 3,143 deduplicated rows | 0.6007¹ |
 | `b_tapt_5f` | 1 | TAPT MuRIL, five fold models averaged | 0.5922 |
 | `d0v0_noaux_full` | 4 | TAPT MuRIL, 5 seeds on all 3,159 rows, TAPT on every comment | not run yet |
-| `b_reinit1_full` | 8 | TAPT MuRIL, one-layer reinit, 5 seeds on all 3,159 rows | not run yet |
+| `b_reinit1_full` | 8 | TAPT MuRIL, one-layer reinit, 5 seeds on all 3,159 rows | **0.6299** |
 
 ¹ Inferred, not confirmed: the `scoring_result.zip` reading 0.6007 was downloaded a few
 minutes after `f_tapt.zip`. Check the CodaBench submission list.
@@ -316,7 +315,7 @@ the score after averaging OOF probabilities, and per-class F1. There is no submi
 this run; use `--reinit-layers 0` for the final fit only if it consistently beats the
 one-layer control.
 
-### Run 8 -- full-data one-layer fit and official validation inference, not run yet
+### Run 8 -- full-data one-layer fit and official validation inference, 2026-09-17
 
 `notebooks/task_b/08_full_data_fit_reinit1.ipynb` is the provisional final-fit notebook
 for the currently best observed recipe. It uses `--reinit-layers 1`, TAPT on all 6,406
@@ -326,9 +325,15 @@ rows in `data/raw/multiclass_validation_inputs.csv`.
 
 | output | purpose | status |
 |---|---|---|
-| `b_reinit1_full` | five-seed full-data predictions and probabilities | not run yet |
-| `b_reinit1_full.zip` | validated `id,label` payload for CodaBench | not run yet |
+| `b_reinit1_full` | five-seed full-data predictions and probabilities | completed |
+| `b_reinit1_full.zip` | validated `id,label` payload for CodaBench | **0.6299** |
 
-This run has no local F1 by construction. Its score comes only from the CodaBench Task B
-validation phase. Run 8 should be used after Runs 6--7 if the confirmation evidence changes
-the selected reinitialization setting; otherwise this one-layer recipe is the candidate.
+The uploaded log `fulldatafit08.log` confirms TAPT on all 6,406 comments and five classifier
+seeds (`42--46`) on all 3,159 labelled rows with `--reinit-layers 1`. The submission helper
+validated 395 rows and a ZIP containing one bare `predictions.csv`. CodaBench returned
+macro-F1 `0.6299` and accuracy `0.6886`, making this the best confirmed Task B output so far.
+
+The notebook's final diagnostic cell raised `NameError: pd is not defined` after the ZIP had
+already been written. This affected only the distribution-reporting cell, not training,
+prediction generation, ZIP validation, or the submitted result; the canonical notebook now
+imports pandas before that cell.

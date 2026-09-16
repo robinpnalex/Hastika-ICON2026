@@ -9,7 +9,7 @@ session dies with the browser tab and they all run for hours.
 
 | notebook | what it does | time | score |
 |---|---|---|---|
-| `08_full_data_fit_reinit1.ipynb` | Provisional final fit using one-layer reinitialization: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, inference on the 395 official validation inputs, and ZIP packaging. | ~2 h | CodaBench only |
+| `08_full_data_fit_reinit1.ipynb` | Full-data one-layer fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, inference on the 395 official validation inputs, and ZIP packaging. | ~2 h | **0.6299 CodaBench** |
 | `04_full_data_fit.ipynb` | The current recipe, `D0_V0_noaux`, on 100% of the data. TAPT on all 6,406 comments with nothing held out, then five seeds on all 3,159 rows with no deduplication and no auxiliary head. Reads its own logs and stops if either count is short. | ~2 h | CodaBench only |
 
 `D0_V0_noaux` means TAPT on Kannada text only (D0), MuRIL's tokenizer as shipped (V0),
@@ -22,8 +22,8 @@ it returns is the run's score. Record it in `docs/EXPERIMENTS.md` and
 `submissions/README.md`.
 
 The `08_full_data_fit_reinit1.ipynb` candidate uses the same full-data protocol but sets
-`--reinit-layers 1`, based on the observed 0.6102 OOF result. Run it after the seed
-confirmation if you want the confirmed recipe; its ZIP is `b_reinit1_full.zip`.
+`--reinit-layers 1`, based on the observed 0.6102 OOF result. It scored **0.6299** on
+CodaBench; its ZIP is `b_reinit1_full.zip`. Runs 6 and 7 remain follow-up ablations.
 
 ## Current ablation
 
