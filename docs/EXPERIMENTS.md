@@ -16,7 +16,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Best Task B local result | One-layer reinitialization, `0.614` averaged five-fold OOF macro-F1, Run 6 |
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
-| Next Task B step | Preserve the result and focus experimentation on Task A |
+| Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
 | Current Task A work | MuRIL embeddings + SVM experiment is ready; TAPT and full-data ensemble remain pending |
 | Next Task A step | Measure MuRIL embeddings + RBF SVM on the fixed 85/15 holdout |
 | Current branch | `task-b` |
@@ -46,6 +46,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 7 | 2026-09-17, completed | `07_no_reinit_ablation.ipynb` | compare one layer with no reinitialization | one layer wins averaged OOF: `0.614` vs `0.584` |
 | Task B 8 | 2026-09-17, completed | `08_full_data_fit_reinit1.ipynb` | train current candidate on all data and infer validation | **0.6299 CodaBench** |
 | Task B 9 | 2026-09-17, completed | `09_rdrop_one_layer.ipynb` | submit full-data R-Drop on the current one-layer recipe | **0.6410 CodaBench macro-F1, 0.6937 accuracy** |
+| Task B 10 | ready; not run | `10_context_decode.ipynb` | does a violent word mean Violence only when no target group is named? | 5-fold OOF, nested; ZIP written only if it wins |
+| Task B 11 | ready; not run | `experiments/task_b/stack_full.py` | four full-data arms stacked on the 0.6410 recipe: 10 epochs, unchanged control, tags, no-FGM | CodaBench pending, ~8.9 h |
 
 ## Ordered next steps
 
@@ -62,6 +64,10 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
    and submit it against the current Task A best of `0.8163`.
 6. Keep `b_reinit1_rdrop_full` as the Task B candidate and focus new GPU budget on
    Task A rather than further reinitialization ablations.
+7. If Task B gets another session, run [Task B Run 10](../notebooks/task_b/10_context_decode.ipynb)
+   before Run 11. It is the cheaper of the two and it leaves behind `oof_probs.npy` for
+   the current recipe, which nothing in the repo currently has; with that file, decode
+   ideas cost seconds instead of 108 minutes of GPU.
 
 Do not compare a full-data fit to a local OOF score as though they were the same
 measurement. A full-data fit has no local F1; its only evaluation is CodaBench. Also treat

@@ -5,6 +5,25 @@ Upload one of these to Kaggle, set **Accelerator** to `GPU T4 x2` or `GPU P100` 
 itself, so the notebook file is all you upload. Never run these interactively: the
 session dies with the browser tab and they all run for hours.
 
+## Queued, not yet run
+
+| notebook | what it answers | time | score |
+|---|---|---|---|
+| `10_context_decode.ipynb` | Run 10. Does a violent action word mean Violence only when no target group is named? Five folds of the current recipe, then a per-cell prior correction fitted and nested on the OOF. Writes a ZIP only if the nested check wins. | ~2.6 h | yes, 5-fold OOF |
+
+A violent word's meaning depends on its company. Among the 420 training comments
+containing one: with media context present, Others is 0.27 and Violence 0.18; with no
+target named, Violence is 0.34 and Others 0.06. `decode.py` fits one weight per class and
+has lost its nested check every time, because the right correction for Violence flips
+sign with context. `hastika.task_b.context_decode` fits a lift per cell instead, and on
+the calibrated TF-IDF SVM that is worth +2.9 points nested, 0.5630 to 0.5923, with
+Violence F1 going 0.24 to about 0.35. Whether it helps MuRIL is open: a transformer can
+represent the interaction and a bag of n-grams cannot, so the model may already know it.
+
+Run 10 also leaves behind `oof_probs.npy` for the current recipe, which nothing else in
+the repo has. With that file any future decode idea can be tested in seconds rather than
+in 108 minutes of GPU.
+
 ## Run this one
 
 | notebook | what it does | time | score |
