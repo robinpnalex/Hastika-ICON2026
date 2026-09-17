@@ -23,6 +23,9 @@ holding out an entire released CSV, 0.178% of its tokens fall outside a vocab
 built from the other three, because wordpiece backs off to seen subwords.
 """
 import argparse
+import json
+import pathlib
+
 import numpy as np
 import pandas as pd
 import torch
@@ -34,6 +37,7 @@ from hastika.common.paths import RAW_DATA_DIR
 from hastika.common.preprocessing import clean, dedupe_index
 from hastika.models.muril import N_SPLITS, ROOT, RUNS, SPLIT_SEED, train_fold
 from .features import TagLexicon, describe
+from .normalize import apply_transform
 
 LABELS = ["Gender", "Geo-political", "Others", "Political", "Religion", "Violence"]
 
@@ -75,7 +79,11 @@ def tag_split(args, X, y, tr_i, va_i, X_test, verbose=False):
     if verbose:
         print("  fold gazetteer (first 8 terms per class):", flush=True)
         print(describe(lex), flush=True)
-    return lex.transform(X[tr_i]), lex.transform(X[va_i]), lex.transform(X_test)
+    # np.array(..., dtype=object): TagLexicon.transform returns plain lists, and the
+    # --folds 1 branch below reads .dtype off the training array to build an empty
+    # validation array. Lists have no .dtype, so --tags used to crash on a full fit.
+    arr = lambda z: np.array(lex.transform(z), dtype=object)
+    return arr(X[tr_i]), arr(X[va_i]), arr(X_test)
 
 
 def main():
@@ -136,6 +144,14 @@ def main():
                          "competing topic cues; composes with --class-weight balanced. "
                          "UNMEASURED on MuRIL -- A/B it with experiments/task_b/sweep.sh")
     ap.add_argument("--focal-gamma", type=float, default=2.0)
+    ap.add_argument("--text-transform", choices=["raw", "stopwords", "stem", "polarity"],
+                    default="raw",
+                    help="stack an input-text change on top of the recipe. `raw` is the "
+                         "identity and reproduces the submitted model exactly. See "
+                         "normalize.py: stopwords and stem both break the match with the "
+                         "text TAPT adapted to, so read a loss there carefully")
+    ap.add_argument("--polarity-map", default="",
+                    help="JSON {comment: tag} written by experiments/task_b/polarity_tagger.py")
     ap.add_argument("--tags", action="store_true", default=False,
                     help="append topic/mood/address tags to each comment (features.py). "
                          "OFF by default: on the TF-IDF SVM the tags moved 5-fold macro-F1 "
@@ -180,6 +196,15 @@ def main():
     y = train["Hate Category"].map(LABELS.index).values
     X_test = test["Comment"].map(lambda t: clean(t, demojize=demoji)).values
     assert not pd.isna(y).any(), "unmapped category label"
+
+    # `raw` is the identity, so the default path is bit-for-bit the Run 9 recipe.
+    if args.text_transform != "raw":
+        pol = (json.loads(pathlib.Path(args.polarity_map).read_text())
+               if args.polarity_map else None)
+        Xt, Xs = apply_transform(args.text_transform, list(X), list(X_test), pol)
+        X, X_test = np.array(Xt, dtype=object), np.array(Xs, dtype=object)
+        print(f"text transform '{args.text_transform}' applied; example:\n"
+              f"  {X[0][:150]}", flush=True)
 
     if args.limit:
         X, y = X[:args.limit], y[:args.limit]
