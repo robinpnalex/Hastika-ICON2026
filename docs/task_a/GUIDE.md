@@ -275,20 +275,40 @@ files from TAPT because those comments overlap with hidden evaluation data. Expe
 runtime is approximately 2--4 hours on a T4 or RTX 3070. The notebook has been checked
 for valid JSON and compilable code, but no experiment score has been recorded yet.
 
-### Task A MuRIL + TF-IDF ensemble notebook — created, not yet run
+### Task A MuRIL + TF-IDF ensemble notebook — completed, not retained
 
 After reviewing the TAPT comparison, the aligned OOF blend can be run with [the Task A
 ensemble notebook](../../notebooks/task_a/02_muril_tfidf_ensemble.ipynb). It trains
 demojized TF-IDF and demojized MuRIL on identical five-fold splits, searches blend weights
 from OOF probabilities, and performs a nested check to estimate whether blending really
-helps. It creates validated ZIPs for both individual models and the ensemble. Submit the
-ensemble only if its nested score supports the blend; otherwise use the strongest single
-model. Expected runtime is approximately 3--5 hours on a T4.
+helps. The run produced validated ZIPs for both individual models and the ensemble.
 
-The first attempted run stopped during setup because no Kaggle GPU accelerator was
-enabled (`torch.cuda.is_available()` was false). No TF-IDF or MuRIL training ran and no
-score was produced. Enable a GPU and Internet before choosing **Save Version -> Save &
-Run All** again.
+The ensemble scored `0.8233` OOF macro-F1 (`0.8230` nested estimate), using 57% SVM and
+43% MuRIL. Its CodaBench validation score was only **`0.7890` macro-F1** and `0.7891`
+accuracy, below the confirmed MuRIL result (`0.8163`/`0.8164`). The ensemble is therefore
+not retained as a submission candidate; use the strongest single model unless a future
+experiment addresses this generalization gap.
+
+### Task A full-data MuRIL + TF-IDF ensemble — ready to run
+
+Use the same [ensemble notebook](../../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) for
+the final-fit follow-up. It trains both demojized components on all 6,401 deduplicated
+labelled rows, with no 80/20 folds and no 15% holdout. MuRIL uses `--folds 1` for a true
+full-data fit, while the SVM uses `--full-fit` to skip its OOF pass.
+
+The notebook applies the fixed 57% SVM / 43% MuRIL blend from the previous OOF run. It
+does not learn weights from hidden validation labels. The output is
+`task_a_full_ensemble.zip` in the Kaggle Output tab. Compare its CodaBench score with
+the current MuRIL result of `0.8163` macro-F1 before retaining it.
+
+### Task A MuRIL embeddings + SVM — ready to run
+
+The [embedding-SVM notebook](../../notebooks/task_a/03_muril_embeddings_svm.ipynb) freezes
+MuRIL, extracts masked mean+max embeddings from demojized text, and trains an RBF SVM
+classifier on top. It evaluates first on the fixed 15% stratified holdout, then refits
+the SVM on all 6,401 deduplicated labelled rows and writes
+`task_a_muril_embeddings_svm_rbf.zip`. This is distinct from the rejected TF-IDF
+probability ensemble because the SVM operates on MuRIL semantic embeddings.
 
 ## Useful training options
 

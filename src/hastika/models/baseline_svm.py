@@ -94,6 +94,8 @@ def main():
     ap.add_argument("--demojize", action="store_true")
     ap.add_argument("--proba", choices=["calibrated", "softmax"], default=None,
                     help="default: calibrated for task a, softmax for task b; see module docstring")
+    ap.add_argument("--full-fit", action="store_true",
+                    help="skip OOF training and fit once on every labelled row")
     ap.add_argument("--no-dedupe", action="store_true",
                     help="must match the setting used by every other run in the ensemble")
     args = ap.parse_args()
@@ -113,6 +115,19 @@ def main():
     X_test = test["Comment"].map(lambda x: clean(x, demojize=args.demojize)).values
     assert not pd.isna(y).any(), f"unmapped label in {spec['train']}"
 
+    run = RUNS_DIR / tag
+    run.mkdir(parents=True, exist_ok=True)
+
+    if args.full_fit:
+        test_probs = build(args.C, proba).fit(X, y).predict_proba(X_test)
+        np.save(run / "test_probs.npy", test_probs)
+        labels = [classes[i] for i in test_probs.argmax(1)]
+        pd.DataFrame({"id": test["id"], "label": labels}).to_csv(
+            run / "predictions.csv", index=False)
+        print(f"task {args.task.upper()} full fit on {len(y)} rows")
+        print(f"wrote {run}/  ({pd.Series(labels).value_counts().to_dict()})")
+        return
+
     skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=SPLIT_SEED)
     oof = np.zeros((len(y), len(classes)))
     for tr, va in skf.split(X, y):
@@ -127,8 +142,6 @@ def main():
     # refit on everything for the submission predictions
     test_probs = build(args.C, proba).fit(X, y).predict_proba(X_test)
 
-    run = RUNS_DIR / tag
-    run.mkdir(parents=True, exist_ok=True)
     np.save(run / "oof_probs.npy", oof)
     np.save(run / "test_probs.npy", test_probs)
     labels = [classes[i] for i in test_probs.argmax(1)]

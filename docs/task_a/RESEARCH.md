@@ -43,8 +43,10 @@ Output lands in `artifacts/runs/<tag>/` and the final upload is
 - MuRIL is the best single prior: its pretraining included transliterated Indic,
   which is what Kanglish is. Expect roughly +2–5 over XLM-R based on published
   DravidianLangTech code-mixed results.
-- The blend should beat every individual member; `ensemble.py` seeds the search
-  with the single-model corners so it cannot come out worse.
+- The blend can beat individual members on local OOF data, but that does not guarantee
+  official validation performance. The first MuRIL + TF-IDF blend scored `0.8233` OOF
+  yet only `0.7890` on CodaBench, so future blends must be treated as candidates until
+  externally validated.
 
 ## Next experiment: Task-A-domain TAPT
 

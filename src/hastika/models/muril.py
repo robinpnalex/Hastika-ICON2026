@@ -581,7 +581,8 @@ def main():
                     help="carry the stage-1 classifier head into stage 2 instead of "
                          "re-initializing it")
     # schedule
-    ap.add_argument("--folds", type=int, default=N_SPLITS, help="0 = 15%% holdout")
+    ap.add_argument("--folds", type=int, default=N_SPLITS,
+                    help="0 = 15%% holdout, 1 = full-data fit, >1 = OOF folds")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42],
                     help="average several seeds; BERT fine-tuning is high-variance at this size")
     ap.add_argument("--epochs", type=int, default=6)
@@ -702,6 +703,11 @@ def main():
                                             X_test, device, f"s{seed}f{k}")
                 oof[va_i] += p_va / n_seeds
                 test_probs += p_te / (args.folds * n_seeds)
+        elif args.folds == 1:
+            X_tr, y_tr = with_external(X, y, X_ext, y_ext, args)
+            f1, p_va, p_te = train_fold(args, tok, X_tr, y_tr, np.array([]), np.array([]),
+                                         X_test, device, f"s{seed}full")
+            test_probs += p_te / n_seeds
         else:
             from sklearn.model_selection import train_test_split
             tr_i, va_i = train_test_split(np.arange(len(y)), test_size=0.15,

@@ -8,7 +8,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 * **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
   `Political`, `Religion`, and `Violence`.
 
-## Current status — 2026-09-17
+## Current status — 2026-09-18
 
 | item | current state |
 |---|---|
@@ -17,8 +17,8 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Preserve the result and focus experimentation on Task A |
-| Current Task A work | TAPT + demojized MuRIL notebook is in progress |
-| Next Task A step | Rerun the MuRIL + TF-IDF ensemble with a GPU |
+| Current Task A work | MuRIL embeddings + SVM experiment is ready; TAPT and full-data ensemble remain pending |
+| Next Task A step | Measure MuRIL embeddings + RBF SVM on the fixed 85/15 holdout |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -34,7 +34,9 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 5 | pending | `experiments/task_a/run_rdrop.sh` | test R-Drop against the matched demojized MuRIL control | local OOF and validation submission |
 | Task A 6 | 2026-09-17, completed | MuRIL validation submission | compare MuRIL with the TF-IDF result on validation A | **0.8163 macro-F1, 0.8164 accuracy** |
 | Task A 7 | 2026-09-17, in progress | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
-| Task A 8 | 2026-09-17, GPU-blocked | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | no model stages started; rerun with GPU |
+| Task A 8 | 2026-09-17, completed | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
+| Task A 9 | 2026-09-18, ready; not run | `02_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | fixed 57/43 blend; CodaBench pending |
+| Task A 10 | 2026-09-18, ready; not run | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | fixed 85/15 holdout; CodaBench pending |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -47,13 +49,18 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 
 ## Ordered next steps
 
-1. Finish [Task A Run 7](../notebooks/task_a/01_tapt_demojized_muril.ipynb) and compare
+1. Run [Task A Run 10](../notebooks/task_a/03_muril_embeddings_svm.ipynb) and compare
+   its fixed-holdout score with the existing MuRIL recipe.
+2. Run [Task A Run 9](../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) so both the
+   SVM and MuRIL components train on all 6,401 deduplicated rows, then compare its
+   CodaBench score with `0.8163`.
+3. Finish [Task A Run 7](../notebooks/task_a/01_tapt_demojized_muril.ipynb) and compare
    the stock and TAPT MuRIL holdout scores.
-2. Rerun [Task A Run 8](../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) with a GPU
-   enabled, then use its nested OOF estimate to judge the MuRIL + TF-IDF blend.
-3. If TAPT or the ensemble improves the local result, train a full-data, multi-seed
-   candidate and submit only the strongest version against `0.8163`.
-4. Keep `b_reinit1_rdrop_full` as the Task B candidate and focus new GPU budget on
+4. Treat the Run 8 ensemble as rejected for submission: its local OOF macro-F1 was
+   `0.8233`, but its official CodaBench score was only `0.7890`.
+5. If TAPT improves the matched local result, train a full-data, multi-seed candidate
+   and submit it against the current Task A best of `0.8163`.
+6. Keep `b_reinit1_rdrop_full` as the Task B candidate and focus new GPU budget on
    Task A rather than further reinitialization ablations.
 
 Do not compare a full-data fit to a local OOF score as though they were the same
@@ -136,19 +143,34 @@ created and code-validated, but has not been run yet. Its purpose is to decide w
 TAPT is worth a later full-data submission against the current `0.8163` MuRIL result; it
 does not assume that the Task B TAPT gain transfers to Task A.
 
-## Experiment 8: demojized MuRIL + TF-IDF OOF ensemble, notebook created 2026-09-17
+## Experiment 8: demojized MuRIL + TF-IDF OOF ensemble, 2026-09-17
 
 [The ensemble notebook](../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) trains
 demojized TF-IDF + calibrated LinearSVC and demojized MuRIL on the same deduplicate-first,
 five-fold split with split seed 42. It fits blend weights from OOF probabilities and uses
 a nested weight-search estimate to check whether any apparent blend gain survives
 out-of-sample evaluation. It also packages the two individual models and the ensemble
-as validated Task A ZIP candidates. This is the next step after the TAPT notebook if a
-complementary error pattern is useful; it has not been run yet.
+as validated Task A ZIP candidates. The completed run used a Tesla T4 and finished all
+five MuRIL folds, the blend search, and ZIP validation.
 
-The first attempt stopped in the setup cell because the Kaggle session had no GPU
-(`torch.cuda.is_available()` was false). Neither TF-IDF nor MuRIL training started, so
-there is no ensemble result to record. Rerun with a GPU accelerator enabled.
+The individual OOF scores were `0.8073` for TF-IDF/SVM and `0.7932` for MuRIL. The
+selected blend was 57% SVM and 43% MuRIL, scoring `0.8233` OOF macro-F1 (`0.8230`
+nested estimate). However, the submitted ensemble scored only **`0.7890` macro-F1** and
+`0.7891` accuracy on CodaBench, below the confirmed MuRIL result of `0.8163`/`0.8164`.
+This local-to-official mismatch means the blend is not a viable candidate; retain the
+MuRIL submission as the Task A baseline and do not spend more GPU time rerunning this
+same ensemble.
+
+## Experiment 9: full-data MuRIL + TF-IDF ensemble, ready 2026-09-18
+
+Run 9 is the corrected final-fit follow-up to Run 8. The notebook trains demojized
+TF-IDF/SVM and demojized MuRIL once each on all 6,401 deduplicated Task A rows. It does
+not perform a holdout or OOF pass, and it does not use the hidden validation labels to
+fit weights. It applies the fixed weights learned in Run 8: 57% SVM and 43% MuRIL.
+
+The notebook writes `task_a_full_ensemble.zip`, containing one bare `predictions.csv`,
+and preserves the component probabilities, blend weights, and logs in
+`task_a_full_ensemble_outputs`. It has been code-validated but has not been run yet.
 
 ---
 

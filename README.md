@@ -52,12 +52,15 @@ The latest Task A validation submission used MuRIL and scored **`0.8163` macro-F
 The exact flags for that submitted MuRIL artifact are not yet recorded; see the experiment
 ledger before treating it as a reproducible recipe.
 
-The current Task A experiment is [the TAPT + demojized MuRIL notebook](notebooks/task_a/01_tapt_demojized_muril.ipynb).
-It compares stock MuRIL with a checkpoint adapted on the legal Task A training-side text
-and permitted OffensEval Kannada text, using a fixed 85/15 holdout. It is ready to run on
-Kaggle and is currently in progress. After it finishes, the next step is the aligned
-[MuRIL + TF-IDF OOF ensemble](notebooks/task_a/02_muril_tfidf_ensemble.ipynb); its first
-attempt was blocked because the Kaggle session had no GPU.
+The current Task A candidate is the [full-data MuRIL + TF-IDF ensemble](notebooks/task_a/02_muril_tfidf_ensemble.ipynb).
+It trains both demojized components on all 6,401 deduplicated labelled rows and applies
+the fixed 57% SVM / 43% MuRIL blend from the earlier OOF experiment. The earlier OOF
+ensemble scored `0.8233` locally but only `0.7890` on CodaBench, so this full-data fit
+must be compared against the current MuRIL best of `0.8163`. The separate [TAPT +
+demojized MuRIL notebook](notebooks/task_a/01_tapt_demojized_muril.ipynb) remains a
+follow-up experiment using an 85/15 holdout. We are also testing [MuRIL embeddings +
+SVM](notebooks/task_a/03_muril_embeddings_svm.ipynb), which uses a fixed 85/15 holdout
+for measurement before its final full-data refit.
 
 ```bash
 uv run --extra cu128 hastika-task-a-train \
