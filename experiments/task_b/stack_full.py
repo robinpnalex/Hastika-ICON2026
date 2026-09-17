@@ -50,18 +50,64 @@ LABELS = ["Gender", "Geo-political", "Others", "Political", "Religion", "Violenc
 TAPT_OUT = "artifacts/runs/tapt-stack"
 POLARITY = "artifacts/runs/polarity_map.json"
 
+SEEDS = ["42", "43", "44", "45", "46"]
+
+# Ordered by how much each is worth, because the budget guard skips from the
+# bottom. Everything below the default list stays runnable via --arms; it is off
+# by default because the evidence already available says it will lose:
+#
+#   s_stopwords  the 60-word frequency stoplist contains bjp, congress, dagar and
+#                desha, which is the Political and Gender signal. Nothing to learn.
+#   s_stem       char normalization measured -0.003 and transliteration-lite
+#                +0.001 on this corpus. Wordpiece already splits madthare into
+#                stem and suffixes, so this does that job worse and breaks the
+#                match with the text TAPT adapted to.
+#   s_polarity   the same shape as b_abusive, an abusive-tuned warm start, which
+#                scored 0.5718 against stock MuRIL's 0.5948. Also the only arm
+#                carrying a rules question, since it reads external LABELS.
+#   s_control    reruns the recipe unchanged; only needed to supply
+#                test_probs.npy for the TF-IDF blend.
+#
 #   tag              extra train.py flags                      est. minutes
 ARMS = [
-    ("s_tags",      ["--tags"],                                        113),
-    ("s_stem",      ["--text-transform", "stem"],                      113),
-    ("s_stopwords", ["--text-transform", "stopwords"],                 113),
+    ("s_seeds10",   ["--seeds", *SEEDS, "47", "48", "49", "50", "51"],  226),
+    ("s_epochs10",  ["--epochs-override", "10"],                        188),
+    ("s_nofgm",     ["--no-fgm"],                                        73),
+    ("s_tags",      ["--tags"],                                         113),
+    ("s_stopwords", ["--text-transform", "stopwords"],                  113),
+    ("s_stem",      ["--text-transform", "stem"],                       113),
     ("s_polarity",  ["--text-transform", "polarity",
-                     "--polarity-map", POLARITY],                      113),
-    ("s_nofgm",     ["--no-fgm"],                                       73),
-    ("s_control",   [],                                                113),   # opt-in
+                     "--polarity-map", POLARITY],                       113),
+    ("s_control",   [],                                                 113),
 ]
 BASE = ["--folds", "1", "--no-dedupe", "--reinit-layers", "1", "--rdrop", "0.5",
-        "--aux-weight", "0", "--seeds", "42", "43", "44", "45", "46", "--epochs", "6"]
+        "--aux-weight", "0", "--seeds", *SEEDS, "--epochs", "6"]
+
+
+def base_for(flags):
+    """BASE with --seeds / --epochs replaced when an arm overrides them.
+
+    argparse would take the last value anyway, but a command line carrying two
+    --seeds is unreadable in a log, and these logs are the record of what ran.
+    """
+    out, flags = list(BASE), list(flags)
+    if "--epochs-override" in flags:
+        i = flags.index("--epochs-override")
+        out[out.index("--epochs") + 1] = flags[i + 1]
+        del flags[i:i + 2]
+    if "--seeds" in flags:
+        i = flags.index("--seeds")
+        j = i + 1
+        while j < len(flags) and not flags[j].startswith("--"):
+            j += 1
+        seeds = flags[i + 1:j]
+        k = out.index("--seeds")
+        e = k + 1
+        while e < len(out) and not out[e].startswith("--"):
+            e += 1
+        out[k + 1:e] = seeds
+        del flags[i:j]
+    return out, flags
 
 
 def sh(cmd, log=None, required=False):
@@ -138,9 +184,10 @@ def main():
     ap.add_argument("--budget-hours", type=float, default=10.5)
     ap.add_argument("--reserve-min", type=float, default=20)
     ap.add_argument("--out", default="/kaggle/working")
-    ap.add_argument("--arms", nargs="*", default=["s_tags", "s_stem", "s_stopwords",
-                                                  "s_polarity", "s_nofgm"],
-                    help="s_control reruns Run 9 unchanged; include it only if you want "
+    ap.add_argument("--arms", nargs="*",
+                    default=["s_seeds10", "s_epochs10", "s_nofgm", "s_tags"],
+                    help="see the ARMS table for what is off by default and why. "
+                         "s_control reruns Run 9 unchanged; include it only if you want "
                          "its test_probs.npy for the TF-IDF blend, at 113 min")
     ap.add_argument("--reference", default="submissions/b_tapt_5f/predictions.csv",
                     help="submission whose CodaBench score you know, for the agreement "
@@ -183,8 +230,9 @@ def main():
         if left() < est * 60:
             print(f"skip {tag}: {left()/60:.0f} min left, needs ~{est}", flush=True)
             continue
+        base, extra = base_for(flags)
         rc = sh([py, "-u", "-m", "hastika.task_b.train", "--tag", tag,
-                 "--model", TAPT_OUT, *BASE, *flags], log=LOGS / f"{tag}.log")
+                 "--model", TAPT_OUT, *base, *extra], log=LOGS / f"{tag}.log")
         if rc == 0:
             sh([py, "-m", "hastika.common.submission", "--task", "b",
                 "--pred", str(RUNS / tag / "predictions.csv"),
