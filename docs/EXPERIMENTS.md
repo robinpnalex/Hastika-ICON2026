@@ -16,7 +16,9 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Best Task B local result | One-layer reinitialization, `0.6102` five-fold OOF macro-F1, Run 5 |
 | Best recorded Task B CodaBench result | `b_reinit1_full`, **`0.6299`** — confirmed Run 8 |
 | Current Task B candidate | `b_reinit1_full`, one-layer reinitialization, five seeds on all data |
-| Next Task A experiment | TAPT + demojized MuRIL notebook, created and ready to run |
+| Next Task B experiment | Full-data R-Drop submission, Run 9 notebook ready to run |
+| Current Task A work | TAPT + demojized MuRIL notebook is in progress |
+| Next Task A step | Rerun the MuRIL + TF-IDF ensemble with a GPU |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -31,28 +33,28 @@ choice, but they no longer block using the Run 8 recipe as the current candidate
 | Task A 1--4 | completed | Task A training scripts | baseline, demojization, and TF-IDF comparisons | best: `0.8103` |
 | Task A 5 | pending | `experiments/task_a/run_rdrop.sh` | test R-Drop against the matched demojized MuRIL control | local OOF and validation submission |
 | Task A 6 | 2026-09-17, completed | MuRIL validation submission | compare MuRIL with the TF-IDF result on validation A | **0.8163 macro-F1, 0.8164 accuracy** |
-| Task A 7 | 2026-09-17, created; not run | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | local holdout and validation submissions |
+| Task A 7 | 2026-09-17, in progress | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
+| Task A 8 | 2026-09-17, GPU-blocked | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | no model stages started; rerun with GPU |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
 | Task B 4 | not run | `04_full_data_fit.ipynb` | original two-layer full-data fit | superseded by the one-layer candidate |
 | Task B 5 | 2026-09-16, completed | `05_reinit_one_layer.ipynb` | one versus two reinitialized layers | one layer: `0.6102` vs `0.6013` |
-| Task B 6 | pending | `06_reinit_confirmation.ipynb` | confirm one layer at seeds 43/44 | not run |
-| Task B 7 | pending | `07_no_reinit_ablation.ipynb` | compare one layer with no reinitialization | not run |
+| Task B 6 | 2026-09-17, completed | `06_reinit_confirmation.ipynb` | confirm one layer at seeds 43/44 | one layer wins averaged OOF: `0.614` vs `0.612` |
+| Task B 7 | 2026-09-17, completed | `07_no_reinit_ablation.ipynb` | compare one layer with no reinitialization | one layer wins averaged OOF: `0.614` vs `0.584` |
 | Task B 8 | 2026-09-17, completed | `08_full_data_fit_reinit1.ipynb` | train current candidate on all data and infer validation | **0.6299 CodaBench** |
+| Task B 9 | 2026-09-17, created; not run | `09_rdrop_one_layer.ipynb` | submit full-data R-Drop on the current one-layer recipe | one five-seed submission ZIP |
 
 ## Ordered next steps
 
-1. Run [Run 6](../notebooks/task_b/06_reinit_confirmation.ipynb) and compare one-layer
-   versus two-layer reinitialization at model seeds 43 and 44.
-2. Run [Run 7](../notebooks/task_b/07_no_reinit_ablation.ipynb) and compare one-layer
-   versus zero-layer reinitialization at the same seeds.
-3. Select the reinitialization setting using the individual seed scores and the
-   probability-averaged OOF score. Prefer a change only if the advantage is consistent.
-4. If either ablation is consistently better, train that alternative on all data and
-   submit it as a controlled follow-up to Run 8; otherwise retain `b_reinit1_full`.
-5. Preserve the Run 8 score, exact recipe, commit, and output metadata in
-   `submissions/README.md` and compare future submissions against `0.6299`.
+1. Finish [Task A Run 7](../notebooks/task_a/01_tapt_demojized_muril.ipynb) and compare
+   the stock and TAPT MuRIL holdout scores.
+2. Rerun [Task A Run 8](../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) with a GPU
+   enabled, then use its nested OOF estimate to judge the MuRIL + TF-IDF blend.
+3. If TAPT or the ensemble improves the local result, train a full-data, multi-seed
+   candidate and submit only the strongest version against `0.8163`.
+4. Run [Task B Run 9](../notebooks/task_b/09_rdrop_one_layer.ipynb) as a separate
+   full-data R-Drop submission candidate and compare it with the confirmed `0.6299`.
 
 Do not compare a full-data fit to a local OOF score as though they were the same
 measurement. A full-data fit has no local F1; its only evaluation is CodaBench. Also treat
@@ -133,6 +135,20 @@ probabilities, and `task_a_tapt_summary.csv` in the Kaggle Output tab. The exper
 created and code-validated, but has not been run yet. Its purpose is to decide whether
 TAPT is worth a later full-data submission against the current `0.8163` MuRIL result; it
 does not assume that the Task B TAPT gain transfers to Task A.
+
+## Experiment 8: demojized MuRIL + TF-IDF OOF ensemble, notebook created 2026-09-17
+
+[The ensemble notebook](../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) trains
+demojized TF-IDF + calibrated LinearSVC and demojized MuRIL on the same deduplicate-first,
+five-fold split with split seed 42. It fits blend weights from OOF probabilities and uses
+a nested weight-search estimate to check whether any apparent blend gain survives
+out-of-sample evaluation. It also packages the two individual models and the ensemble
+as validated Task A ZIP candidates. This is the next step after the TAPT notebook if a
+complementary error pattern is useful; it has not been run yet.
+
+The first attempt stopped in the setup cell because the Kaggle session had no GPU
+(`torch.cuda.is_available()` was false). Neither TF-IDF nor MuRIL training started, so
+there is no ensemble result to record. Rerun with a GPU accelerator enabled.
 
 ---
 
@@ -311,43 +327,46 @@ independent comparison cell failed after training because the live kernel did no
 `src/` into the live kernel path. Confirm the one-layer result with seeds 43 and 44 before
 changing the recommended recipe. There is no CodaBench submission in this experiment.
 
-### Run 6 -- confirm one-layer reinitialization, not run yet
+### Run 6 -- confirm one-layer reinitialization, 2026-09-17
 
 `notebooks/task_b/06_reinit_confirmation.ipynb` repeats Run 5 at model seeds 43 and 44.
 It builds one shared TAPT checkpoint and runs four separate five-fold comparisons:
+The captured run log is [run06_reinit_confirmation.log](../results/task_b/logs/run06_reinit_confirmation.log).
 
 | run | reinitialized layers | model seed | status |
 |---|---:|---:|---|
-| `b_tapt_reinit2_s43` | 2 (control) | 43 | not run yet |
-| `b_tapt_reinit1_s43` | 1 (ablation) | 43 | not run yet |
-| `b_tapt_reinit2_s44` | 2 (control) | 44 | not run yet |
-| `b_tapt_reinit1_s44` | 1 (ablation) | 44 | not run yet |
+| `b_tapt_reinit2_s43` | 2 (control) | 43 | `0.6026` OOF macro-F1 |
+| `b_tapt_reinit1_s43` | 1 (ablation) | 43 | **`0.6127`** OOF macro-F1 |
+| `b_tapt_reinit2_s44` | 2 (control) | 44 | `0.6083` OOF macro-F1 |
+| `b_tapt_reinit1_s44` | 1 (ablation) | 44 | `0.6082` OOF macro-F1 |
 
 All settings other than `--reinit-layers` match Run 5. The notebook reports each seed's
 OOF macro-F1, the mean of the two seed scores, and macro-F1 after averaging the two seeds'
-OOF probabilities. It also prints per-class reports. There is no submission in this run;
-the one-layer recipe should be promoted to the final full-data experiment only if its
-advantage survives this confirmation.
+OOF probabilities. It also prints per-class reports. The one-layer mean seed score was
+`0.6105` versus `0.6055` for two layers; averaged probabilities scored `0.614` versus
+`0.612`. The small positive aggregate supports retaining one-layer reinitialization.
+There is no submission in this run.
 
-### Run 7 -- no encoder-layer reinitialization ablation, not run yet
+### Run 7 -- no encoder-layer reinitialization ablation, 2026-09-17
 
 `notebooks/task_b/07_no_reinit_ablation.ipynb` tests whether preserving the final encoder
 layer as well is better than the current one-layer setting. `--reinit-layers 1` is the
 control; `--reinit-layers 0` keeps both layers 11 and 12 from the TAPT checkpoint:
+The captured run log is [run07_no_reinit_ablation.log](../results/task_b/logs/run07_no_reinit_ablation.log).
 
 | run | reinitialized layers | model seed | status |
 |---|---:|---:|---|
-| `b_tapt_reinit1_vs0_s43` | 1 (control) | 43 | not run yet |
-| `b_tapt_reinit0_s43` | 0 (ablation) | 43 | not run yet |
-| `b_tapt_reinit1_vs0_s44` | 1 (control) | 44 | not run yet |
-| `b_tapt_reinit0_s44` | 0 (ablation) | 44 | not run yet |
+| `b_tapt_reinit1_vs0_s43` | 1 (control) | 43 | `0.6127` OOF macro-F1 |
+| `b_tapt_reinit0_s43` | 0 (ablation) | 43 | `0.5854` OOF macro-F1 |
+| `b_tapt_reinit1_vs0_s44` | 1 (control) | 44 | `0.6082` OOF macro-F1 |
+| `b_tapt_reinit0_s44` | 0 (ablation) | 44 | `0.5760` OOF macro-F1 |
 
 All other settings match Runs 5 and 6: one shared TAPT checkpoint, deduplicated Task B
 data, fixed five-fold split with split seed 42, six epochs, existing regularization, no
 auxiliary head, and `--select last`. The notebook reports each seed, the mean seed score,
-the score after averaging OOF probabilities, and per-class F1. There is no submission in
-this run; use `--reinit-layers 0` for the final fit only if it consistently beats the
-one-layer control.
+the score after averaging OOF probabilities, and per-class F1. One-layer averaged OOF
+macro-F1 was `0.614` versus `0.584` with no reinitialization, so the zero-layer option is
+discarded. There is no submission in this run.
 
 ### Run 8 -- full-data one-layer fit and official validation inference, 2026-09-17
 
@@ -362,8 +381,9 @@ rows in `data/raw/multiclass_validation_inputs.csv`.
 | `b_reinit1_full` | five-seed full-data predictions and probabilities | completed |
 | `b_reinit1_full.zip` | validated `id,label` payload for CodaBench | **0.6299** |
 
-The uploaded log `fulldatafit08.log` confirms TAPT on all 6,406 comments and five classifier
-seeds (`42--46`) on all 3,159 labelled rows with `--reinit-layers 1`. The submission helper
+The captured log is [run08_full_data_reinit1.log](../results/task_b/logs/run08_full_data_reinit1.log).
+It confirms TAPT on all 6,406 comments and five classifier seeds (`42--46`) on all 3,159
+labelled rows with `--reinit-layers 1`. The submission helper
 validated 395 rows and a ZIP containing one bare `predictions.csv`. CodaBench returned
 macro-F1 `0.6299` and accuracy `0.6886`, making this the best confirmed Task B output so far.
 
@@ -371,3 +391,17 @@ The notebook's final diagnostic cell raised `NameError: pd is not defined` after
 already been written. This affected only the distribution-reporting cell, not training,
 prediction generation, ZIP validation, or the submitted result; the canonical notebook now
 imports pandas before that cell.
+
+### Run 9 -- full-data R-Drop submission, created 2026-09-17
+
+`notebooks/task_b/09_rdrop_one_layer.ipynb` trains the R-Drop version of the current
+one-layer TAPT MuRIL recipe directly on all labelled Task B rows. It uses TAPT on all
+6,406 permitted comments, `--reinit-layers 1`, `--rdrop 0.5`, five seeds (`42--46`), six
+epochs, balanced class weighting, FGM, EMA, and no auxiliary head. The five validation
+probability matrices are averaged. This is a final-fit submission run, so it has no local
+OOF score and does not include a no-R-Drop control.
+
+The notebook validates the 395-row prediction file and writes the single candidate
+`b_reinit1_rdrop_full.zip`, containing one bare `predictions.csv`. It has been
+code-validated but has not been run yet. Expected runtime is approximately 4--6 hours on
+a T4.

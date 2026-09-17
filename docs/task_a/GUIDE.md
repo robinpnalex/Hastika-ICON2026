@@ -275,6 +275,21 @@ files from TAPT because those comments overlap with hidden evaluation data. Expe
 runtime is approximately 2--4 hours on a T4 or RTX 3070. The notebook has been checked
 for valid JSON and compilable code, but no experiment score has been recorded yet.
 
+### Task A MuRIL + TF-IDF ensemble notebook — created, not yet run
+
+After reviewing the TAPT comparison, the aligned OOF blend can be run with [the Task A
+ensemble notebook](../../notebooks/task_a/02_muril_tfidf_ensemble.ipynb). It trains
+demojized TF-IDF and demojized MuRIL on identical five-fold splits, searches blend weights
+from OOF probabilities, and performs a nested check to estimate whether blending really
+helps. It creates validated ZIPs for both individual models and the ensemble. Submit the
+ensemble only if its nested score supports the blend; otherwise use the strongest single
+model. Expected runtime is approximately 3--5 hours on a T4.
+
+The first attempted run stopped during setup because no Kaggle GPU accelerator was
+enabled (`torch.cuda.is_available()` was false). No TF-IDF or MuRIL training ran and no
+score was produced. Enable a GPU and Internet before choosing **Save Version -> Save &
+Run All** again.
+
 ## Useful training options
 
 ```bash

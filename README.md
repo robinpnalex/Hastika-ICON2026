@@ -52,10 +52,12 @@ The latest Task A validation submission used MuRIL and scored **`0.8163` macro-F
 The exact flags for that submitted MuRIL artifact are not yet recorded; see the experiment
 ledger before treating it as a reproducible recipe.
 
-The next Task A experiment is [the TAPT + demojized MuRIL notebook](notebooks/task_a/01_tapt_demojized_muril.ipynb).
+The current Task A experiment is [the TAPT + demojized MuRIL notebook](notebooks/task_a/01_tapt_demojized_muril.ipynb).
 It compares stock MuRIL with a checkpoint adapted on the legal Task A training-side text
 and permitted OffensEval Kannada text, using a fixed 85/15 holdout. It is ready to run on
-Kaggle but has no result yet.
+Kaggle and is currently in progress. After it finishes, the next step is the aligned
+[MuRIL + TF-IDF OOF ensemble](notebooks/task_a/02_muril_tfidf_ensemble.ipynb); its first
+attempt was blocked because the Kaggle session had no GPU.
 
 ```bash
 uv run --extra cu128 hastika-task-a-train \
