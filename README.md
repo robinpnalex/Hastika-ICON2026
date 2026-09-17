@@ -80,35 +80,35 @@ The complete walkthrough is in [docs/task_a/GUIDE.md](docs/task_a/GUIDE.md).
 ## Task B
 
 The strongest observed Task B recipe is task-adaptive pretraining of MuRIL followed by
-six-way fine-tuning with only the final encoder layer reinitialized. Its five-fold OOF
-macro-F1 was `0.6102` at seed 42, and the five-seed full-data submission scored **`0.6299`**
-on CodaBench. The full-data commands are:
+six-way fine-tuning with R-Drop and only the final encoder layer reinitialized. Its
+five-fold OOF macro-F1 was `0.6102` at seed 42, and the five-seed full-data submission
+scored **`0.6410`** macro-F1 and `0.6937` accuracy on CodaBench. The full-data commands are:
 
 ```bash
 uv run --extra cu128 hastika-task-b-tapt \
   --model google/muril-base-cased \
   --corpus data/raw/multiclass_train.csv data/external/offenseval_kn.csv \
   --val-frac 0 --min-words 1 --no-dedupe \
-  --out artifacts/runs/tapt-d0v0-reinit1-100
+  --out artifacts/runs/tapt-d0v0-rdrop-full
 
 uv run --extra cu128 hastika-task-b-train \
-  --tag b_reinit1_full \
-  --model artifacts/runs/tapt-d0v0-reinit1-100 \
-  --folds 1 --no-dedupe --reinit-layers 1 --aux-weight 0 \
+  --tag b_reinit1_rdrop_full \
+  --model artifacts/runs/tapt-d0v0-rdrop-full \
+  --folds 1 --no-dedupe --reinit-layers 1 --rdrop 0.5 --aux-weight 0 \
   --seeds 42 43 44 45 46 --epochs 6
 
 uv run --extra cu128 hastika-submit \
   --task b \
-  --pred artifacts/runs/b_reinit1_full/predictions.csv \
-  --out artifacts/runs/b_reinit1_full/submission.zip
+  --pred artifacts/runs/b_reinit1_rdrop_full/predictions.csv \
+  --out artifacts/runs/b_reinit1_rdrop_full/submission.zip
 ```
 
 There is no local score for a full-data fit because every labelled row is used
 for training. Use the CodaBench validation phase to score its predictions.
 
 The complete experiment history and ordered next steps are in
-[docs/EXPERIMENTS.md](docs/EXPERIMENTS.md). The seed-confirmation notebooks should be
-run before treating one-layer reinitialization as final.
+[docs/EXPERIMENTS.md](docs/EXPERIMENTS.md). The current priority is improving Task A;
+the R-Drop recipe is the strongest confirmed Task B candidate.
 
 - Commands and methodology: [docs/task_b/GUIDE.md](docs/task_b/GUIDE.md)
 - Notebook index: [docs/task_b/NOTEBOOKS.md](docs/task_b/NOTEBOOKS.md)

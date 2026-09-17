@@ -13,18 +13,18 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | item | current state |
 |---|---|
 | Best Task A result | MuRIL, **`0.8163`** macro-F1 and `0.8164` accuracy on validation A |
-| Best Task B local result | One-layer reinitialization, `0.6102` five-fold OOF macro-F1, Run 5 |
-| Best recorded Task B CodaBench result | `b_reinit1_full`, **`0.6299`** — confirmed Run 8 |
-| Current Task B candidate | `b_reinit1_full`, one-layer reinitialization, five seeds on all data |
-| Next Task B experiment | Full-data R-Drop submission, Run 9 notebook ready to run |
+| Best Task B local result | One-layer reinitialization, `0.614` averaged five-fold OOF macro-F1, Run 6 |
+| Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
+| Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
+| Next Task B step | Preserve the result and focus experimentation on Task A |
 | Current Task A work | TAPT + demojized MuRIL notebook is in progress |
 | Next Task A step | Rerun the MuRIL + TF-IDF ensemble with a GPU |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
-Run 8 is now the strongest confirmed Task B submission: the one-layer full-data fit scored
-`0.6299` on CodaBench. Runs 6 and 7 remain useful scientific checks of the reinitialization
-choice, but they no longer block using the Run 8 recipe as the current candidate.
+Run 9 is now the strongest confirmed Task B submission: the one-layer full-data R-Drop fit
+scored `0.6410` on CodaBench, improving on Run 8's `0.6299`. Runs 6 and 7 support the
+one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 
 ## Experiment roadmap
 
@@ -43,7 +43,7 @@ choice, but they no longer block using the Run 8 recipe as the current candidate
 | Task B 6 | 2026-09-17, completed | `06_reinit_confirmation.ipynb` | confirm one layer at seeds 43/44 | one layer wins averaged OOF: `0.614` vs `0.612` |
 | Task B 7 | 2026-09-17, completed | `07_no_reinit_ablation.ipynb` | compare one layer with no reinitialization | one layer wins averaged OOF: `0.614` vs `0.584` |
 | Task B 8 | 2026-09-17, completed | `08_full_data_fit_reinit1.ipynb` | train current candidate on all data and infer validation | **0.6299 CodaBench** |
-| Task B 9 | 2026-09-17, created; not run | `09_rdrop_one_layer.ipynb` | submit full-data R-Drop on the current one-layer recipe | one five-seed submission ZIP |
+| Task B 9 | 2026-09-17, completed | `09_rdrop_one_layer.ipynb` | submit full-data R-Drop on the current one-layer recipe | **0.6410 CodaBench macro-F1, 0.6937 accuracy** |
 
 ## Ordered next steps
 
@@ -53,8 +53,8 @@ choice, but they no longer block using the Run 8 recipe as the current candidate
    enabled, then use its nested OOF estimate to judge the MuRIL + TF-IDF blend.
 3. If TAPT or the ensemble improves the local result, train a full-data, multi-seed
    candidate and submit only the strongest version against `0.8163`.
-4. Run [Task B Run 9](../notebooks/task_b/09_rdrop_one_layer.ipynb) as a separate
-   full-data R-Drop submission candidate and compare it with the confirmed `0.6299`.
+4. Keep `b_reinit1_rdrop_full` as the Task B candidate and focus new GPU budget on
+   Task A rather than further reinitialization ablations.
 
 Do not compare a full-data fit to a local OOF score as though they were the same
 measurement. A full-data fit has no local F1; its only evaluation is CodaBench. Also treat
@@ -166,6 +166,7 @@ with hidden labels. The current status and ordered roadmap are at the top of thi
 | `b_tapt_5f` | 1 | TAPT MuRIL, five fold models averaged | 0.5922 |
 | `d0v0_noaux_full` | 4 | TAPT MuRIL, 5 seeds on all 3,159 rows, TAPT on every comment | not run yet |
 | `b_reinit1_full` | 8 | TAPT MuRIL, one-layer reinit, 5 seeds on all 3,159 rows | **0.6299** |
+| `b_reinit1_rdrop_full` | 9 | TAPT MuRIL, one-layer reinit + R-Drop 0.5, 5 seeds on all 3,159 rows | **0.6410** |
 
 ¹ Inferred, not confirmed: the `scoring_result.zip` reading 0.6007 was downloaded a few
 minutes after `f_tapt.zip`. Check the CodaBench submission list.
@@ -385,14 +386,14 @@ The captured log is [run08_full_data_reinit1.log](../results/task_b/logs/run08_f
 It confirms TAPT on all 6,406 comments and five classifier seeds (`42--46`) on all 3,159
 labelled rows with `--reinit-layers 1`. The submission helper
 validated 395 rows and a ZIP containing one bare `predictions.csv`. CodaBench returned
-macro-F1 `0.6299` and accuracy `0.6886`, making this the best confirmed Task B output so far.
+macro-F1 `0.6299` and accuracy `0.6886`; Run 9 subsequently surpassed this result.
 
 The notebook's final diagnostic cell raised `NameError: pd is not defined` after the ZIP had
 already been written. This affected only the distribution-reporting cell, not training,
 prediction generation, ZIP validation, or the submitted result; the canonical notebook now
 imports pandas before that cell.
 
-### Run 9 -- full-data R-Drop submission, created 2026-09-17
+### Run 9 -- full-data R-Drop submission, 2026-09-17
 
 `notebooks/task_b/09_rdrop_one_layer.ipynb` trains the R-Drop version of the current
 one-layer TAPT MuRIL recipe directly on all labelled Task B rows. It uses TAPT on all
@@ -401,7 +402,8 @@ epochs, balanced class weighting, FGM, EMA, and no auxiliary head. The five vali
 probability matrices are averaged. This is a final-fit submission run, so it has no local
 OOF score and does not include a no-R-Drop control.
 
-The notebook validates the 395-row prediction file and writes the single candidate
-`b_reinit1_rdrop_full.zip`, containing one bare `predictions.csv`. It has been
-code-validated but has not been run yet. Expected runtime is approximately 4--6 hours on
-a T4.
+The notebook validated the 395-row prediction file and wrote the single candidate
+`b_reinit1_rdrop_full.zip`, containing one bare `predictions.csv`. CodaBench returned
+macro-F1 **`0.6410`** and accuracy **`0.6937`**, improving on Run 8's `0.6299` macro-F1
+and `0.6886` accuracy by `+0.0111` and `+0.0051`, respectively. This is now the best
+confirmed Task B result. The captured log is [run09_rdrop_full.log](../results/task_b/logs/run09_rdrop_full.log).

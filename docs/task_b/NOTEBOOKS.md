@@ -9,12 +9,14 @@ session dies with the browser tab and they all run for hours.
 
 | notebook | what it does | time | score |
 |---|---|---|---|
+| `09_rdrop_one_layer.ipynb` | Full-data one-layer R-Drop fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. | ~2.7 h | **0.6410 CodaBench** |
 | `08_full_data_fit_reinit1.ipynb` | Full-data one-layer fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, inference on the 395 official validation inputs, and ZIP packaging. | ~2 h | **0.6299 CodaBench** |
 | `04_full_data_fit.ipynb` | The current recipe, `D0_V0_noaux`, on 100% of the data. TAPT on all 6,406 comments with nothing held out, then five seeds on all 3,159 rows with no deduplication and no auxiliary head. Reads its own logs and stops if either count is short. | ~2 h | CodaBench only |
 
 `D0_V0_noaux` means TAPT on Kannada text only (D0), MuRIL's tokenizer as shipped (V0),
 and a plain six-way head (no aux). It led the data-processing grid. The current
-provisional candidate adds `--reinit-layers 1`, based on Run 5's `0.6102` OOF result.
+provisional candidate adds `--reinit-layers 1` and `--rdrop 0.5`, based on the Run 5/6
+OOF results and Run 9's CodaBench improvement.
 
 Nothing is held out in either full-data notebook, so neither prints a local F1. Upload the
 ZIP from the selected candidate to the Task B validation phase on CodaBench; the macro-F1
@@ -23,15 +25,16 @@ it returns is the run's score. Record it in `docs/EXPERIMENTS.md` and
 
 The `08_full_data_fit_reinit1.ipynb` candidate uses the same full-data protocol but sets
 `--reinit-layers 1`, based on the observed 0.6102 OOF result. It scored **0.6299** on
-CodaBench; its ZIP is `b_reinit1_full.zip`. Runs 6 and 7 remain follow-up ablations.
+CodaBench; its ZIP is `b_reinit1_full.zip`. Run 9 adds R-Drop and is now the preferred
+candidate, with ZIP `b_reinit1_rdrop_full.zip` and CodaBench macro-F1 **0.6410**.
 
 ## Current ablation
 
 | notebook | what it does | time | score |
 |---|---|---|---|
 | `05_reinit_one_layer.ipynb` | Run 5. Reuses one TAPT checkpoint and compares the established top-two-layer reset with a top-one-layer reset using identical five-fold settings. | ~3--3.5 h | 0.6013 vs **0.6102** |
-| `06_reinit_confirmation.ipynb` | Run 6. Repeats both settings at model seeds 43 and 44, then compares individual and probability-averaged OOF scores. | ~6--7 h | pending |
-| `07_no_reinit_ablation.ipynb` | Run 7. Compares the current one-layer setting with no encoder-layer reinitialization at seeds 43 and 44. | ~6--7 h | pending |
+| `06_reinit_confirmation.ipynb` | Run 6. Repeats both settings at model seeds 43 and 44, then compares individual and probability-averaged OOF scores. | ~6--7 h | one layer **0.614** vs two layers 0.612 (averaged OOF) |
+| `07_no_reinit_ablation.ipynb` | Run 7. Compares the current one-layer setting with no encoder-layer reinitialization at seeds 43 and 44. | ~6--7 h | one layer **0.614** vs no layers 0.584 (averaged OOF) |
 
 This is a local controlled experiment, not a submission notebook. It runs the TAPT pass
 once, then trains `b_tapt_reinit2_5f` and `b_tapt_reinit1_5f` with seed 42, five folds,
@@ -40,12 +43,14 @@ six epochs and `--select last`. The completed run scored 0.6013 for two layers a
 particularly better on `Violence` and `Others`. The outputs belong under `artifacts/`;
 download the logs and probability matrices from Kaggle for review.
 
-Run 6 is the confirmation before changing the recommended recipe. It must show the
-one-layer setting winning at both seeds, or in the averaged-probability comparison,
-before it is used for a full-data fit.
+Run 6 confirmed that the one-layer setting was stronger in the averaged-probability
+comparison: 0.614 versus 0.612 for two-layer reinitialization. Run 7 then showed that
+removing reinitialization entirely was substantially worse: 0.584 versus 0.614.
 
-Run 7 asks the next nested question: after keeping layer 11, should we keep layer 12 as
-well? It compares `--reinit-layers 1` against `--reinit-layers 0` under the same protocol.
+Run 9 is the current preferred Task B candidate: full-data TAPT plus one-layer
+reinitialization and R-Drop (`--rdrop 0.5`) across five seeds. It scored **0.6410
+macro-F1** and **0.6937 accuracy** on CodaBench, improving on Run 8's 0.6299 macro-F1
+and 0.6886 accuracy. Further GPU budget should now prioritize Task A experiments.
 
 ## Earlier runs, kept for reproducibility
 
