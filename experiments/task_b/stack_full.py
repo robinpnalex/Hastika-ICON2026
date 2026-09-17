@@ -65,20 +65,23 @@ SEEDS = ["42", "43", "44", "45", "46"]
 #   s_polarity   the same shape as b_abusive, an abusive-tuned warm start, which
 #                scored 0.5718 against stock MuRIL's 0.5948. Also the only arm
 #                carrying a rules question, since it reads external LABELS.
-#   s_control    reruns the recipe unchanged; only needed to supply
-#                test_probs.npy for the TF-IDF blend.
+#   s_seeds10    ten seeds instead of five. Averaging still helps in principle,
+#                but run-to-run spread on this recipe is ~0.5 points (seeds 43
+#                and 44 scored 0.6127 and 0.6082), whatever 5->10 buys is smaller
+#                than that, and 1 point on the 395-row set is 2 rows. 226 min to
+#                move something the leaderboard cannot resolve.
 #
 #   tag              extra train.py flags                      est. minutes
 ARMS = [
-    ("s_seeds10",   ["--seeds", *SEEDS, "47", "48", "49", "50", "51"],  226),
     ("s_epochs10",  ["--epochs-override", "10"],                        188),
-    ("s_nofgm",     ["--no-fgm"],                                        73),
+    ("s_control",   [],                                                 113),
     ("s_tags",      ["--tags"],                                         113),
+    ("s_nofgm",     ["--no-fgm"],                                        73),
+    ("s_seeds10",   ["--seeds", *SEEDS, "47", "48", "49", "50", "51"],  226),
     ("s_stopwords", ["--text-transform", "stopwords"],                  113),
     ("s_stem",      ["--text-transform", "stem"],                       113),
     ("s_polarity",  ["--text-transform", "polarity",
                      "--polarity-map", POLARITY],                       113),
-    ("s_control",   [],                                                 113),
 ]
 BASE = ["--folds", "1", "--no-dedupe", "--reinit-layers", "1", "--rdrop", "0.5",
         "--aux-weight", "0", "--seeds", *SEEDS, "--epochs", "6"]
@@ -185,10 +188,11 @@ def main():
     ap.add_argument("--reserve-min", type=float, default=20)
     ap.add_argument("--out", default="/kaggle/working")
     ap.add_argument("--arms", nargs="*",
-                    default=["s_seeds10", "s_epochs10", "s_nofgm", "s_tags"],
+                    default=["s_epochs10", "s_control", "s_tags", "s_nofgm"],
                     help="see the ARMS table for what is off by default and why. "
-                         "s_control reruns Run 9 unchanged; include it only if you want "
-                         "its test_probs.npy for the TF-IDF blend, at 113 min")
+                         "s_control reruns Run 9 unchanged: it supplies the "
+                         "test_probs.npy the blend needs, and its CodaBench score "
+                         "against Run 9's 0.6410 is a free read on run-to-run noise")
     ap.add_argument("--reference", default="submissions/b_tapt_5f/predictions.csv",
                     help="submission whose CodaBench score you know, for the agreement "
                          "column. Point this at Run 9's predictions.csv if you kept it")
