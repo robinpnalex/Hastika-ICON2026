@@ -10,7 +10,7 @@ encoder at all — MuRIL is used as a feature extractor and only the SVM is trai
 | encoder | `google/muril-base-cased`, frozen, meanmax pooling |
 | classifier | `SVC(kernel="rbf", C=2.0, class_weight="balanced")` |
 | fitted on | all 6,401 deduplicated rows, after the holdout measurement |
-| produced by | `notebooks/task_a/03_muril_embeddings_svm.ipynb`, 2026-09-19 |
+| produced by | `notebooks/task_a/10_frozen_embeddings_svm.ipynb`, 2026-09-19 |
 
 ## Validation of the artifact
 
@@ -57,7 +57,7 @@ Solving with agreement 0.772, accuracy 0.8189 and 0.70:
 
 A blend can only help by overruling the stronger member somewhere, and here it would be
 wrong three times out of four when it did. There is no weight that gains. **Do not add it
-to the blend search in `notebooks/task_a/08_third_member_blend.ipynb`.**
+to the blend search in `notebooks/task_a/14_third_member_blend.ipynb`.**
 
 One by-product is worth keeping: on the 622 rows where the two agree, they are still wrong
 16.4% of the time. Two systems with very different inductive biases failing together on
@@ -75,5 +75,5 @@ score already settles the method, and a holdout number would only refine by how 
 
 ## Reproduce
 
-Upload `notebooks/task_a/03_muril_embeddings_svm.ipynb` to Kaggle with GPU and Internet
+Upload `notebooks/task_a/10_frozen_embeddings_svm.ipynb` to Kaggle with GPU and Internet
 on. About 20 to 45 minutes.

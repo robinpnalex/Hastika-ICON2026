@@ -53,14 +53,14 @@ The latest Task A validation submission is the full-data MuRIL + TF-IDF ensemble
 The exact flags for that submitted MuRIL artifact are not yet recorded; see the experiment
 ledger before treating it as a reproducible recipe.
 
-The current Task A candidate is the [full-data MuRIL + TF-IDF ensemble](notebooks/task_a/02_muril_tfidf_ensemble.ipynb).
+The current Task A candidate is the [full-data MuRIL + TF-IDF ensemble](notebooks/task_a/08_muril_tfidf_ensemble.ipynb).
 It trains both demojized components on all 6,401 deduplicated labelled rows and applies
 the fixed 57% SVM / 43% MuRIL blend from the earlier OOF experiment. The earlier OOF
 ensemble scored `0.8233` locally but only `0.7890` on CodaBench; the corrected full-data
 fit scored `0.8187`. The separate [TAPT +
-demojized MuRIL notebook](notebooks/task_a/01_tapt_demojized_muril.ipynb) remains a
+demojized MuRIL notebook](notebooks/task_a/07_tapt_holdout.ipynb) remains a
 follow-up experiment using an 85/15 holdout. We are also testing [MuRIL embeddings +
-SVM](notebooks/task_a/03_muril_embeddings_svm.ipynb), which uses a fixed 85/15 holdout
+SVM](notebooks/task_a/10_frozen_embeddings_svm.ipynb), which uses a fixed 85/15 holdout
 for measurement before its final full-data refit.
 
 ```bash
