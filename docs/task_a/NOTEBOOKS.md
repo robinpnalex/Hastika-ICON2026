@@ -31,23 +31,32 @@ These follow the standing constraint: stacked on the `0.8187` recipe, `--folds 1
 
 | notebook | run | the one change | time |
 |---|---|---|---|
-| `11_reinit1_full_data.ipynb` | 11 | `--reinit-layers 1` instead of 2 | ~40 min |
+| `11_reinit1_full_data.ipynb` | 11 | `--reinit-layers 1`, **and the blend weight refitted to match** | ~3.4 h |
 | `05_rdrop_full_data.ipynb` | 5 | `--rdrop 0.5`, against a matched control, 5 seeds each | ~6.5 h |
 
 **Run 11 first.** It is 40 minutes and it decides the base for everything after it. If one
 reinitialized layer beats `0.8187`, the queued experiments stack on one layer; if it loses
 by more than about 3 points, they keep two.
 
-### Run 11 in detail
+### Run 11 in detail — run this first
 
-Run 9's MuRIL component reinitializes the top **two** encoder layers, a default inherited
-rather than chosen. Task B measured one layer against none at **+3.0** and one against two
-at +0.5. Task A has tested neither.
+Run 9's MuRIL reinitializes the top **two** encoder layers, a default inherited rather than
+chosen, and its 57/43 blend weights were fitted in Run 8 **against that two-layer
+component**. Change the component and the weight it deserves changes with it: a stronger
+MuRIL should take more of the blend. So Run 11 does both, one layer and a refitted weight.
 
-Everything else is held fixed, including the 57/43 blend weights and the 0.5 threshold.
-Those weights were fitted in Run 8 against a two-layer MuRIL so they are arguably no longer
-optimal, but refitting them would be a second change and there is no holdout to refit them
-on honestly. One change at a time is what makes a CodaBench gap attributable.
+Refitting needs out-of-fold probabilities, so stage 1 runs five folds for both components,
+stage 2 fits the weight and threshold with a nested check, and stage 3 refits both on all
+6,401 rows and applies those values. About 3.4 hours, not the eight a two-way comparison
+would cost, because folds are run only for the configuration being shipped.
+
+Three things come out besides the submission: MuRIL's own out-of-fold score against the
+`0.8073` floor, a fitted threshold worth a measured `+0.0035`, and **`oof_probs.npy` for
+both components — which the repository has never had for Task A**. With those stored, every
+later blend weight, threshold or decode idea costs seconds of CPU instead of a GPU session.
+
+Its five-fold MuRIL arm is the same configuration as the funnel's `control`, so running it
+first also supplies the funnel's reference point.
 
 ### Run 5 in detail
 
@@ -56,21 +65,36 @@ control is trained rather than comparing against `0.8187` directly, because Run 
 used a **single seed** — a five-seed R-Drop arm against it would change two things at once.
 Four ZIPs: each arm alone and each blended with the SVM. Upload the control blend first.
 
-## Queued — measurement, five-fold
+## Queued — the funnel, which supersedes Runs 12 to 15
 
-These hold rows back so they can score themselves, which is why they exist despite the
-no-holdout rule: they decide *what* to build before a submission slot is spent. None writes
-a submission.
-
-| notebook | run | what it answers | time |
+| notebook | run | what it does | time |
 |---|---|---|---|
-| `12_tapt_oof.ipynb` | 12 | does task-adaptive pretraining help Task A? | ~6.3 h |
-| `13_external_labels.ipynb` | 13 | can the external corpus's **labels** be trained on? | ~9.9 h |
-| `14_third_member_blend.ipynb` | 14 | does XLM-R add anything as a third ensemble member? | ~6 h |
-| `15_capacity_and_schedule.ipynb` | 15 | is the recipe underfitting? MuRIL-large and 10 epochs | ~8 h |
-| `07_tapt_holdout.ipynb` | 7 | the leak-free version of Run 12, on the fixed 85/15 split | ~2--4 h |
+| `16_funnel.ipynb` | 16 | screens seven component-level arms on the cheap split, promotes the leaders to five folds | ~6 h stage 1 |
 
-**Run 12** tests the largest measured effect in the project: TAPT was worth +2.9 on Task B.
+**Run this instead of Runs 12 to 15 individually.** Those test one factor each against
+their own control, cost about 30 hours in total, and never put the factors on one table.
+The funnel screens all seven at ~33 min each, then spends five-fold time only on the
+leaders. Task B ran this exact funnel and recorded that the holdout ranked all four
+promoted arms in the same order five folds did, reading about two points high — so stage 1
+orders arms and never reports a number.
+
+Arms: `control` (one layer, 6 epochs), `reinit2`, `tapt`, `ext_mix`, `ext_stage`,
+`epochs10`, `large`. Every one changes the MuRIL component only; the SVM half of the blend
+is fixed because nothing queued touches it. Each arm's predicted class balance is checked
+against Task A's 0.491 prior, and a collapsed arm is not promoted.
+
+Runs 12 to 15 are kept as standalone notebooks for anyone who wants one factor in
+isolation, and Run 7 remains the leak-free TAPT comparison on the fixed holdout.
+
+| notebook | run | kept for | time |
+|---|---|---|---|
+| `12_tapt_oof.ipynb` | 12 | TAPT alone, five-fold | ~6.3 h |
+| `13_external_labels.ipynb` | 13 | external labels alone, three arms | ~9.9 h |
+| `14_third_member_blend.ipynb` | 14 | XLM-R as a third member; downgraded after Run 10 | ~6 h |
+| `15_capacity_and_schedule.ipynb` | 15 | MuRIL-large and 10 epochs alone | ~8 h |
+| `07_tapt_holdout.ipynb` | 7 | the leak-free TAPT comparison | ~2--4 h |
+
+**Run 12**, if run standalone, tests the largest measured effect in the project: TAPT was worth +2.9 on Task B.
 It states its own bias plainly — the MLM stage reads every Task A training comment, so the
 TAPT arm has seen the wording of its own out-of-fold rows and the control has not. Run 7 is
 the leak-free version on a 960-row holdout; read them together.

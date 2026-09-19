@@ -19,7 +19,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
 | Current Task A work | Run 10 completed and rejected at 0.71; Runs 5, 7 and 11--15 written and unrun |
-| Next Task A step | Run 11, 40 min, decides the base recipe; then Run 12 (TAPT), then Runs 13--15 |
+| Next Task A step | Run 11 (~3.4 h), then Run 16's funnel; Runs 12--15 are superseded by the funnel |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -38,7 +38,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 8 | 2026-09-17, completed | `08_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
 | Task A 9 | 2026-09-18, completed | `08_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
 | Task A 10 | 2026-09-19, completed | `10_frozen_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | **0.71 macro-F1, 0.70 accuracy**; rejected, and rejected as a blend member too |
-| Task A 11 | 2026-09-19, ready; not run | `11_reinit1_full_data.ipynb` | does one reinitialized layer beat two? The 0.8187 recipe with that one flag changed | full data, no local score; CodaBench pending, ~40 min |
+| Task A 11 | 2026-09-19, ready; **run this first** | `11_reinit1_full_data.ipynb` | one reinitialized layer, with the blend weight and threshold refitted to match | 5-fold OOF then full-data refit; CodaBench pending, ~3.4 h |
+| Task A 16 | 2026-09-19, ready; not run | `16_funnel.ipynb` | which component-level ideas actually help? Seven arms screened, leaders confirmed | holdout rank then 5-fold; ~6 h stage 1 |
 | Task A 12 | 2026-09-19, ready; not run | `12_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
 | Task A 13 | 2026-09-19, ready; not run | `13_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
 | Task A 14 | 2026-09-19, ready; not run | `14_third_member_blend.ipynb` | does XLM-R as a third ensemble member help? | 5-fold OOF, nested three-way blend |
@@ -301,6 +302,43 @@ About 40 minutes, two for the SVM and roughly 33 for a single MuRIL seed.
 **If it beats `0.8187`, one layer becomes the base** and every queued experiment stacks on
 it. If it loses by more than about 3 points, two layers is right for Task A. Under 3 points
 is unresolved: one score on 806 rows carries roughly 1.5 points of standard deviation.
+
+## Experiment 16: the funnel over component-level ideas, created 2026-09-19
+
+[The notebook](../notebooks/task_a/16_funnel.ipynb) and
+[`experiments/task_a/funnel.py`](../experiments/task_a/funnel.py) replace Runs 12 to 15 as
+the way to answer "what helps".
+
+Eight full-data submissions cannot answer it: one CodaBench score on 806 rows carries about
+1.5 points of standard deviation and most of these ideas are worth one or two. Eight
+five-fold runs would answer it, at ~160 minutes each, about 30 hours, and would still never
+put the factors on one table.
+
+So: screen every arm on the fixed 15% holdout at ~33 minutes, then promote only the
+leaders. Task B ran this funnel and recorded that the holdout ranked all four promoted arms
+in the same order five folds did, while reading about 0.022 high. Stage 1 therefore orders
+arms and never reports a number.
+
+| arm | the change | prior evidence |
+|---|---|---|
+| `control` | one reinitialized layer, 6 epochs | the reference |
+| `reinit2` | two layers | Run 9's inherited setting |
+| `tapt` | TAPT checkpoint | +2.9 on Task B, the largest effect measured anywhere here |
+| `ext_mix` | external rows in training | +0.0030 on the TF-IDF floor |
+| `ext_stage` | external first, then Task A | lets clean labels overwrite the external boundary |
+| `epochs10` | 10 epochs | Task A logs show validation F1 still rising at epoch 6 |
+| `large` | MuRIL-large, `--no-fgm`, `--lr 1e-5` | untested anywhere |
+
+Every arm changes the MuRIL component only; the SVM half of the blend is fixed because
+nothing queued touches it. That is also the dependency order: a blend weight depends on how
+strong its components are, so the component must be settled before Run 11 fits the weight.
+
+Two safeguards. Each arm's predicted positive rate is checked against Task A's 0.491 prior,
+and an arm calling one class on over 90% of rows is not promoted — which is what mDeBERTa
+did on Task B at a learning rate that suited the base model. And every stage skips work
+whose output exists, so a session that dies partway resumes rather than restarts.
+
+Record the whole table here when it runs, **including the arms that lose**.
 
 ## Task B
 

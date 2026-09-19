@@ -263,6 +263,33 @@ Do not rebuild these. Each cost a run and each is written down so it does not co
 | HingRoBERTa | 0.5678 | Task B Run 1 |
 | mDeBERTa | collapsed to 0.1002; 3e-5 is too high for it | Task B Run 1 |
 
+## How the experiments fit together
+
+The ideas above are not independent, and running them as independent submissions would not
+tell you which one helped. Two dependencies drive the order:
+
+1. **Component before blend.** A blend weight depends on how strong its components are, so
+   the MuRIL component must be settled before the weight is fitted. Fitting the weight and
+   then changing the encoder invalidates the weight — which is exactly what happened to
+   Run 8's 57/43, fitted against a two-layer MuRIL that Run 11 now changes.
+2. **Measure before ship.** Anything worth under 3 points cannot be resolved on 806
+   CodaBench rows, but can be on 6,401 out-of-fold rows. So decide locally, submit once.
+
+That gives three phases:
+
+| phase | what | where | cost |
+|---|---|---|---|
+| screen | seven component-level arms ranked on the 15% holdout | Run 16 stage 1 | ~6 h |
+| confirm | the leaders plus the control on five folds | Run 16 stage 2 | ~160 min per arm |
+| ship | fit the weight and threshold on the winner's OOF, refit on all rows, submit | Run 11 | ~35 min |
+
+Run 11 doubles as the first pass of this: its five-fold MuRIL arm is the same configuration
+as the funnel's `control`, so running it first supplies the funnel's reference point and the
+first `oof_probs.npy` Task A has ever had.
+
+By the end there is one table saying what helps and what does not, measured on 6,401 rows,
+with one submission spent on the answer rather than eight spent failing to find it.
+
 ## The measurement problem, and the cheapest fix
 
 With no holdout, 806 rows decide everything on Task A and 395 on Task B. Most ideas above
