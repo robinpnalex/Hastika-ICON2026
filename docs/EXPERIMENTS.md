@@ -60,6 +60,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 13 | ready; not run | `experiments/task_b/stack_full.py` | four full-data arms stacked on the 0.6410 recipe: 10 epochs, unchanged control, tags, no-FGM | CodaBench pending, ~8.9 h |
 | Task B 14 | ready; not run | `14_full_data_tapt_taska_text.ipynb` | add permitted Task A training comments as unlabelled TAPT text, then train the current Task B recipe | CodaBench pending, ~3--4 h; transductive |
 | Task B 15 | ready; not run | `15_full_data_muril_large.ipynb` | train a memory-safe MuRIL-large version of the current Task B recipe | CodaBench pending, ~5--8 h |
+| Task B 16 | ready; not run | `16_full_data_rdrop_augmented.ipynb` | train the 0.6410 recipe on all 3,159 gold rows plus 779 multiclass-labeled binary comments | CodaBench pending, ~3--5 h |
 
 ## Ordered next steps
 

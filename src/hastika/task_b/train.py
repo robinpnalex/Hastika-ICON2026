@@ -170,6 +170,10 @@ def main():
                     help="drop the 95%% of MuRIL embedding rows this corpus never emits; "
                          "saves ~2.3GB and was needed to fit a 6GB CPU box, but the bare "
                          "run keeps the full table so the model is unmodified")
+    ap.add_argument("--train-data", default=None,
+                    help="path to training CSV (default: data/raw/multiclass_train.csv)")
+    ap.add_argument("--extra-train-data", default=None,
+                    help="optional additional CSV to append to the training set")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--threads", type=int, default=0)
     ap.add_argument("--limit", type=int, default=0,
@@ -186,7 +190,24 @@ def main():
           f"class_weight={args.class_weight} loss={args.loss} tags={args.tags} "
           f"seeds={args.seeds}", flush=True)
 
-    train = pd.read_csv(RAW_DATA_DIR / "multiclass_train.csv")
+    train_path = pathlib.Path(args.train_data) if args.train_data else RAW_DATA_DIR / "multiclass_train.csv"
+    if not train_path.is_absolute():
+        train_path = ROOT / train_path
+    train = pd.read_csv(train_path)
+    if "Hate Category" not in train.columns and "Label" in train.columns:
+        train = train.rename(columns={"Label": "Hate Category"})
+
+    if args.extra_train_data:
+        extra_path = pathlib.Path(args.extra_train_data)
+        if not extra_path.is_absolute():
+            extra_path = ROOT / extra_path
+        extra = pd.read_csv(extra_path)
+        if "Hate Category" not in extra.columns and "Label" in extra.columns:
+            extra = extra.rename(columns={"Label": "Hate Category"})
+        new_rows = extra[~extra["id"].isin(train["id"])]
+        train = pd.concat([train, new_rows], ignore_index=True)
+        print(f"appended {len(new_rows)} rows from {extra_path.name} (total {len(train)} rows)", flush=True)
+
     test = pd.read_csv(RAW_DATA_DIR / "multiclass_validation_inputs.csv")
     if not args.no_dedupe:
         train = train.iloc[dedupe_index(train["Comment"].tolist(),

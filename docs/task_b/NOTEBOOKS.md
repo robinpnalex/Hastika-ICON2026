@@ -29,6 +29,7 @@ in 108 minutes of GPU.
 
 | notebook | what it does | time | score |
 |---|---|---|---|
+| `16_full_data_rdrop_augmented.ipynb` | Full-data one-layer R-Drop fit with multiclass-augmented binary data: merges `multiclass_train.csv` (3,159 gold rows) with `hate_only_compiled_multiclass.csv` (779 new rows), TAPT on combined corpus, five seeds on all 3,938 rows, and ZIP packaging. | ~3--5 h | CodaBench pending |
 | `09_rdrop_one_layer.ipynb` | Full-data one-layer R-Drop fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. | ~2.7 h | **0.6410 CodaBench** |
 | `12_full_data_context_tags.ipynb` | Full-data context-tagged fit: TAPT on all 6,406 comments, five tagged models on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. The uploaded log shows training completed, but the final packaging assertion failed because the trainer log did not print the expected R-Drop string. | ~2--3 h | training complete; recover artifacts or rerun packaging |
 | `14_full_data_tapt_taska_text.ipynb` | Full-data expanded-TAPT fit: TAPT on Task B text, OffensEval and permitted Task A training comments, then five Task B models on all 3,159 labelled rows and ZIP packaging. Task A labels are not read. | ~3--4 h | CodaBench pending |
