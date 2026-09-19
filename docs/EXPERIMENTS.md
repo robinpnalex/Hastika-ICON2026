@@ -17,8 +17,8 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
-| Current Task A work | MuRIL embeddings + SVM experiment is ready; full-data ensemble is now the best result |
-| Next Task A step | Measure MuRIL embeddings + RBF SVM on the fixed 85/15 holdout |
+| Current Task A work | Three notebooks written and unrun: R-Drop (Run 5), TAPT (Run 7), frozen-embedding SVM (Run 10) |
+| Next Task A step | Run 5, the full-data R-Drop pair; then Run 7 (TAPT) and Run 10 (frozen-embedding SVM) |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -31,7 +31,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | run | date/status | notebook or runner | question | result/status |
 |---|---|---|---|---|
 | Task A 1--4 | completed | Task A training scripts | baseline, demojization, and TF-IDF comparisons | best: `0.8103` |
-| Task A 5 | pending | `experiments/task_a/run_rdrop.sh` | test R-Drop against the matched demojized MuRIL control | local OOF and validation submission |
+| Task A 5 | 2026-09-19, ready; not run | `04_rdrop_full_data.ipynb` | test R-Drop against a matched control, both on all 6,401 rows | four CodaBench ZIPs; no local score by construction |
 | Task A 6 | 2026-09-17, completed | MuRIL validation submission | compare MuRIL with the TF-IDF result on validation A | **0.8163 macro-F1, 0.8164 accuracy** |
 | Task A 7 | 2026-09-17, in progress | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
 | Task A 8 | 2026-09-17, completed | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
@@ -108,6 +108,35 @@ Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Tas
 * **Output Directory:** `artifacts/runs/svm_demojize/`
 * **Notes:** Previously best performing model. It has now been surpassed by the MuRIL validation submission recorded below.
 
+## Experiment 5: full-data R-Drop against a matched control, notebook created 2026-09-19
+
+[The R-Drop notebook](../notebooks/task_a/04_rdrop_full_data.ipynb) trains two arms on all
+6,401 deduplicated rows with `--folds 1`, five seeds each, differing by one flag only:
+
+| arm | `--rdrop` | everything else |
+|---|---|---|
+| control | `0` | demojized MuRIL, two-layer reinitialization, 6 epochs, effective batch 16, `--select last`, seeds 42--46 |
+| variant | `0.5` | identical |
+
+A matched control is trained rather than reusing Run 9's `0.8187`, because that
+submission's MuRIL component used a **single seed**. Comparing a five-seed R-Drop arm
+against it would change two things at once, and the 806-row validation set cannot
+separate them.
+
+The notebook writes four ZIPs: each MuRIL arm alone, and each blended with a full-fit
+TF-IDF/SVM at Run 8's fixed 57/43 weights, so the result is also comparable with the
+current best. Those weights are carried over unchanged and deliberately not re-optimized,
+because there is no OOF pass here to fit them on honestly.
+
+Expected runtime is about 6.5 hours: roughly 33 minutes per control seed and 45 per
+R-Drop seed, since R-Drop adds a second forward pass. Upload `task_a_control_blend.zip`
+first; its score against `0.8187` shows how far the 806-row set moves on its own, and
+only then is the control-versus-R-Drop gap readable.
+
+Neither arm has a local macro-F1 and neither can have one, because every labelled row is
+in training. `experiments/task_a/run_rdrop.sh` remains the five-fold version of the same
+comparison, which does produce an OOF score at roughly five times the cost.
+
 ## Experiment 6: MuRIL validation submission, 2026-09-17
 * **Model:** MuRIL
 * **Evaluation:** Task A validation A on CodaBench
@@ -117,13 +146,11 @@ Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Tas
 
 ## Task A follow-up
 
-Run 5 tests whether R-Drop improves the demojized MuRIL model. It uses one seed by
-default because R-Drop adds a second stochastic forward pass, but trains both a
-matched `--rdrop 0` control and a `--rdrop 0.5` variant under identical five-fold
-splits. The script packages both validation predictions; only the stronger candidate
-should be submitted after comparing the local OOF scores. This is a model experiment,
-not a replacement for the confirmed MuRIL validation result (`0.8163`) until the local
-comparison identifies whether it improves the same underlying recipe.
+Run 5 above is the full-data pair that gets submitted. `experiments/task_a/run_rdrop.sh`
+is the five-fold version of the same control-versus-R-Drop comparison: slower, but it
+produces an OOF macro-F1, so it can answer whether R-Drop helps without spending a
+CodaBench slot. Neither replaces the confirmed `0.8187` ensemble as the candidate until a
+score says otherwise.
 
 ## Experiment 7: Task-A-domain TAPT + demojized MuRIL, notebook created 2026-09-17
 

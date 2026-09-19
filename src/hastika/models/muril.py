@@ -704,7 +704,12 @@ def main():
                 oof[va_i] += p_va / n_seeds
                 test_probs += p_te / (args.folds * n_seeds)
         elif args.folds == 1:
+            # Announce the row count the way task_b/train.py does. A full fit prints no
+            # score, so this line is the only evidence in the log that a seed ran at all
+            # and saw every row; notebooks assert on it to catch a truncated sweep.
             X_tr, y_tr = with_external(X, y, X_ext, y_ext, args)
+            print(f"===== seed {seed} FULL FIT, {len(y_tr)} rows, no validation =====",
+                  flush=True)
             f1, p_va, p_te = train_fold(args, tok, X_tr, y_tr, np.array([]), np.array([]),
                                          X_test, device, f"s{seed}full")
             test_probs += p_te / n_seeds
