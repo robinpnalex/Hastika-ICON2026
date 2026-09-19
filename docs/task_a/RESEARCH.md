@@ -50,7 +50,7 @@ Output lands in `artifacts/runs/<tag>/` and the final upload is
 
 ## Next experiment: Task-A-domain TAPT
 
-`notebooks/task_a/01_tapt_demojized_muril.ipynb` is the next controlled experiment. It
+`notebooks/task_a/07_tapt_holdout.ipynb` is the next controlled experiment. It
 compares stock MuRIL against MuRIL first adapted with masked-language modeling on only
 the classifier-training side of a fixed 85/15 Task A split, plus permitted OffensEval
 Kannada text. Both arms then use the same demojized MuRIL fine-tuning recipe. The holdout,

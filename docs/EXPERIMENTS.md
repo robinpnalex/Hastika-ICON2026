@@ -19,7 +19,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
 | Current Task A work | Run 10 completed and rejected at 0.71; Runs 5, 7 and 11--15 written and unrun |
-| Next Task A step | Run 12 (TAPT), then Run 11 (reinit + blend weight), then Runs 13--15 |
+| Next Task A step | Run 11, 40 min, decides the base recipe; then Run 12 (TAPT), then Runs 13--15 |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -32,17 +32,17 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | run | date/status | notebook or runner | question | result/status |
 |---|---|---|---|---|
 | Task A 1--4 | completed | Task A training scripts | baseline, demojization, and TF-IDF comparisons | best: `0.8103` |
-| Task A 5 | 2026-09-19, ready; not run | `04_rdrop_full_data.ipynb` | test R-Drop against a matched control, both on all 6,401 rows | four CodaBench ZIPs; no local score by construction |
+| Task A 5 | 2026-09-19, ready; not run | `05_rdrop_full_data.ipynb` | test R-Drop against a matched control, both on all 6,401 rows | four CodaBench ZIPs; no local score by construction |
 | Task A 6 | 2026-09-17, completed | MuRIL validation submission | compare MuRIL with the TF-IDF result on validation A | **0.8163 macro-F1, 0.8164 accuracy** |
-| Task A 7 | 2026-09-17, in progress | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
-| Task A 8 | 2026-09-17, completed | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
-| Task A 9 | 2026-09-18, completed | `02_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
-| Task A 10 | 2026-09-19, completed | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | **0.71 macro-F1, 0.70 accuracy**; rejected, and rejected as a blend member too |
-| Task A 11 | 2026-09-19, ready; not run | `05_reinit_ensemble_weight.ipynb` | does one-layer reinitialization help Task A, and what blend weight does it deserve? | 5-fold OOF on 6,401 rows, nested weight and threshold; CodaBench pending |
-| Task A 12 | 2026-09-19, ready; not run | `06_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
-| Task A 13 | 2026-09-19, ready; not run | `07_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
-| Task A 14 | 2026-09-19, ready; not run | `08_third_member_blend.ipynb` | does XLM-R as a third ensemble member help? | 5-fold OOF, nested three-way blend |
-| Task A 15 | 2026-09-19, ready; not run | `09_capacity_and_schedule.ipynb` | is the recipe underfitting? MuRIL-large and 10 epochs | 5-fold OOF; collapse check first |
+| Task A 7 | 2026-09-17, in progress | `07_tapt_holdout.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
+| Task A 8 | 2026-09-17, completed | `08_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
+| Task A 9 | 2026-09-18, completed | `08_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
+| Task A 10 | 2026-09-19, completed | `10_frozen_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | **0.71 macro-F1, 0.70 accuracy**; rejected, and rejected as a blend member too |
+| Task A 11 | 2026-09-19, ready; not run | `11_reinit1_full_data.ipynb` | does one reinitialized layer beat two? The 0.8187 recipe with that one flag changed | full data, no local score; CodaBench pending, ~40 min |
+| Task A 12 | 2026-09-19, ready; not run | `12_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
+| Task A 13 | 2026-09-19, ready; not run | `13_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
+| Task A 14 | 2026-09-19, ready; not run | `14_third_member_blend.ipynb` | does XLM-R as a third ensemble member help? | 5-fold OOF, nested three-way blend |
+| Task A 15 | 2026-09-19, ready; not run | `15_capacity_and_schedule.ipynb` | is the recipe underfitting? MuRIL-large and 10 epochs | 5-fold OOF; collapse check first |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -59,9 +59,9 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 
 ## Ordered next steps
 
-1. Run [Task A Run 10](../notebooks/task_a/03_muril_embeddings_svm.ipynb) and compare
+1. Run [Task A Run 10](../notebooks/task_a/10_frozen_embeddings_svm.ipynb) and compare
    its fixed-holdout score with the existing MuRIL recipe.
-2. Finish [Task A Run 7](../notebooks/task_a/01_tapt_demojized_muril.ipynb) and compare
+2. Finish [Task A Run 7](../notebooks/task_a/07_tapt_holdout.ipynb) and compare
    the stock and TAPT MuRIL holdout scores.
 3. Treat the Run 8 ensemble as rejected for submission: its local OOF macro-F1 was
    `0.8233`, but its official CodaBench score was only `0.7890`.
@@ -116,7 +116,7 @@ Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Tas
 
 ## Experiment 5: full-data R-Drop against a matched control, notebook created 2026-09-19
 
-[The R-Drop notebook](../notebooks/task_a/04_rdrop_full_data.ipynb) trains two arms on all
+[The R-Drop notebook](../notebooks/task_a/05_rdrop_full_data.ipynb) trains two arms on all
 6,401 deduplicated rows with `--folds 1`, five seeds each, differing by one flag only:
 
 | arm | `--rdrop` | everything else |
@@ -160,7 +160,7 @@ score says otherwise.
 
 ## Experiment 7: Task-A-domain TAPT + demojized MuRIL, notebook created 2026-09-17
 
-[The Kaggle notebook](../notebooks/task_a/01_tapt_demojized_muril.ipynb) compares two
+[The Kaggle notebook](../notebooks/task_a/07_tapt_holdout.ipynb) compares two
 matched Task A arms:
 
 | arm | encoder initialization | classifier fine-tuning |
@@ -184,7 +184,7 @@ does not assume that the Task B TAPT gain transfers to Task A.
 
 ## Experiment 8: demojized MuRIL + TF-IDF OOF ensemble, 2026-09-17
 
-[The ensemble notebook](../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) trains
+[The ensemble notebook](../notebooks/task_a/08_muril_tfidf_ensemble.ipynb) trains
 demojized TF-IDF + calibrated LinearSVC and demojized MuRIL on the same deduplicate-first,
 five-fold split with split seed 42. It fits blend weights from OOF probabilities and uses
 a nested weight-search estimate to check whether any apparent blend gain survives
@@ -218,7 +218,7 @@ the 806-row validation set.
 
 ## Experiment 10: RBF SVM on frozen MuRIL embeddings, 2026-09-19
 
-[The notebook](../notebooks/task_a/03_muril_embeddings_svm.ipynb) uses MuRIL as a feature
+[The notebook](../notebooks/task_a/10_frozen_embeddings_svm.ipynb) uses MuRIL as a feature
 extractor with **no fine-tuning at all**: meanmax-pooled embeddings feed an
 `SVC(kernel="rbf", C=2.0, class_weight="balanced")`. It scores the method on the fixed
 85/15 holdout, then refits the SVM on all 6,401 deduplicated rows and predicts the
@@ -257,7 +257,7 @@ to 1. With agreement 0.772 and accuracies 0.8189 and 0.70:
 
 A blend helps only by overruling the stronger member, and here it would be wrong three
 times in four when it did. No weight gains. It should not enter the blend search in
-[Run 14](../notebooks/task_a/08_third_member_blend.ipynb).
+[Run 14](../notebooks/task_a/14_third_member_blend.ipynb).
 
 **The by-product is the more useful finding.** On the 622 rows where the two agree, they
 are still wrong 16.4% of the time. Two systems with very different inductive biases, a
@@ -269,6 +269,38 @@ disagrees this much and still adds nothing, XLM-R may not either.
 
 The notebook's holdout macro-F1 was not downloaded. Retrieving it is now optional, since
 the CodaBench score settles the method.
+
+## Experiment 11: one reinitialized layer, full data, notebook created 2026-09-19
+
+[The notebook](../notebooks/task_a/11_reinit1_full_data.ipynb) is the current best Task A
+submission with **exactly one flag changed**.
+
+| setting | Run 9, the current best | Run 11 |
+|---|---|---|
+| SVM | demojized, `--full-fit`, all 6,401 rows | same |
+| MuRIL | demojized, `--folds 1`, 1 seed, 6 epochs, effective batch 16 | same |
+| reinitialized layers | **2** | **1** |
+| blend weights | 0.57 SVM / 0.43 MuRIL | same |
+| decision threshold | 0.5 | same |
+
+Run 9's two-layer setting was a default inherited rather than chosen. Task B measured one
+layer against none at **+3.0 points** and one against two at +0.5, which is inside noise.
+Task A has tested neither.
+
+The blend weights are held fixed even though they were fitted in Run 8 against a two-layer
+MuRIL and are arguably no longer optimal. Refitting them would be a second change, and with
+no holdout there is nothing to refit them on that is not the hidden labels.
+
+No local score exists and none can: every labelled row is in training. The notebook prints
+two label-free diagnostics instead — predicted class balance against the training prior,
+which catches a collapse, and agreement with the preserved Task A submission, which says
+whether this is a near-rerun or a different bet.
+
+About 40 minutes, two for the SVM and roughly 33 for a single MuRIL seed.
+
+**If it beats `0.8187`, one layer becomes the base** and every queued experiment stacks on
+it. If it loses by more than about 3 points, two layers is right for Task A. Under 3 points
+is unresolved: one score on 806 rows carries roughly 1.5 points of standard deviation.
 
 ## Task B
 

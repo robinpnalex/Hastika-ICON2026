@@ -57,10 +57,10 @@ Any feature built from a word list targets rows that are already right.
 |---|---|---|---|---|---|
 | 1 | TAPT | A | +0.5 to +2.0 | 6 h | notebook written |
 | 2 | External corpus **labels** | A | +0.3 to +1.0 | 4 h full-data | notebook written, 5-fold |
-| 3 | One reinitialized layer instead of two | A | +0.0 to +0.5 | 3 h | notebook written |
-| 4 | Five seeds instead of one | A | +0.2 to +0.5, cannot hurt | 3 h | in Runs 5 and 11 |
-| 5 | Tuned decision threshold on the blend | A | +0.35 measured | free | in Run 11 |
-| 6 | Refit the blend weight | A | small, unknown sign | free | in Run 11 |
+| 3 | One reinitialized layer instead of two | A | +0.0 to +0.5 | **40 min** | Run 11, full data, ready |
+| 4 | Five seeds instead of one | A | +0.2 to +0.5, cannot hurt | 3 h | in Run 5 |
+| 5 | Tuned decision threshold on the blend | A | +0.35 measured | free, needs OOF | not built |
+| 6 | Refit the blend weight | A | small, unknown sign | free, needs OOF | not built |
 | 7 | R-Drop | A | unknown | 6.5 h | notebook written |
 | 8 | Ten epochs instead of six | A | +0.1 to +0.4 | 4.5 h | notebook written |
 | 9 | MuRIL-large | A, B | -8 to +1.5 | 8 h | notebook written |
@@ -103,7 +103,11 @@ pass on clean labels overwrites whatever boundary the external annotation set.
 **Rules note.** This trains on external *labels*, not just text. TAPT deliberately avoids
 that and every Task B decision kept external labels out. Settle it before submitting.
 
-### 3. One reinitialized layer instead of two
+### 3. One reinitialized layer instead of two — Run 11, ready
+
+**This is the one to run first.** Forty minutes, and it decides the base recipe that every
+other idea stacks on.
+
 
 Task B measured one layer against none at **+3.0**, and one against two at +0.5, which is
 inside noise. Task A's best submission uses two, inherited rather than chosen. The
@@ -136,8 +140,10 @@ to the MuRIL component changes the weight it deserves. Reinitialization cannot i
 with the ensemble — it touches only MuRIL's top layers and the SVM is untouched — but it
 does move the optimum.
 
-Free, given out-of-fold probabilities for both components, which no Task A run has yet
-stored.
+Free, given out-of-fold probabilities for both components — which no Task A run has yet
+stored, so ideas 5 and 6 are both blocked on the one five-fold pass described at the end of
+this file. Run 11 deliberately holds the weights and the threshold fixed so its result is
+attributable to the reinitialization alone.
 
 ### 7. R-Drop
 

@@ -253,7 +253,7 @@ The archive should contain only `predictions.csv`. Upload
 
 ### Task-A TAPT notebook — created, not yet run
 
-The next experiment is [the Task A TAPT notebook](../../notebooks/task_a/01_tapt_demojized_muril.ipynb).
+The next experiment is [the Task A TAPT notebook](../../notebooks/task_a/07_tapt_holdout.ipynb).
 Upload that notebook to Kaggle, enable GPU and Internet, and choose **Save Version ->
 Save & Run All**. It creates a fixed 85/15 classifier split, adapts MuRIL only on the
 85% training-side comments plus OffensEval Kannada text, then compares stock MuRIL with
@@ -278,7 +278,7 @@ for valid JSON and compilable code, but no experiment score has been recorded ye
 ### Task A MuRIL + TF-IDF ensemble notebook — completed, not retained
 
 After reviewing the TAPT comparison, the aligned OOF blend can be run with [the Task A
-ensemble notebook](../../notebooks/task_a/02_muril_tfidf_ensemble.ipynb). It trains
+ensemble notebook](../../notebooks/task_a/08_muril_tfidf_ensemble.ipynb). It trains
 demojized TF-IDF and demojized MuRIL on identical five-fold splits, searches blend weights
 from OOF probabilities, and performs a nested check to estimate whether blending really
 helps. The run produced validated ZIPs for both individual models and the ensemble.
@@ -291,7 +291,7 @@ experiment addresses this generalization gap.
 
 ### Task A full-data MuRIL + TF-IDF ensemble — completed
 
-Use the same [ensemble notebook](../../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) for
+Use the same [ensemble notebook](../../notebooks/task_a/08_muril_tfidf_ensemble.ipynb) for
 the final-fit follow-up. It trains both demojized components on all 6,401 deduplicated
 labelled rows, with no 80/20 folds and no 15% holdout. MuRIL uses `--folds 1` for a true
 full-data fit, while the SVM uses `--full-fit` to skip its OOF pass.
@@ -303,7 +303,7 @@ does not learn weights from hidden validation labels. The output was
 
 ### Task A MuRIL embeddings + SVM — ready to run
 
-The [embedding-SVM notebook](../../notebooks/task_a/03_muril_embeddings_svm.ipynb) freezes
+The [embedding-SVM notebook](../../notebooks/task_a/10_frozen_embeddings_svm.ipynb) freezes
 MuRIL, extracts masked mean+max embeddings from demojized text, and trains an RBF SVM
 classifier on top. It evaluates first on the fixed 15% stratified holdout, then refits
 the SVM on all 6,401 deduplicated labelled rows and writes
