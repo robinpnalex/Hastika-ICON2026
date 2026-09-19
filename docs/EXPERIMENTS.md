@@ -17,7 +17,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
-| Current Task A work | Three notebooks written and unrun: R-Drop (Run 5), TAPT (Run 7), frozen-embedding SVM (Run 10) |
+| Current Task A work | Run 10 built a submission, not yet scored; Runs 5, 7 and 11--15 written and unrun |
 | Next Task A step | Run 12 (TAPT), then Run 11 (reinit + blend weight), then Runs 13--15 |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
@@ -36,7 +36,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 7 | 2026-09-17, in progress | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
 | Task A 8 | 2026-09-17, completed | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
 | Task A 9 | 2026-09-18, completed | `02_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
-| Task A 10 | 2026-09-18, ready; not run | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | fixed 85/15 holdout; CodaBench pending |
+| Task A 10 | 2026-09-19, run; submission built | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | ZIP validated and preserved; holdout macro-F1 not captured; CodaBench pending |
 | Task A 11 | 2026-09-19, ready; not run | `05_reinit_ensemble_weight.ipynb` | does one-layer reinitialization help Task A, and what blend weight does it deserve? | 5-fold OOF on 6,401 rows, nested weight and threshold; CodaBench pending |
 | Task A 12 | 2026-09-19, ready; not run | `06_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
 | Task A 13 | 2026-09-19, ready; not run | `07_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
@@ -214,6 +214,44 @@ accuracy**, improving on the previous MuRIL result (`0.8163`/`0.8164`) by `+0.00
 the 806-row validation set.
 
 ---
+
+## Experiment 10: RBF SVM on frozen MuRIL embeddings, 2026-09-19
+
+[The notebook](../notebooks/task_a/03_muril_embeddings_svm.ipynb) uses MuRIL as a feature
+extractor with **no fine-tuning at all**: meanmax-pooled embeddings feed an
+`SVC(kernel="rbf", C=2.0, class_weight="balanced")`. It scores the method on the fixed
+85/15 holdout, then refits the SVM on all 6,401 deduplicated rows and predicts the
+official validation inputs.
+
+The artifact is preserved at
+[`submissions/task_a_embeddings_svm/`](../submissions/task_a_embeddings_svm/) and was
+validated on 2026-09-19: 806 rows, ids matching `binary_validation_inputs.csv` exactly, no
+duplicates, `id,label` header, allowed labels only, and a flat ZIP containing one bare
+`predictions.csv`.
+
+| | this run | training prior | previous Task A submission |
+|---|---|---|---|
+| Hate | 55.2% | 49.1% | 49.3% |
+| Non-Hate | 44.8% | 50.9% | 50.7% |
+
+It leans about six points further toward `Hate` than either reference. Not a collapse, but
+on a balanced task a skewed prior costs macro-F1 on the under-called class.
+
+**The number worth noting is the disagreement.** It matches the preserved Task A
+submission on only **77.2%** of the 806 rows. Two systems on the same task disagreeing
+that much is exactly the property that makes an ensemble member useful: blending pays when
+members fail differently, not when the added member is strong. A frozen encoder with an
+RBF head has a genuinely different inductive bias from a fine-tuned transformer, and this
+figure measures that. If its CodaBench score lands anywhere near the current best, it
+belongs in the blend search in
+[Run 14](../notebooks/task_a/08_third_member_blend.ipynb) alongside XLM-R.
+
+**Two figures are missing and should be filled in.** The notebook computes a holdout
+macro-F1 before refitting, and writes `config.json`, `holdout_idx.npy` and
+`holdout_decision.npy` to `task_a_muril_embeddings_svm_outputs` on Kaggle. Only the ZIP
+was downloaded, so there is no local number to set against the `0.8073` TF-IDF floor, and
+no CodaBench score has been reported yet. Retrieve both and record them here and in
+`submissions/task_a_embeddings_svm/README.md`.
 
 ## Task B
 

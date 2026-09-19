@@ -19,7 +19,6 @@ Notebook numbers are the order they were written, not the Run numbers in
 | `08_third_member_blend.ipynb` | 14 | does a third ensemble member with a different tokenizer help? SVM, MuRIL and XLM-R, nested three-way blend. | ~6 h | yes, 5-fold OOF |
 | `09_capacity_and_schedule.ipynb` | 15 | is the recipe underfitting? MuRIL-large and ten epochs against the six-epoch control. | ~8 h | yes, 5-fold OOF |
 | `01_tapt_demojized_muril.ipynb` | 7 | does Task-A-domain TAPT help before fine-tuning? Control against TAPT on the fixed 85/15 split. | ~2--4 h | yes, 15% holdout |
-| `03_muril_embeddings_svm.ipynb` | 10 | can an RBF SVM on frozen MuRIL embeddings beat fine-tuning? | — | yes, 85/15 holdout |
 
 ### Runs 12 to 15, why each exists
 
@@ -104,6 +103,12 @@ comparison and does produce an OOF score, at roughly five times the cost.
 |---|---|---|---|
 | `02_muril_tfidf_ensemble.ipynb` | 8 | OOF blend of demojized MuRIL and TF-IDF/SVM, weights nested-checked | 0.7890, rejected |
 | `02_muril_tfidf_ensemble.ipynb` | 9 | the same two components, each fitted on all 6,401 rows, fixed 57/43 weights | **0.8187**, current best |
+| `03_muril_embeddings_svm.ipynb` | 10 | RBF SVM on frozen MuRIL embeddings, no fine-tuning | ZIP validated and preserved; holdout score not captured, CodaBench pending |
+
+Run 10's artifact is at `submissions/task_a_embeddings_svm/`. It agrees with the older
+preserved Task A submission on only 77.2% of the 806 rows, which makes it a candidate for
+the blend search in Run 14 whatever its own score turns out to be. Its holdout macro-F1
+was computed by the notebook but not downloaded; retrieve it from the Kaggle output.
 
 Runs 1 to 4 and 6 predate the notebooks and were run from the Task A training scripts.
 Their numbers are in [`../EXPERIMENTS.md`](../EXPERIMENTS.md).

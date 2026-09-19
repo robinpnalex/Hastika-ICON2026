@@ -37,10 +37,21 @@ exact commands and the CodaBench score, and add its row above.
 
 `submissions/task_a/task_a_predictions.zip` is the preserved Task A upload.
 
-The latest Task A submission was the full-data MuRIL + TF-IDF ensemble. It scored
-**0.8187 macro-F1** and **0.8189 accuracy**, improving on the previous MuRIL submission
-(`0.8163`/`0.8164`). Its ZIP and unpacked CSV were uploaded from external Kaggle output
+| rank | arm | macro-F1 | measured on | submitted |
+|---|---|---|---|---|
+| 1 | full-data MuRIL + TF-IDF ensemble | **0.8187** | CodaBench, 806 rows | yes |
+| 2 | MuRIL, flags unrecorded | 0.8163 | CodaBench | yes |
+| 3 | demojized TF-IDF + LinearSVC | 0.8103 | 5-fold CV | — |
+| — | `task_a_embeddings_svm` | pending | — | built, not yet scored |
+
+The best Task A submission is the full-data MuRIL + TF-IDF ensemble at **0.8187 macro-F1**
+and **0.8189 accuracy**. Its ZIP and unpacked CSV were uploaded from external Kaggle output
 and are not currently stored in this repository.
+
+`task_a_embeddings_svm/` holds Run 10, an RBF SVM on frozen MuRIL embeddings. The artifact
+is validated and preserved, but its holdout macro-F1 was not captured and it has not been
+scored on CodaBench. It agrees with the older preserved Task A submission on only 77.2% of
+rows, which makes it a candidate ensemble member regardless of its own score.
 
 ## Format
 
