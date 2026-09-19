@@ -38,7 +38,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 8 | 2026-09-17, completed | `08_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
 | Task A 9 | 2026-09-18, completed | `08_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
 | Task A 10 | 2026-09-19, completed | `10_frozen_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | **0.71 macro-F1, 0.70 accuracy**; rejected, and rejected as a blend member too |
-| Task A 11 | 2026-09-19, ready; **run this first** | `11_reinit1_full_data.ipynb` | one reinitialized layer, with the blend weight and threshold refitted to match | 5-fold OOF then full-data refit; CodaBench pending, ~3.4 h |
+| Task A 11 | 2026-09-19, completed | `11_reinit1_full_data.ipynb` | one reinitialized layer, with the blend weight and threshold refitted to match | **0.8188 macro-F1, 0.8189 accuracy** — a tie with Run 9's 0.8187 |
 | Task A 16 | 2026-09-19, ready; not run | `16_funnel.ipynb` | which component-level ideas actually help? Seven arms screened, leaders confirmed | holdout rank then 5-fold; ~6 h stage 1 |
 | Task A 12 | 2026-09-19, ready; not run | `12_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
 | Task A 13 | 2026-09-19, ready; not run | `13_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
