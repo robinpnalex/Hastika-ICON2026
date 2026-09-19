@@ -39,13 +39,16 @@ exact commands and the CodaBench score, and add its row above.
 
 | rank | arm | macro-F1 | measured on | submitted |
 |---|---|---|---|---|
-| 1 | full-data MuRIL + TF-IDF ensemble | **0.8187** | CodaBench, 806 rows | yes |
+| 1 | one-layer reinit + refitted blend, Run 11 | **0.8188** | CodaBench, 806 rows | yes |
+| 1= | full-data MuRIL + TF-IDF ensemble, Run 9 | **0.8187** | CodaBench, 806 rows | yes |
 | 2 | MuRIL, flags unrecorded | 0.8163 | CodaBench | yes |
 | 3 | demojized TF-IDF + LinearSVC | 0.8103 | 5-fold CV | — |
 | — | `task_a_embeddings_svm` | pending | — | built, not yet scored |
 
-The best Task A submission is the full-data MuRIL + TF-IDF ensemble at **0.8187 macro-F1**
-and **0.8189 accuracy**. Its ZIP and unpacked CSV were uploaded from external Kaggle output
+Runs 9 and 11 are tied: `0.8187` and `0.8188` macro-F1, both `0.8189` accuracy. The gap is
+under one row of 806, so either can serve as the base recipe. Run 11 changed three things
+at once — one reinitialized layer, a refitted blend weight, a fitted threshold — and
+together they moved nothing. Its ZIP and unpacked CSV were uploaded from external Kaggle output
 and are not currently stored in this repository.
 
 `task_a_embeddings_svm/` holds Run 10, an RBF SVM on frozen MuRIL embeddings. The artifact

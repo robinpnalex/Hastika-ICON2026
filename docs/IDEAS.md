@@ -57,10 +57,10 @@ Any feature built from a word list targets rows that are already right.
 |---|---|---|---|---|---|
 | 1 | TAPT | A | +0.5 to +2.0 | 6 h | notebook written |
 | 2 | External corpus **labels** | A | +0.3 to +1.0 | 4 h full-data | notebook written, 5-fold |
-| 3 | One reinitialized layer instead of two | A | +0.0 to +0.5 | **40 min** | Run 11, full data, ready |
+| 3 | One reinitialized layer instead of two | A | **measured: tie, +0.0001** | — | Run 11, done |
 | 4 | Five seeds instead of one | A | +0.2 to +0.5, cannot hurt | 3 h | in Run 5 |
-| 5 | Tuned decision threshold on the blend | A | +0.35 measured | free, needs OOF | not built |
-| 6 | Refit the blend weight | A | small, unknown sign | free, needs OOF | not built |
+| 5 | Tuned decision threshold on the blend | A | **folded into Run 11's tie** | free | done |
+| 6 | Refit the blend weight | A | **folded into Run 11's tie** | free | done |
 | 7 | R-Drop | A | unknown | 6.5 h | notebook written |
 | 8 | Ten epochs instead of six | A | +0.1 to +0.4 | 4.5 h | notebook written |
 | 9 | MuRIL-large | A, B | -8 to +1.5 | 8 h | notebook written |

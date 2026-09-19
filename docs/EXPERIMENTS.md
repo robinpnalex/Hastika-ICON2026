@@ -271,37 +271,48 @@ disagrees this much and still adds nothing, XLM-R may not either.
 The notebook's holdout macro-F1 was not downloaded. Retrieving it is now optional, since
 the CodaBench score settles the method.
 
-## Experiment 11: one reinitialized layer, full data, notebook created 2026-09-19
+## Experiment 11: one reinitialized layer and a refitted blend, 2026-09-19
 
-[The notebook](../notebooks/task_a/11_reinit1_full_data.ipynb) is the current best Task A
-submission with **exactly one flag changed**.
+[The notebook](../notebooks/task_a/11_reinit1_full_data.ipynb) changed three things about
+the current best Task A recipe and measured them together.
 
-| setting | Run 9, the current best | Run 11 |
+| setting | Run 9, previous best | Run 11 |
 |---|---|---|
 | SVM | demojized, `--full-fit`, all 6,401 rows | same |
 | MuRIL | demojized, `--folds 1`, 1 seed, 6 epochs, effective batch 16 | same |
-| reinitialized layers | **2** | **1** |
-| blend weights | 0.57 SVM / 0.43 MuRIL | same |
-| decision threshold | 0.5 | same |
+| reinitialized layers | 2 | **1** |
+| blend weight | 0.57 / 0.43, fitted in Run 8 against a two-layer MuRIL | **refitted** |
+| decision threshold | 0.5, never tuned | **fitted** |
 
-Run 9's two-layer setting was a default inherited rather than chosen. Task B measured one
-layer against none at **+3.0 points** and one against two at +0.5, which is inside noise.
-Task A has tested neither.
+The weight was refitted rather than carried over because it was fitted against the
+component this run replaces: a stronger MuRIL deserves more of the blend. That required
+out-of-fold probabilities, so stage 1 ran five folds for both components, stage 2 fitted
+the weight and threshold with a nested check, and stage 3 refitted both on all 6,401 rows.
+About 3.4 hours.
 
-The blend weights are held fixed even though they were fitted in Run 8 against a two-layer
-MuRIL and are arguably no longer optimal. Refitting them would be a second change, and with
-no holdout there is nothing to refit them on that is not the hidden labels.
+### Result
 
-No local score exists and none can: every labelled row is in training. The notebook prints
-two label-free diagnostics instead — predicted class balance against the training prior,
-which catches a collapse, and agreement with the preserved Task A submission, which says
-whether this is a near-rerun or a different bet.
+CodaBench returned **`0.8188` macro-F1 and `0.8189` accuracy**, against Run 9's `0.8187`
+and `0.8189`. That is `+0.0001`, less than one row of 806, with accuracy identical to four
+decimals. **A tie.**
 
-About 40 minutes, two for the SVM and roughly 33 for a single MuRIL seed.
+Three changes at once moved nothing. Two readings fit that, and the stage-2 output
+distinguishes them:
 
-**If it beats `0.8187`, one layer becomes the base** and every queued experiment stacks on
-it. If it loses by more than about 3 points, two layers is right for Task A. Under 3 points
-is unresolved: one score on 806 rows carries roughly 1.5 points of standard deviation.
+* if the refitted weight came out near 0.57, one layer did not make MuRIL stronger, and
+  Task B's finding that one beat two by +0.5 does not transfer to Task A
+* if the weight moved a long way and the score still did not budge, the blend is flat in
+  that region and the weight was never the constraint
+
+The stage-2 numbers — both components' OOF scores, the nested blend score, the fitted
+weight and threshold — are **not yet recorded**. They are the informative part of this run,
+measured on 6,401 rows at about 0.6 points of noise against the roughly 1.5 points one
+CodaBench score carries. Retrieve them from the notebook output.
+
+**Either recipe can serve as the base**, since they are indistinguishable. The durable
+product is the stored `oof_probs.npy` for both components, which Task A had never had:
+every later blend weight, threshold or decode rule is now seconds of CPU rather than a GPU
+session.
 
 ## Experiment 16: the funnel over component-level ideas, created 2026-09-19
 
