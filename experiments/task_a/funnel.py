@@ -35,10 +35,16 @@ Fitting the weight first and then changing the encoder would invalidate the weig
 Skipped deliberately, all measured and dead -- see docs/IDEAS.md: gazetteer and profanity
 features, stemming, stopword removal, focal loss, class weighting, frozen embeddings.
 
-RESUMABLE
----------
+RESUMABLE, AND SHARED WITH RUN 11
+---------------------------------
 Every stage skips work whose output already exists, so a session that dies partway can be
 re-run and will continue rather than restart. RESULTS.md is rewritten after every arm.
+
+The five-fold control is tagged `f_control`, which is the same tag and the same
+configuration that notebooks/task_a/11_reinit1_full_data.ipynb uses for its MuRIL arm.
+Whichever runs second finds the file and skips the 160 minutes. Nothing else is shared:
+each arm trains exactly the one configuration it is testing, and the control is trained
+once for all seven arms rather than once per arm.
 """
 import argparse
 import json
@@ -243,7 +249,10 @@ def main():
             promote.append("control")
         for tag in promote:
             est = dict((x[0], x[3]) for x in ARMS)[tag]
-            if oof_score(tag, y) is None:
+            if oof_score(tag, y) is not None:
+                print(f"reusing existing five-fold {tag}"
+                      + (" (from Run 11)" if tag == "control" else ""), flush=True)
+            else:
                 if left() < est * 60:
                     print(f"skip 5-fold {tag}: {left()/60:.0f} min left, needs ~{est}",
                           flush=True)

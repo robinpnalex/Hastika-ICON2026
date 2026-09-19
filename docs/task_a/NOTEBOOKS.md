@@ -55,8 +55,10 @@ Three things come out besides the submission: MuRIL's own out-of-fold score agai
 both components — which the repository has never had for Task A**. With those stored, every
 later blend weight, threshold or decode idea costs seconds of CPU instead of a GPU session.
 
-Its five-fold MuRIL arm is the same configuration as the funnel's `control`, so running it
-first also supplies the funnel's reference point.
+Its five-fold MuRIL arm is tagged **`f_control`**, the same tag and configuration the
+funnel uses for its own control. Whichever notebook runs second finds the file and skips
+the 160 minutes, so the control is trained once across both. Run 11 first and the funnel
+inherits its reference point free.
 
 ### Run 5 in detail
 
@@ -83,8 +85,12 @@ Arms: `control` (one layer, 6 epochs), `reinit2`, `tapt`, `ext_mix`, `ext_stage`
 is fixed because nothing queued touches it. Each arm's predicted class balance is checked
 against Task A's 0.491 prior, and a collapsed arm is not promoted.
 
-Runs 12 to 15 are kept as standalone notebooks for anyone who wants one factor in
-isolation, and Run 7 remains the leak-free TAPT comparison on the fixed holdout.
+**Runs 12 to 15 each train their own control**, which is why they are wasteful once the
+funnel exists: the funnel trains one control for all seven arms, and shares it with Run 11
+on top of that. They are kept only for anyone wanting a single factor in isolation. Run 5
+is superseded the same way — it is a 6.5 hour full-data pair testing what a 33 minute
+funnel arm would answer. Run 7 remains the leak-free TAPT comparison and is worth running
+only if `tapt` wins the funnel.
 
 | notebook | run | kept for | time |
 |---|---|---|---|
