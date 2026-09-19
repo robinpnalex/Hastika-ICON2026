@@ -37,6 +37,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 8 | 2026-09-17, completed | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
 | Task A 9 | 2026-09-18, completed | `02_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
 | Task A 10 | 2026-09-18, ready; not run | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | fixed 85/15 holdout; CodaBench pending |
+| Task A 11 | 2026-09-19, ready; not run | `05_reinit_ensemble_weight.ipynb` | does one-layer reinitialization help Task A, and what blend weight does it deserve? | 5-fold OOF on 6,401 rows, nested weight and threshold; CodaBench pending |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |

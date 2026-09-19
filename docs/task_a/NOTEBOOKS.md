@@ -12,9 +12,33 @@ Notebook numbers are the order they were written, not the Run numbers in
 
 | notebook | run | what it answers | time | local score? |
 |---|---|---|---|---|
+| `05_reinit_ensemble_weight.ipynb` | 11 | does one-layer reinitialization help Task A, and what is the right blend weight now? Five-fold OOF for both settings, nested weight and threshold search, then a full-data fit of the winner. | ~8.2 h | yes, 5-fold OOF |
 | `04_rdrop_full_data.ipynb` | 5 | does R-Drop improve the recipe? Two arms on all 6,401 rows, five seeds each, one flag apart. | ~6.5 h | no |
 | `01_tapt_demojized_muril.ipynb` | 7 | does Task-A-domain TAPT help before fine-tuning? Control against TAPT on the fixed 85/15 split. | ~2--4 h | yes, 15% holdout |
 | `03_muril_embeddings_svm.ipynb` | 10 | can an RBF SVM on frozen MuRIL embeddings beat fine-tuning? | — | yes, 85/15 holdout |
+
+### Run 11 in detail
+
+Run 9's blend weight of 57/43 was fitted in Run 8 against a **two-layer** MuRIL. A better
+MuRIL component should earn more weight, so this notebook refits it rather than assuming
+it. Reinitialization itself cannot interfere with the ensemble: it touches only MuRIL's
+top layers before fine-tuning and the TF-IDF/SVM is untouched. What it changes is the
+optimal mixing weight, which depends on the relative strength of the two components.
+
+Stage 1 runs five-fold OOF for the SVM and for MuRIL at one and two reinitialized layers,
+all on split seed 42 so the matrices line up row for row. Stage 2 compares the two
+reinitialization settings on 6,401 out-of-fold rows, where noise is about 0.6 points --
+Task B could never resolve a gap this small. Stage 3 sweeps the blend weight and the
+decision threshold together and reports a **nested** estimate, with both chosen on an
+inner split of each fold's training rows. Stage 4 fits the winner on all rows with five
+seeds and applies the stage-3 values unchanged.
+
+The threshold is swept because it is free and it works: on the TF-IDF floor, 0.5 scores
+`0.8073` and a nested threshold scores `0.8108`. `hastika.models.muril` already does this
+for a single model, but the ensemble notebook hard-codes `> 0.5`.
+
+The budget guard runs the one-layer arm first, so a short session still answers the weight
+question and still produces a submission.
 
 ### Run 5 in detail
 
