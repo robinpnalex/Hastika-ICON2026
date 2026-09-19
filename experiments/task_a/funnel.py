@@ -18,6 +18,12 @@ Three stages, each answering a different question, cheapest first.
   stage 3  the winner's blend weight and threshold
            fitted on its OOF, then a full-data refit   ~35 min
 
+Every arm is also packaged as a CodaBench ZIP under subs/, because muril.py writes
+predictions.csv whatever --folds is. A five-fold arm's predictions are the average of its
+five fold models, which is a legitimate submission -- Task B's b_tapt_5f was exactly that.
+A holdout arm's predictions come from one model trained on 85% of the rows, so it is
+weaker, but it is there if you want it.
+
 Task B ran this exact funnel and recorded the result: "for all four promoted arms the
 five-fold order matched the holdout order exactly, while the level dropped by roughly
 0.022 in three of the four cases." So the holdout RANKS correctly and READS high. Stage 1
@@ -263,6 +269,19 @@ def main():
                    log=LOGS / f"f_{tag}.log")
             res.setdefault(tag, {})["fold"] = oof_score(tag, y)
             write_results(res, out, time.time() - t0, "2 (confirming)")
+
+    # ---- package every arm that produced predictions -----------------------
+    # muril.py writes predictions.csv whatever --folds is: for 5 it is the average
+    # over the fold models, for 0 it is the single 85% model. Both are valid
+    # submissions, the holdout one just saw less data. Zipping them costs nothing
+    # and means a screening session still hands you something uploadable.
+    subs = out / "subs"; subs.mkdir(exist_ok=True)
+    for d in sorted(RUNS.glob("[af]_*")):
+        pred = d / "predictions.csv"
+        if pred.exists():
+            sh([py, "-m", "hastika.common.submission", "--task", "a",
+                "--pred", str(pred), "--out", str(subs / f"{d.name}.zip")])
+    print(f"\npackaged {len(list(subs.glob('*.zip')))} submission ZIPs in {subs}", flush=True)
 
     for f in LOGS.glob("*.log"):
         sh(["cp", str(f), str(out)])
