@@ -10,6 +10,7 @@ session dies with the browser tab and they all run for hours.
 | notebook | what it answers | time | score |
 |---|---|---|---|
 | `10_context_decode.ipynb` | Run 10. Does a violent action word mean Violence only when no target group is named? Five folds of the current recipe, then a per-cell prior correction fitted and nested on the OOF. Writes a ZIP only if the nested check wins. | ~2.6 h | yes, 5-fold OOF |
+| `11_stack_on_best.ipynb` | Run 11. Four full-data arms, each the 0.6410 recipe plus exactly one flag: `--epochs 10`, an unchanged control rerun, `--tags`, and `--no-fgm`. One CodaBench ZIP per arm, plus a no-GPU TF-IDF blend. | ~8.9 h | no; CodaBench only |
 
 A violent word's meaning depends on its company. Among the 420 training comments
 containing one: with media context present, Others is 0.27 and Violence 0.18; with no
@@ -23,6 +24,33 @@ represent the interaction and a bag of n-grams cannot, so the model may already 
 Run 10 also leaves behind `oof_probs.npy` for the current recipe, which nothing else in
 the repo has. With that file any future decode idea can be tested in seconds rather than
 in 108 minutes of GPU.
+
+### Run 11 in detail
+
+Every arm is byte-for-byte `b_reinit1_rdrop_full` except the single flag named. Arms are
+ordered by value and the wall-clock guard skips from the bottom, so a short session loses
+`s_nofgm` rather than `s_epochs10`. `RESULTS.md` is rewritten after every arm, so an
+interrupted session still leaves usable output.
+
+| arm | flag | what it answers | time |
+|---|---|---|---|
+| `s_epochs10` | `--epochs 10` | six epochs was tuned on Task A before R-Drop and TAPT existed, and R-Drop makes each epoch teach less | 188 min |
+| `s_control` | none | rerun of Run 9. Its score against 0.6410 measures run-to-run noise, and it supplies the `test_probs.npy` the blend needs | 113 min |
+| `s_tags` | `--tags` | gazetteer, mood and address tags. Noise on the SVM at -0.007, but that model already has those words as features | 113 min |
+| `s_nofgm` | `--no-fgm` | FGM is ~45% of runtime and has never been tested on Task B. A tie makes every future run twice as fast | 73 min |
+| `s_blend` | none | no GPU: averages `s_control`'s probabilities with the TF-IDF SVM's | 0 min |
+
+Four arms are deliberately off and `--arms` re-enables them: `s_stopwords`, because the
+frequency stoplist contains `bjp`, `congress`, `dagar` and `desha`; `s_stem`, because
+character normalization already measured -0.003 and wordpiece splits `madthare` already;
+`s_polarity`, because it is the shape of `b_abusive` at 0.5718 and reads external labels,
+which is a rules question; and `s_seeds10`, because run-to-run spread is about 0.5 points
+and 1 point on the 395-row set is 2 rows.
+
+**Submit `s_control` first.** Its CodaBench score against Run 9's 0.6410 is what tells you
+how to read the other three. If a pure rerun of the identical recipe lands at 0.63 or
+0.65, then a 1-point gap anywhere in the table means nothing, and only arms moving 2
+points or more are worth acting on. Record every score, including the losers.
 
 ## Run this one
 

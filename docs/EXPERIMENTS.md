@@ -47,7 +47,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 8 | 2026-09-17, completed | `08_full_data_fit_reinit1.ipynb` | train current candidate on all data and infer validation | **0.6299 CodaBench** |
 | Task B 9 | 2026-09-17, completed | `09_rdrop_one_layer.ipynb` | submit full-data R-Drop on the current one-layer recipe | **0.6410 CodaBench macro-F1, 0.6937 accuracy** |
 | Task B 10 | ready; not run | `10_context_decode.ipynb` | does a violent word mean Violence only when no target group is named? | 5-fold OOF, nested; ZIP written only if it wins |
-| Task B 11 | ready; not run | `experiments/task_b/stack_full.py` | four full-data arms stacked on the 0.6410 recipe: 10 epochs, unchanged control, tags, no-FGM | CodaBench pending, ~8.9 h |
+| Task B 11 | ready; not run | `11_stack_on_best.ipynb` | four full-data arms stacked on the 0.6410 recipe: 10 epochs, unchanged control, tags, no-FGM | CodaBench pending, ~8.9 h; submit `s_control` first to measure rerun noise |
 
 ## Ordered next steps
 
