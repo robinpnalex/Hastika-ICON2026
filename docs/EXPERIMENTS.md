@@ -1,6 +1,7 @@
 # Training Results Log
 
-This is the experiment ledger for the project. It separates completed measurements,
+This is the experiment ledger for the project. Ideas not yet run, and ideas measured and
+rejected, live in [`IDEAS.md`](IDEAS.md). It separates completed measurements,
 provisional findings, and planned runs. Local Task B scores are unbiased OOF macro-F1
 unless explicitly marked as a holdout or full fit; full-data fits have no local score.
 
