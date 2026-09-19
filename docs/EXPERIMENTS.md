@@ -305,15 +305,42 @@ distinguishes them:
 * if the weight moved a long way and the score still did not budge, the blend is flat in
   that region and the weight was never the constraint
 
-The stage-2 numbers — both components' OOF scores, the nested blend score, the fitted
-weight and threshold — are **not yet recorded**. They are the informative part of this run,
-measured on 6,401 rows at about 0.6 points of noise against the roughly 1.5 points one
-CodaBench score carries. Retrieve them from the notebook output.
+### Stage 2, recovered 2026-09-20, and it explains the tie
 
-**Either recipe can serve as the base**, since they are indistinguishable. The durable
-product is the stored `oof_probs.npy` for both components, which Task A had never had:
-every later blend weight, threshold or decode rule is now seconds of CPU rather than a GPU
-session.
+| quantity | value |
+|---|---|
+| SVM, five-fold OOF | **0.8073** |
+| MuRIL with one reinitialized layer, five-fold OOF | **0.7894** |
+| nested blend | **0.8164** |
+| Run 8's fixed 0.57 at threshold 0.50, in-sample | 0.8188 |
+| refitted weight and threshold | **SVM 0.62 / MuRIL 0.38, threshold 0.48** |
+| per-fold picks | w from 0.45 to 0.85, threshold 0.46 to 0.52 |
+| predicted Hate rate | 0.488 against a 0.491 prior |
+| agreement with the preserved submission | 0.871 |
+
+**The MuRIL component is weaker than the SVM**: 0.7894 against 0.8073. That is the first
+thing to notice, and it holds independently — Run 12's stock arm, the same configuration,
+scored exactly 0.7894 on the same folds.
+
+**So the weight moved the other way from what was expected.** I predicted it would fall
+below 0.57 if one layer made MuRIL stronger. It rose to 0.62, because one layer made MuRIL
+*weaker*, which is the same finding Run 16 reached independently at +0.0160 for two layers.
+
+That is the whole story of the tie. One reinitialized layer cost the MuRIL component
+accuracy, the refitted weight correctly compensated by leaning further on the SVM, and the
+two effects cancelled to within one row of 806.
+
+**The per-fold picks are unstable**, w ranging from 0.45 to 0.85 across five folds. The
+blend surface is flat in that region, so the weight is not well determined and small changes
+to it mean little. That answers the second reading offered above: the weight was never the
+constraint.
+
+**Blending does pay**, though: the nested blend at 0.8164 beats the better component alone
+by +0.009.
+
+**Implication for the next submission.** Run 12's TAPT MuRIL scores 0.8128 out-of-fold,
+against 0.7894 for this one. Blending that against the same SVM should beat 0.8164, and
+this time the weight should move toward MuRIL rather than away from it.
 
 ## Experiment 16: the funnel over component-level ideas, created 2026-09-19
 

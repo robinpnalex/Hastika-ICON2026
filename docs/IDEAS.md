@@ -278,6 +278,13 @@ about 0.013 of noise; five-fold figures are on 6,401 rows with about 0.006.
 | External corpus labels, as a first stage | -0.0066, dead | Run 16 |
 | One layer + refitted weight + tuned threshold, together | +0.0001, a tie | Run 11 |
 
+Run 11's components, five-fold OOF: SVM `0.8073`, MuRIL with one layer `0.7894`, nested
+blend `0.8164`, refitted weight SVM 0.62 / MuRIL 0.38 at threshold 0.48. The MuRIL half is
+**weaker than the SVM**, which is why the weight rose rather than fell, and why the tie
+happened: one layer cost the component accuracy and the refit compensated by leaning on the
+SVM. The per-fold weight picks ranged 0.45 to 0.85, so the blend surface is flat there and
+the weight was never the constraint.
+
 Three of these contradict what was expected, and the contradictions are the useful part:
 
 * **Ten epochs was predicted to be worth "a few tenths" and is worth 2.8 points.** The
