@@ -17,7 +17,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
-| Current Task A work | Run 10 built a submission, not yet scored; Runs 5, 7 and 11--15 written and unrun |
+| Current Task A work | Run 10 completed and rejected at 0.71; Runs 5, 7 and 11--15 written and unrun |
 | Next Task A step | Run 12 (TAPT), then Run 11 (reinit + blend weight), then Runs 13--15 |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
@@ -36,7 +36,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 7 | 2026-09-17, in progress | `01_tapt_demojized_muril.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
 | Task A 8 | 2026-09-17, completed | `02_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
 | Task A 9 | 2026-09-18, completed | `02_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
-| Task A 10 | 2026-09-19, run; submission built | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | ZIP validated and preserved; holdout macro-F1 not captured; CodaBench pending |
+| Task A 10 | 2026-09-19, completed | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | **0.71 macro-F1, 0.70 accuracy**; rejected, and rejected as a blend member too |
 | Task A 11 | 2026-09-19, ready; not run | `05_reinit_ensemble_weight.ipynb` | does one-layer reinitialization help Task A, and what blend weight does it deserve? | 5-fold OOF on 6,401 rows, nested weight and threshold; CodaBench pending |
 | Task A 12 | 2026-09-19, ready; not run | `06_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
 | Task A 13 | 2026-09-19, ready; not run | `07_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
@@ -237,21 +237,37 @@ duplicates, `id,label` header, allowed labels only, and a flat ZIP containing on
 It leans about six points further toward `Hate` than either reference. Not a collapse, but
 on a balanced task a skewed prior costs macro-F1 on the under-called class.
 
-**The number worth noting is the disagreement.** It matches the preserved Task A
-submission on only **77.2%** of the 806 rows. Two systems on the same task disagreeing
-that much is exactly the property that makes an ensemble member useful: blending pays when
-members fail differently, not when the added member is strong. A frozen encoder with an
-RBF head has a genuinely different inductive bias from a fine-tuned transformer, and this
-figure measures that. If its CodaBench score lands anywhere near the current best, it
-belongs in the blend search in
-[Run 14](../notebooks/task_a/08_third_member_blend.ipynb) alongside XLM-R.
+**CodaBench returned `0.71` macro-F1 and `0.70` accuracy.** That is 11 points below the
+current best and 10 below the TF-IDF floor, so freezing the encoder costs far more than an
+RBF head recovers. The method is rejected.
 
-**Two figures are missing and should be filled in.** The notebook computes a holdout
-macro-F1 before refitting, and writes `config.json`, `holdout_idx.npy` and
-`holdout_decision.npy` to `task_a_muril_embeddings_svm_outputs` on Kaggle. Only the ZIP
-was downloaded, so there is no local number to set against the `0.8073` TF-IDF floor, and
-no CodaBench score has been reported yet. Retrieve both and record them here and in
-`submissions/task_a_embeddings_svm/README.md`.
+**It is also rejected as an ensemble member, and the arithmetic settles that without the
+hidden labels.** It disagrees with the best submission on 22.8% of rows, which is normally
+the property that makes a blend worth trying. But on a binary task, when two systems
+disagree exactly one of them matches gold, so their hit-rates on the disagreement rows sum
+to 1. With agreement 0.772 and accuracies 0.8189 and 0.70:
+
+| quantity | value |
+|---|---|
+| rows where they disagree | 184 of 806 |
+| on those rows, the best submission is right | 76.0% |
+| on those rows, this model is right | **24.0%** |
+| on rows where they agree, both are right | 83.6% |
+
+A blend helps only by overruling the stronger member, and here it would be wrong three
+times in four when it did. No weight gains. It should not enter the blend search in
+[Run 14](../notebooks/task_a/08_third_member_blend.ipynb).
+
+**The by-product is the more useful finding.** On the 622 rows where the two agree, they
+are still wrong 16.4% of the time. Two systems with very different inductive biases, a
+fine-tuned transformer and a frozen encoder with a kernel head, failing together on the
+same rows matches the Task A error analysis, which found 92% of errors in comments
+carrying no profanity at all. That shared residue, not member diversity, is where the
+remaining points are. It also lowers the expected value of Run 14: if a frozen MuRIL
+disagrees this much and still adds nothing, XLM-R may not either.
+
+The notebook's holdout macro-F1 was not downloaded. Retrieving it is now optional, since
+the CodaBench score settles the method.
 
 ## Task B
 

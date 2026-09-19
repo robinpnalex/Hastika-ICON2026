@@ -103,12 +103,13 @@ comparison and does produce an OOF score, at roughly five times the cost.
 |---|---|---|---|
 | `02_muril_tfidf_ensemble.ipynb` | 8 | OOF blend of demojized MuRIL and TF-IDF/SVM, weights nested-checked | 0.7890, rejected |
 | `02_muril_tfidf_ensemble.ipynb` | 9 | the same two components, each fitted on all 6,401 rows, fixed 57/43 weights | **0.8187**, current best |
-| `03_muril_embeddings_svm.ipynb` | 10 | RBF SVM on frozen MuRIL embeddings, no fine-tuning | ZIP validated and preserved; holdout score not captured, CodaBench pending |
+| `03_muril_embeddings_svm.ipynb` | 10 | RBF SVM on frozen MuRIL embeddings, no fine-tuning | **0.71**, rejected; also rejected as a blend member |
 
-Run 10's artifact is at `submissions/task_a_embeddings_svm/`. It agrees with the older
-preserved Task A submission on only 77.2% of the 806 rows, which makes it a candidate for
-the blend search in Run 14 whatever its own score turns out to be. Its holdout macro-F1
-was computed by the notebook but not downloaded; retrieve it from the Kaggle output.
+Run 10 scored 0.71 and is rejected. It is rejected as a blend member too: it disagrees
+with the best submission on 184 of 806 rows and is right on only 24% of them, so no weight
+gains. The derivation is in `submissions/task_a_embeddings_svm/README.md`. That result
+also lowers the expected value of Run 14 — if a frozen encoder disagrees this much and
+still adds nothing, XLM-R may not either.
 
 Runs 1 to 4 and 6 predate the notebooks and were run from the Task A training scripts.
 Their numbers are in [`../EXPERIMENTS.md`](../EXPERIMENTS.md).
