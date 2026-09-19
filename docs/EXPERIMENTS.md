@@ -9,18 +9,18 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 * **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
   `Political`, `Religion`, and `Violence`.
 
-## Current status — 2026-09-18
+## Current status — 2026-09-20
 
 | item | current state |
 |---|---|
-| Best Task A result | Runs 9 and 11 tied at **`0.8187`** / **`0.8188`** macro-F1 on validation A |
+| Best Task A result | Run 11 at **`0.8188`** macro-F1 / `0.8189` accuracy on validation A; Run 9 is next at `0.8187` / `0.8189` |
 | Best Task A component | TAPT MuRIL alone, `0.8128` five-fold OOF, against the `0.8073` TF-IDF floor |
 | Best Task B local result | One-layer reinitialization, `0.614` averaged five-fold OOF macro-F1, Run 6 |
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
-| Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
-| Current Task A work | Run 10 completed and rejected at 0.71; Runs 5, 7 and 11--15 written and unrun |
-| Next Task A step | Combine the winners: TAPT + 10 epochs + two reinitialized layers, five-fold |
+| Next Task B step | Run 14 (expanded TAPT) or Run 15 (MuRIL-large); both are full-data CodaBench submissions |
+| Current Task A work | Run 7 trained but its summary assertion failed; Run 12 and Run 16 stage 1 are measured; Run 10 is rejected |
+| Next Task A step | Finish the leak-free Run 7 readout, then confirm the Run 16 leaders (`epochs10` and `large`) with five-fold OOF |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -35,16 +35,16 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 1--4 | completed | Task A training scripts | baseline, demojization, and TF-IDF comparisons | best: `0.8103` |
 | Task A 5 | 2026-09-19, ready; not run | `05_rdrop_full_data.ipynb` | test R-Drop against a matched control, both on all 6,401 rows | four CodaBench ZIPs; no local score by construction |
 | Task A 6 | 2026-09-17, completed | MuRIL validation submission | compare MuRIL with the TF-IDF result on validation A | **0.8163 macro-F1, 0.8164 accuracy** |
-| Task A 7 | 2026-09-17, in progress | `07_tapt_holdout.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | awaiting holdout results |
+| Task A 7 | 2026-09-17, trained; summary assertion failed | `07_tapt_holdout.ipynb` | test Task-A-domain TAPT before demojized MuRIL fine-tuning | inspect saved predictions/logs; no recorded holdout score yet |
 | Task A 8 | 2026-09-17, completed | `08_muril_tfidf_ensemble.ipynb` | test a MuRIL + TF-IDF OOF blend | **0.7890 CodaBench macro-F1, 0.7891 accuracy**; not retained |
 | Task A 9 | 2026-09-18, completed | `08_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
 | Task A 10 | 2026-09-19, completed | `10_frozen_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | **0.71 macro-F1, 0.70 accuracy**; rejected, and rejected as a blend member too |
-| Task A 11 | 2026-09-19, completed | `11_reinit1_full_data.ipynb` | one reinitialized layer, with the blend weight and threshold refitted to match | **0.8188 macro-F1, 0.8189 accuracy** — a tie with Run 9's 0.8187 |
-| Task A 16 | 2026-09-20, stage 1 completed | `16_funnel.ipynb` | which component-level ideas actually help? Six arms screened | **epochs10 +0.028, large +0.021, reinit2 +0.016; both external arms dead** |
+| Task A 11 | 2026-09-19, completed | `11_reinit1_full_data.ipynb` | one reinitialized layer, with the blend weight and threshold refitted to match | **0.8188 macro-F1, 0.8189 accuracy** — currently ahead of Run 9's 0.8187 |
 | Task A 12 | 2026-09-20, completed | `12_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | **yes: 0.8128 vs 0.7894, +0.0234** |
 | Task A 13 | 2026-09-19, ready; not run | `13_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
 | Task A 14 | 2026-09-19, ready; not run | `14_third_member_blend.ipynb` | does XLM-R as a third ensemble member help? | 5-fold OOF, nested three-way blend |
 | Task A 15 | 2026-09-19, ready; not run | `15_capacity_and_schedule.ipynb` | is the recipe underfitting? MuRIL-large and 10 epochs | 5-fold OOF; collapse check first |
+| Task A 16 | 2026-09-20, stage 1 completed | `16_funnel.ipynb` | which component-level ideas actually help? Six arms screened | **epochs10 +0.028, large +0.021, reinit2 +0.016; both external arms dead** |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -56,32 +56,37 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 9 | 2026-09-17, completed | `09_rdrop_one_layer.ipynb` | submit full-data R-Drop on the current one-layer recipe | **0.6410 CodaBench macro-F1, 0.6937 accuracy** |
 | Task B 10 | ready; not run | `10_context_decode.ipynb` | does a violent word mean Violence only when no target group is named? | 5-fold OOF, nested; ZIP written only if it wins |
 | Task B 11 | ready; not run | `11_context_tags.ipynb` | compare the winning recipe with fold-safe topic, mood and address tags | matched 5-fold OOF, ~3.5--4 h |
-| Task B 12 | ready; not run | `12_full_data_context_tags.ipynb` | train the context-tagged winning recipe on all labelled rows and package a submission | CodaBench pending, ~2--3 h |
+| Task B 12 | 2026-09-20, training completed; packaging failed | `12_full_data_context_tags.ipynb` | train the context-tagged winning recipe on all labelled rows and package a submission | all five fits completed; no ZIP because a post-training R-Drop log assertion stopped packaging |
 | Task B 13 | ready; not run | `experiments/task_b/stack_full.py` | four full-data arms stacked on the 0.6410 recipe: 10 epochs, unchanged control, tags, no-FGM | CodaBench pending, ~8.9 h |
+| Task B 14 | ready; not run | `14_full_data_tapt_taska_text.ipynb` | add permitted Task A training comments as unlabelled TAPT text, then train the current Task B recipe | CodaBench pending, ~3--4 h; transductive |
+| Task B 15 | ready; not run | `15_full_data_muril_large.ipynb` | train a memory-safe MuRIL-large version of the current Task B recipe | CodaBench pending, ~5--8 h |
 
 ## Ordered next steps
 
-1. Run [Task A Run 10](../notebooks/task_a/10_frozen_embeddings_svm.ipynb) and compare
-   its fixed-holdout score with the existing MuRIL recipe.
-2. Finish [Task A Run 7](../notebooks/task_a/07_tapt_holdout.ipynb) and compare
-   the stock and TAPT MuRIL holdout scores.
+1. Finish [Task A Run 7](../notebooks/task_a/07_tapt_holdout.ipynb) by inspecting its
+   saved holdout predictions and correcting the summary assertion if needed.
+2. Confirm the Run 16 funnel leaders (`epochs10` and `large`) with five-fold OOF before
+   spending another full-data CodaBench submission.
 3. Treat the Run 8 ensemble as rejected for submission: its local OOF macro-F1 was
    `0.8233`, but its official CodaBench score was only `0.7890`.
-4. If TAPT improves the matched local result, train a full-data, multi-seed candidate
-   and submit it against the current Task A best of `0.8187`.
-5. Keep `b_reinit1_rdrop_full` as the Task B candidate and focus new GPU budget on
-   Task A rather than further reinitialization ablations.
-7. If Task B gets another session, run [Task B Run 10](../notebooks/task_b/10_context_decode.ipynb)
-   or [Task B Run 11](../notebooks/task_b/11_context_tags.ipynb). Run 10 tests a cheap
-   post-training decoder; Run 11 tests whether fold-safe context tags improve the model
-   itself. Run 11 is the stronger next model experiment, while Run 10 leaves behind
-   reusable `oof_probs.npy` for future decoder ideas.
+4. If the confirmed Task A recipe improves locally, train a full-data, multi-seed
+   candidate and submit it against Run 11's `0.8188`.
+5. For Task B, either recover/package Run 12's saved artifacts or run Run 14/15; keep
+   `b_reinit1_rdrop_full` as the `0.6410` baseline.
+6. Keep the full-data Task B runs separate from local OOF measurements: their only valid
+   evaluation is CodaBench.
 
 Do not compare a full-data fit to a local OOF score as though they were the same
 measurement. A full-data fit has no local F1; its only evaluation is CodaBench. Also treat
 small differences on the 395-row official validation set cautiously.
 
 Task A and Task B macro-F1 are **not comparable**: Task A is two classes and Task B is six, so 0.80 on one is not better than 0.60 on the other.
+
+Uploaded execution logs are retained under [`results/task_a/logs/`](../results/task_a/logs/)
+and [`results/task_b/logs/`](../results/task_b/logs/). In particular,
+[`run12_context_tags_full.log`](../results/task_b/logs/run12_context_tags_full.log) shows
+that all five Task B fits completed; the notebook stopped only when its post-training
+assertion looked for an `rdrop=0.5` string that the trainer did not print.
 
 ## Task A
 

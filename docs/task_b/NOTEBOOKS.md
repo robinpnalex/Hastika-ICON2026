@@ -17,7 +17,7 @@ containing one: with media context present, Others is 0.27 and Violence 0.18; wi
 target named, Violence is 0.34 and Others 0.06. `decode.py` fits one weight per class and
 has lost its nested check every time, because the right correction for Violence flips
 sign with context. `hastika.task_b.context_decode` fits a lift per cell instead, and on
-the calibrated TF-IDF SVM that is worth +2.9 points nested, 0.5630 to 0.5923, with
+the calibrated TF-IDF SVM that is worth +2.9 points nested, 0.5630 to 0.5823, with
 Violence F1 going 0.24 to about 0.35. Whether it helps MuRIL is open: a transformer can
 represent the interaction and a bag of n-grams cannot, so the model may already know it.
 
@@ -30,7 +30,9 @@ in 108 minutes of GPU.
 | notebook | what it does | time | score |
 |---|---|---|---|
 | `09_rdrop_one_layer.ipynb` | Full-data one-layer R-Drop fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. | ~2.7 h | **0.6410 CodaBench** |
-| `12_full_data_context_tags.ipynb` | Full-data context-tagged fit: TAPT on all 6,406 comments, five tagged models on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. | ~2--3 h | CodaBench pending |
+| `12_full_data_context_tags.ipynb` | Full-data context-tagged fit: TAPT on all 6,406 comments, five tagged models on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. The uploaded log shows training completed, but the final packaging assertion failed because the trainer log did not print the expected R-Drop string. | ~2--3 h | training complete; recover artifacts or rerun packaging |
+| `14_full_data_tapt_taska_text.ipynb` | Full-data expanded-TAPT fit: TAPT on Task B text, OffensEval and permitted Task A training comments, then five Task B models on all 3,159 labelled rows and ZIP packaging. Task A labels are not read. | ~3--4 h | CodaBench pending |
+| `15_full_data_muril_large.ipynb` | Full-data MuRIL-large fit: separate large TAPT checkpoint, memory-safe classifier settings, five seeds on all 3,159 rows, and ZIP packaging. | ~5--8 h | CodaBench pending |
 | `08_full_data_fit_reinit1.ipynb` | Full-data one-layer fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, inference on the 395 official validation inputs, and ZIP packaging. | ~2 h | **0.6299 CodaBench** |
 | `04_full_data_fit.ipynb` | The current recipe, `D0_V0_noaux`, on 100% of the data. TAPT on all 6,406 comments with nothing held out, then five seeds on all 3,159 rows with no deduplication and no auxiliary head. Reads its own logs and stops if either count is short. | ~2 h | CodaBench only |
 
