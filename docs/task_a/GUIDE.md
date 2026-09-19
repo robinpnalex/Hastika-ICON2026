@@ -289,7 +289,7 @@ accuracy, below the confirmed MuRIL result (`0.8163`/`0.8164`). The ensemble is 
 not retained as a submission candidate; use the strongest single model unless a future
 experiment addresses this generalization gap.
 
-### Task A full-data MuRIL + TF-IDF ensemble — ready to run
+### Task A full-data MuRIL + TF-IDF ensemble — completed
 
 Use the same [ensemble notebook](../../notebooks/task_a/02_muril_tfidf_ensemble.ipynb) for
 the final-fit follow-up. It trains both demojized components on all 6,401 deduplicated
@@ -297,9 +297,9 @@ labelled rows, with no 80/20 folds and no 15% holdout. MuRIL uses `--folds 1` fo
 full-data fit, while the SVM uses `--full-fit` to skip its OOF pass.
 
 The notebook applies the fixed 57% SVM / 43% MuRIL blend from the previous OOF run. It
-does not learn weights from hidden validation labels. The output is
-`task_a_full_ensemble.zip` in the Kaggle Output tab. Compare its CodaBench score with
-the current MuRIL result of `0.8163` macro-F1 before retaining it.
+does not learn weights from hidden validation labels. The output was
+`task_a_full_ensemble.zip` in the Kaggle Output tab. It scored **`0.8187` macro-F1** and
+`0.8189` accuracy on CodaBench, making it the current Task A candidate.
 
 ### Task A MuRIL embeddings + SVM — ready to run
 

@@ -47,16 +47,17 @@ Commands below assume they are run from the repository root.
 
 ## Task A
 
-The latest Task A validation submission used MuRIL and scored **`0.8163` macro-F1** with
-`0.8164` accuracy, beating the previous demojized TF-IDF + LinearSVC result (`0.8103`).
+The latest Task A validation submission is the full-data MuRIL + TF-IDF ensemble, scoring
+**`0.8187` macro-F1** with `0.8189` accuracy. It improves on the previous MuRIL result
+(`0.8163`/`0.8164`) by a small margin.
 The exact flags for that submitted MuRIL artifact are not yet recorded; see the experiment
 ledger before treating it as a reproducible recipe.
 
 The current Task A candidate is the [full-data MuRIL + TF-IDF ensemble](notebooks/task_a/02_muril_tfidf_ensemble.ipynb).
 It trains both demojized components on all 6,401 deduplicated labelled rows and applies
 the fixed 57% SVM / 43% MuRIL blend from the earlier OOF experiment. The earlier OOF
-ensemble scored `0.8233` locally but only `0.7890` on CodaBench, so this full-data fit
-must be compared against the current MuRIL best of `0.8163`. The separate [TAPT +
+ensemble scored `0.8233` locally but only `0.7890` on CodaBench; the corrected full-data
+fit scored `0.8187`. The separate [TAPT +
 demojized MuRIL notebook](notebooks/task_a/01_tapt_demojized_muril.ipynb) remains a
 follow-up experiment using an 85/15 holdout. We are also testing [MuRIL embeddings +
 SVM](notebooks/task_a/03_muril_embeddings_svm.ipynb), which uses a fixed 85/15 holdout

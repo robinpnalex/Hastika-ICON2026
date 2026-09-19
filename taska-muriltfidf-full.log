@@ -1,0 +1,53 @@
+7.8s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+7.8s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+7.8s 3 0.00s - to python to disable frozen modules.
+7.8s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+8.4s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.4s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.4s 7 0.00s - to python to disable frozen modules.
+8.4s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+10.9s 9 80d40d6 docs: record Task B R-Drop result
+11.1s 10 repo: /kaggle/working/hastika
+11.1s 11 80d40d6 docs: record Task B R-Drop result
+13.8s 12 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 817.4 kB/s eta 0:00:00
+14.0s 13 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 817.4 kB/s eta 0:00:00
+22.5s 14 gpu: Tesla T4
+22.6s 15 dedupe task A: 6446 -> 6401 rows (39 duplicate, 6 in label-conflict groups)
+22.6s 16 raw labelled rows: 6446; deduplicated rows used for fitting: 6401
+22.7s 17 $ /usr/bin/python3 -u -m hastika.models.baseline_svm --task a --tag task_a_svm_demojized_full --demojize --full-fit
+25.3s 18 usage: baseline_svm.py [-h] [--task {a,b}] [--C C] [--tag TAG] [--demojize]
+25.3s 19 [--proba {calibrated,softmax}] [--no-dedupe]
+25.3s 20 baseline_svm.py: error: unrecognized arguments: --full-fit
+28.0s 21 Traceback (most recent call last):
+28.0s 22 File "<string>", line 1, in <module>
+28.0s 23 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 131, in execute_notebook
+28.0s 24 raise_for_execution_errors(nb, output_path)
+28.0s 25 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 251, in raise_for_execution_errors
+28.0s 26 raise error
+28.0s 27 papermill.exceptions.PapermillExecutionError:
+28.0s 28 ---------------------------------------------------------------------------
+28.0s 29 Exception encountered at "In [2]":
+28.0s 30 ---------------------------------------------------------------------------
+28.0s 31 RuntimeError                              Traceback (most recent call last)
+28.0s 32 /tmp/ipykernel_22/487044559.py in <cell line: 0>()
+28.0s 33 2 MURIL_TAG = "task_a_muril_full"
+28.0s 34 3
+28.0s 35 ----> 4 run([sys.executable, "-u", "-m", "hastika.models.baseline_svm",
+28.0s 36 5      "--task", "a", "--tag", SVM_TAG, "--demojize", "--full-fit"],
+28.0s 37 6     log="artifacts/logs/task_a_svm_demojized_full.log")
+28.0s 38 
+28.0s 39 /tmp/ipykernel_22/3433121335.py in run(cmd, log)
+28.0s 40 41         fh.close()
+28.0s 41 42     if p.returncode:
+28.0s 42 ---> 43         raise RuntimeError(f"exit {p.returncode}: {cmd}")
+28.0s 43 
+28.0s 44 RuntimeError: exit 2: ['/usr/bin/python3', '-u', '-m', 'hastika.models.baseline_svm', '--task', 'a', '--tag', 'task_a_svm_demojized_full', '--demojize', '--full-fit']
+28.0s 45 
+30.3s 46 /usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+30.3s 47 cells[i][c] = re.sub('\\\\\|', '|', cell)
+30.5s 48 /usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+30.5s 49 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+31.2s 50 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+31.5s 51 [NbConvertApp] Writing 14749 bytes to __notebook__.ipynb
+34.0s 52 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+34.9s 53 [NbConvertApp] Writing 307079 bytes to __results__.html
