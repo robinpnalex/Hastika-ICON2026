@@ -301,6 +301,15 @@ reinitialized layers together. Each is individually above noise and they act on 
 things — the encoder's starting point, how long it trains, and how much of its top is
 discarded — so they are plausibly additive.
 
+### New idea, measured today: drop word features from the SVM
+
+Char-only TF-IDF scores **0.8138** against **0.8073** for word+char, with the repo's own
+calibrated classifier on identical folds. Word features cost 0.0087 when added to character
+features. One flag, no GPU, and it makes the SVM half of the blend nearly as strong as TAPT
+MuRIL's 0.8128. See the analysis section in EXPERIMENTS.md for why: MuRIL splits `sule` and
+`soole` into entirely different fragment sequences, while character n-grams generalize
+across spelling variants by construction.
+
 ## How the experiments fit together
 
 The ideas above are not independent, and running them as independent submissions would not

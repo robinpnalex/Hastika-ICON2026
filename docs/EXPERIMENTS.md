@@ -448,6 +448,78 @@ per-fold `[s42holdout] best ... last ...` lines the trainer has always logged. B
 are fixed: `muril.py` now prints the score, and `funnel.py` has a fallback that reads the
 older form.
 
+## Analysis: why stock MuRIL loses to a linear model on Task A, 2026-09-20
+
+Stock MuRIL scores `0.7894` five-fold. A TF-IDF/LinearSVC scores `0.8073`. A 237M-parameter
+pretrained transformer losing to a bag of n-grams needs an explanation, and it is
+measurable.
+
+### MuRIL's tokenizer shatters exactly the words that carry the signal
+
+| word | MuRIL wordpieces |
+|---|---|
+| `sule` | `su` + `##le` |
+| `soole` | `so` + `##ole` |
+| `thu` | `th` + `##u` |
+| `thuu` | `th` + `##uu` |
+| `dagar` | `da` + `##gar` |
+| `bevarsi` | `be` + `##vars` + `##i` |
+| `hodibeku` | `ho` + `##di` + `##beku` |
+| `saayisbeku` | `sa` + `##ayi` + `##sb` + `##eku` |
+
+`sule` and `soole` are the same word spelled two ways and receive **entirely different**
+fragment sequences. So do `thu` and `thuu`. The fragments are not morphemes; they are
+arbitrary splits of a romanization the vocabulary was never built for.
+
+### The corpus statistics behind that
+
+| measurement | value |
+|---|---|
+| word tokens / word types | 80,108 / 26,945 |
+| word types seen exactly once | **74.4%** |
+| mean wordpieces per word type | 2.43 |
+| word types MuRIL holds as a single piece | **24.9%** |
+| MuRIL vocabulary this corpus uses | 8,810 of 197,258, **4.47%** |
+| `[UNK]` rate after demojize | 0.054% |
+
+Three quarters of word types appear once, and three quarters need splitting. The model must
+therefore learn to compose meaning from fragments, from single examples, using embeddings
+that were pretrained for those fragments in native-script Indic and English contexts rather
+than as pieces of romanized Kannada.
+
+### Character n-grams have the right inductive bias, and it is worth 6 points
+
+Five-fold macro-F1, same folds, same LinearSVC:
+
+| features | macro-F1 |
+|---|---|
+| char 2-5 grams only | **0.8152** |
+| word 1-2 grams + char 2-5 grams | 0.8065 |
+| word 1-2 grams only | 0.7585 |
+
+Character n-grams generalize across spelling variants **by construction**: `sule` and
+`soole` share `s`, `ul`/`ol`, `le`/`ol`, and a model that has seen one has partial evidence
+about the other. MuRIL has to learn that relationship from data, and 74.4% of types occur
+once.
+
+Word features are actively harmful here, costing 0.0087 when added to character features.
+
+### What this explains, and what to do
+
+**Why TAPT is worth +0.0234.** Masked language modelling on in-domain text retrains exactly
+these fragment embeddings, in this register. It is the only intervention available that
+changes the representation rather than reweighting it, which is why it is the only
+representation-level idea that has ever worked on either task.
+
+**Why 6,401 rows cannot fix it by fine-tuning.** Fine-tuning adjusts how existing
+representations are combined. It does not rebuild them, and rebuilding is what romanized
+Kannada needs from a wordpiece vocabulary built for native scripts.
+
+**One free change.** The blend's SVM component uses word + char features. Char-only scores
+`0.8138` against `0.8073` with the repo's own calibrated classifier on identical folds:
+**+0.0065 for no GPU and one flag.** That also makes the SVM half stronger than the MuRIL
+half was in Run 11, and nearly equal to TAPT MuRIL's `0.8128`.
+
 ## Task B
 
 The completed Kaggle runs and follow-up ablations are listed below. Local figures are the
