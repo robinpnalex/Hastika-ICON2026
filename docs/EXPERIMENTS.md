@@ -43,8 +43,10 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 12 | 2026-09-20, completed | `12_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | **yes: 0.8128 vs 0.7894, +0.0234** |
 | Task A 13 | 2026-09-19, ready; not run | `13_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
 | Task A 14 | 2026-09-19, ready; not run | `14_third_member_blend.ipynb` | does XLM-R as a third ensemble member help? | 5-fold OOF, nested three-way blend |
-| Task A 15 | 2026-09-19, ready; not run | `15_capacity_and_schedule.ipynb` | is the recipe underfitting? MuRIL-large and 10 epochs | 5-fold OOF; collapse check first |
 | Task A 16 | 2026-09-20, stage 1 completed | `16_funnel.ipynb` | which component-level ideas actually help? Six arms screened | **epochs10 +0.028, large +0.021, reinit2 +0.016; both external arms dead** |
+| Task A 17 | 2026-09-20, ready; not run | `17_final_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 3 seeds, transductive, 0.4 SVM blend | CodaBench pending |
+| Task A 18 | 2026-09-20, ready; not run | `18_rdrop_short.ipynb` | paired 80-minute holdout test of R-Drop 0.5 vs control on Task A | bootstrapped interval pending |
+| Task A 19 | 2026-09-20, ready; not run | `19_optimized_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 5 seeds, R-Drop 0.5, transductive, 0.25 SVM blend | CodaBench pending |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
