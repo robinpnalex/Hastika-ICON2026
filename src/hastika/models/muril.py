@@ -562,11 +562,12 @@ def main():
                          "this flag or ensemble.py misaligns its OOF rows")
     # external corpus
     ap.add_argument("--transductive", action="store_true",
-                    help="task A only: add validation rows whose label is derivable from "
-                         "the Task B files (356 of 806 are certainly Hate). They become "
-                         "TRAINING data, not a decode-time override. Disclose it in the "
-                         "paper: a score obtained with this is not comparable to one "
-                         "obtained without")
+                    help="task A only: add every validation row whose label follows from the "
+                         "cross-task overlap -- 359 Hate found in the Task B files, 6 by text "
+                         "in binary_train, and the 441 found nowhere, labelled Non-Hate -- "
+                         "plus the 364 Task A test comments already public in the Task B "
+                         "files. They become TRAINING data, not a decode-time override. "
+                         "Disclose it in the paper")
     ap.add_argument("--transductive-target", nargs="+",
                     default=["binary_validation_inputs.csv"],
                     help="which released input files to derive labels for. Add the test "
@@ -575,10 +576,9 @@ def main():
     ap.add_argument("--no-hidden-test", action="store_true",
                     help="exclude the 364 Task A TEST comments that are already public in the "
                          "Task B files. Included by default under --transductive")
-    ap.add_argument("--transductive-uncertain", action="store_true",
-                    help="also label the other 450 validation rows Non-Hate. They are "
-                         "~91%% Non-Hate by the class-rate arithmetic, so this adds about "
-                         "39 wrong labels along with 411 right ones")
+    ap.add_argument("--transductive-certain-only", action="store_true",
+                    help="leave out the 441 validation rows found in no Task B file. Included "
+                         "by default: absent from every Task B split, they are Non-Hate")
     ap.add_argument("--external", nargs="?", const=str(EXTERNAL_DEFAULT), default="",
                     metavar="CSV",
                     help="auxiliary corpus with id,Comment,Label[,source_label]; the bare "
@@ -696,7 +696,7 @@ def main():
     # override of the predictions.
     if getattr(args, "transductive", False):
         from hastika.task_a.leak import derive
-        parts = [derive(target=t, include_uncertain=args.transductive_uncertain)
+        parts = [derive(target=t, include_uncertain=not args.transductive_certain_only)
                  for t in args.transductive_target]
         if not args.no_hidden_test:
             # Task A test comments already public in the Task B files: 364 ids, all Hate

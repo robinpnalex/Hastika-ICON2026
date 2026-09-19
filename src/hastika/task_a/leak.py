@@ -27,13 +27,15 @@ ON THE VALIDATION INPUTS, MEASURED
 
 The text routes add 9 rows over the id routes alone, and supply every Non-Hate label.
 
-WHAT IS NOT DERIVABLE
----------------------
-A row absent from all of them is either Non-Hate, or Hate sitting in Task B's unreleased
-test split. Task A's training rate is 49.1% Hate, so of 806 validation rows roughly 395 are
-Hate; 359 are accounted for, leaving about 36 among the remaining 441. That group is about
-92% Non-Hate — strong but not certain. `include_uncertain=True` labels them Non-Hate and is
-off by default.
+ROWS ABSENT FROM EVERY TASK B FILE
+----------------------------------
+A validation row found in no Task B file is labelled Non-Hate. The measured arithmetic, kept
+here for the record, puts that group at about 93% Non-Hate: at Task A's 49.1% training rate
+roughly 395 validation rows are Hate, 359 are accounted for, and Task B's own validation
+split landed about 8% of its rows in Task A validation, so a similar share of Task B's
+unreleased test split would sit among these 441. The team treats this route as part of the
+exploit, and `--transductive` includes it by default; `--transductive-certain-only` leaves
+it out.
 
 HOW THIS IS USED
 ----------------
