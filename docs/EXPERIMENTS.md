@@ -18,7 +18,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
 | Current Task A work | Three notebooks written and unrun: R-Drop (Run 5), TAPT (Run 7), frozen-embedding SVM (Run 10) |
-| Next Task A step | Run 5, the full-data R-Drop pair; then Run 7 (TAPT) and Run 10 (frozen-embedding SVM) |
+| Next Task A step | Run 12 (TAPT), then Run 11 (reinit + blend weight), then Runs 13--15 |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -38,6 +38,10 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 9 | 2026-09-18, completed | `02_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
 | Task A 10 | 2026-09-18, ready; not run | `03_muril_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | fixed 85/15 holdout; CodaBench pending |
 | Task A 11 | 2026-09-19, ready; not run | `05_reinit_ensemble_weight.ipynb` | does one-layer reinitialization help Task A, and what blend weight does it deserve? | 5-fold OOF on 6,401 rows, nested weight and threshold; CodaBench pending |
+| Task A 12 | 2026-09-19, ready; not run | `06_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
+| Task A 13 | 2026-09-19, ready; not run | `07_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
+| Task A 14 | 2026-09-19, ready; not run | `08_third_member_blend.ipynb` | does XLM-R as a third ensemble member help? | 5-fold OOF, nested three-way blend |
+| Task A 15 | 2026-09-19, ready; not run | `09_capacity_and_schedule.ipynb` | is the recipe underfitting? MuRIL-large and 10 epochs | 5-fold OOF; collapse check first |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |

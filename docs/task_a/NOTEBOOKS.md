@@ -14,8 +14,43 @@ Notebook numbers are the order they were written, not the Run numbers in
 |---|---|---|---|---|
 | `05_reinit_ensemble_weight.ipynb` | 11 | does one-layer reinitialization help Task A, and what is the right blend weight now? Five-fold OOF for both settings, nested weight and threshold search, then a full-data fit of the winner. | ~8.2 h | yes, 5-fold OOF |
 | `04_rdrop_full_data.ipynb` | 5 | does R-Drop improve the recipe? Two arms on all 6,401 rows, five seeds each, one flag apart. | ~6.5 h | no |
+| `06_tapt_oof.ipynb` | 12 | does task-adaptive pretraining help Task A? Stock against TAPT, five-fold. | ~6.3 h | yes, 5-fold OOF |
+| `07_external_labels.ipynb` | 13 | can the external corpus's **labels** be used? Control against mix and stage. | ~9.9 h | yes, 5-fold OOF |
+| `08_third_member_blend.ipynb` | 14 | does a third ensemble member with a different tokenizer help? SVM, MuRIL and XLM-R, nested three-way blend. | ~6 h | yes, 5-fold OOF |
+| `09_capacity_and_schedule.ipynb` | 15 | is the recipe underfitting? MuRIL-large and ten epochs against the six-epoch control. | ~8 h | yes, 5-fold OOF |
 | `01_tapt_demojized_muril.ipynb` | 7 | does Task-A-domain TAPT help before fine-tuning? Control against TAPT on the fixed 85/15 split. | ~2--4 h | yes, 15% holdout |
 | `03_muril_embeddings_svm.ipynb` | 10 | can an RBF SVM on frozen MuRIL embeddings beat fine-tuning? | — | yes, 85/15 holdout |
+
+### Runs 12 to 15, why each exists
+
+These four came out of the prospect ranking on 19 September, ordered by expected gain.
+Every one of them **measures and produces no submission**: deciding and building are
+separate steps, and a five-fold run on 6,401 rows resolves about 0.6 points where the
+806-row CodaBench set cannot.
+
+**Run 12, TAPT.** The largest measured effect anywhere in this project, worth +2.9 on
+Task B and never tried on Task A. Carries a stated bias: the MLM stage reads every Task A
+training comment, so the TAPT arm has seen the wording of its own out-of-fold rows and the
+control has not. Same convention Task B used, which is what makes the numbers comparable.
+`01_tapt_demojized_muril.ipynb` is the leak-free holdout version; read them together.
+
+**Run 13, external labels.** The one opening Task A has that Task B did not: the external
+corpus carries `Hate`/`Non-Hate`, exactly Task A's label space, where Task B's six-way
+taxonomy made those labels unusable. Measured on the TF-IDF floor, adding them moves
+`0.8073` to `0.8103`, and it adds 3,247 rows to 6,401. **It uses external labels, not just
+text, which is a rules question to settle before submitting anything built on it.**
+
+**Run 14, a third ensemble member.** Blending works when members fail differently, so the
+notebook measures pairwise disagreement before searching weights. XLM-R lost to MuRIL by
+four points on Task B, which does not disqualify it: a weaker member can still improve a
+blend if its errors are decorrelated. The weight and threshold search is nested, because a
+three-way simplex has more freedom to fit noise than a two-way one.
+
+**Run 15, capacity and schedule.** Both arms test the same hypothesis, that the recipe is
+underfitting. The evidence is in the existing Task A logs: averaged over 14 fold-runs,
+validation macro-F1 is still rising at epoch 6, gaining +0.0038 in the final epoch.
+MuRIL-large runs first behind a one-fold collapse check, because on Task B mDeBERTa
+collapsed to 0.1002 at a learning rate that suited the base model.
 
 ### Run 11 in detail
 
