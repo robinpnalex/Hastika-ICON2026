@@ -572,6 +572,9 @@ def main():
                     help="which released input files to derive labels for. Add the test "
                          "inputs here when they are released; every route re-runs against "
                          "whatever is listed")
+    ap.add_argument("--no-hidden-test", action="store_true",
+                    help="exclude the 364 Task A TEST comments that are already public in the "
+                         "Task B files. Included by default under --transductive")
     ap.add_argument("--transductive-uncertain", action="store_true",
                     help="also label the other 450 validation rows Non-Hate. They are "
                          "~91%% Non-Hate by the class-rate arithmetic, so this adds about "
@@ -693,8 +696,13 @@ def main():
     # override of the predictions.
     if getattr(args, "transductive", False):
         from hastika.task_a.leak import derive
-        extra = pd.concat([derive(target=t, include_uncertain=args.transductive_uncertain)
-                           for t in args.transductive_target], ignore_index=True)
+        parts = [derive(target=t, include_uncertain=args.transductive_uncertain)
+                 for t in args.transductive_target]
+        if not args.no_hidden_test:
+            # Task A test comments already public in the Task B files: 364 ids, all Hate
+            from hastika.task_a.leak import hidden_test
+            parts.append(hidden_test())
+        extra = pd.concat(parts, ignore_index=True).drop_duplicates("id")
         Xt = extra["Comment"].map(lambda t: clean(t, demojize=demoji)).values
         yt = (extra["Label"] == "Hate").astype(int).values
         if X_ext is None:

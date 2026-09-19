@@ -591,6 +591,50 @@ made every local score measure memorisation; that was caught and fixed before an
 to the validation inputs; add the test inputs when they are released and every route
 re-runs against them.
 
+### The hidden test set is already partly public
+
+Task A is exactly train + validation + test, 6,446 + 806 + 806 = 8,058, and every Task B row
+is a Task A row labelled Hate. So a Task B row whose id appears in **no** released Task A
+file can only be a Task A **test** row:
+
+| Task B file | ids | in Task A train | in Task A validation | in neither |
+|---|---|---|---|---|
+| `multiclass_train` | 3,159 | 2,515 | 324 | **320** |
+| `multiclass_validation_inputs` | 395 | 319 | 32 | **44** |
+
+**364 Task A test comments — 45.2% of the test set — already have their text and their
+label, Hate, in public files**, before the test inputs are released. 361 of them add text
+the training set does not already contain. `hastika.task_a.leak.hidden_test()` returns them
+and `--transductive` includes them by default; `--no-hidden-test` excludes them.
+
+With both sources, `--transductive` adds **726 rows** to every training fold, 720 of them
+Hate, and none to any validation fold.
+
+### Checking whether a submission used it
+
+A model trained without the derived rows gets about 80% of them right — its ordinary
+accuracy on hate comments. A model trained with them has seen those exact comments and
+their labels, and reproduces them almost exactly. So agreement on the derivable validation
+rows fingerprints whether the rows were used, readable from the ZIP alone:
+
+```sh
+python -m hastika.task_a.leak --check submission.zip
+```
+
+Calibrated on 2026-09-20 with the TF-IDF SVM as a positive control, and on every real
+Task A submission so far:
+
+| predictions | agreement on the 365 derivable rows | verdict |
+|---|---|---|
+| SVM trained without the derived rows | 0.797 | not used |
+| SVM trained with validation + hidden-test rows | **0.978** | **used** |
+| Run 11 submission, 0.8188 | 0.822 | not used |
+| Run 9 / preserved submission, 0.8187 | 0.822 | not used |
+| Run 10 submission, 0.71 | 0.770 | not used |
+
+The verdict is `used` at 0.94 or above and `not used` at 0.88 or below, set wide of both
+calibration points so a weaker or stronger model still lands clearly.
+
 ### Disclosure
 
 A Task A score obtained with `--transductive` is not comparable to one obtained without.

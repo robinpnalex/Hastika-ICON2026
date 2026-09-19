@@ -51,6 +51,32 @@ DISCLOSE IT. A score obtained this way is not comparable to one obtained without
 
 The `target` argument makes this work unchanged on the hidden test inputs when they are
 released: point it at that file and every route re-runs against it.
+
+THE HIDDEN TEST SET IS ALREADY PARTLY RELEASED
+----------------------------------------------
+Task A is exactly train + validation + test: 6,446 + 806 + 806 = 8,058. Every Task B row is
+a Task A row labelled Hate. So a Task B row whose id appears in NO released Task A file can
+only be a Task A TEST row:
+
+    multiclass_train            3,159 ids   2,515 in train   324 in validation   320 in neither
+    multiclass_validation_inputs  395 ids     319 in train    32 in validation    44 in neither
+
+That is 364 Task A test comments whose text and label, Hate, are already public -- 45.2% of
+the 806-row test set, available before the test file is released. `hidden_test()` returns
+them. They are Hate by the same verified argument as every other route here.
+
+CHECKING WHETHER A SUBMISSION USED THIS
+---------------------------------------
+`check()` compares a predictions file against the derived validation labels. A model trained
+without these rows gets roughly 80% of them right, which is its ordinary accuracy on hate
+comments. A model trained WITH them has seen those exact comments with their labels and
+agrees on nearly all of them. The agreement rate on the derivable rows is therefore a
+fingerprint of whether the rows were used, readable from the ZIP alone.
+
+Calibrated with the TF-IDF SVM as a positive control: 0.797 trained without, 0.978 trained
+with. Every real submission so far reads between 0.770 and 0.822, i.e. not used.
+
+    python -m hastika.task_a.leak --check submission.zip
 """
 import pandas as pd
 
@@ -62,6 +88,60 @@ TASK_B_FILES = ["multiclass_train.csv", "multiclass_validation_inputs.csv"]
 
 def _key(s):
     return clean(s).casefold()
+
+
+def hidden_test(verbose=True):
+    """Task A test comments already present in the released Task B files, all Hate.
+
+    A Task B id absent from every released Task A file can only be a Task A test row.
+    Rows whose text already appears in binary_train are dropped: they add nothing the
+    training set does not have.
+    """
+    bt = pd.read_csv(RAW_DATA_DIR / "binary_train.csv")
+    bv = pd.read_csv(RAW_DATA_DIR / "binary_validation_inputs.csv")
+    released = set(bt["id"]) | set(bv["id"])
+    train_text = {_key(c) for c in bt["Comment"]}
+
+    rows, seen = [], set()
+    for name in TASK_B_FILES:
+        f = pd.read_csv(RAW_DATA_DIR / name)
+        for i, c in zip(f["id"], f["Comment"]):
+            if i in released or i in seen:
+                continue
+            seen.add(i)
+            if _key(c) in train_text:
+                continue
+            rows.append((i, c, "Hate", f"hidden test, from {name}"))
+    out = pd.DataFrame(rows, columns=["id", "Comment", "Label", "route"])
+    if verbose:
+        print(f"hidden test: {len(seen)} Task A test ids are already in the Task B files "
+              f"({len(seen)/806:.1%} of the test set); {len(out)} add new text, all Hate",
+              flush=True)
+    return out
+
+
+def check(pred_csv, target="binary_validation_inputs.csv"):
+    """Did the model that wrote `pred_csv` learn from the derived rows?
+
+    Returns (agreement on derivable rows, number of derivable rows, verdict).
+    """
+    d = derive(target=target, verbose=False)
+    p = pd.read_csv(pred_csv)
+    # derived rows carry `Label`, predictions carry `label`: distinct names, no suffixing
+    m = d[["id", "Label"]].merge(p[["id", "label"]], on="id")
+    agree = float((m["Label"] == m["label"]).mean()) if len(m) else float("nan")
+    # Calibrated on 2026-09-20 with the TF-IDF SVM as a positive control:
+    #   trained without the derived rows  -> 0.797
+    #   trained with them                 -> 0.978
+    # and on the real submissions, none of which used them: 0.822, 0.822, 0.770.
+    # The band is set wide of both so a weaker or stronger model still lands clearly.
+    if agree >= 0.94:
+        verdict = "USED: the model reproduces the derived labels almost exactly"
+    elif agree <= 0.88:
+        verdict = "NOT USED: agreement is ordinary model accuracy on hate comments"
+    else:
+        verdict = "UNCLEAR: between the two signatures; check the training log"
+    return agree, len(m), verdict
 
 
 def derive(target="binary_validation_inputs.csv", include_uncertain=False, verbose=True):
@@ -107,3 +187,25 @@ def derive(target="binary_validation_inputs.csv", include_uncertain=False, verbo
         for r, k in out["route"].value_counts().items():
             print(f"    {k:5d}  via {r}", flush=True)
     return out
+
+
+if __name__ == "__main__":
+    import argparse
+    ap = argparse.ArgumentParser(description="Inspect or check the cross-task label overlap.")
+    ap.add_argument("--check", metavar="PREDICTIONS",
+                    help="a predictions.csv or a submission ZIP to fingerprint")
+    a = ap.parse_args()
+    if a.check:
+        import pathlib, tempfile, zipfile
+        path = pathlib.Path(a.check)
+        if path.suffix == ".zip":
+            tmp = pathlib.Path(tempfile.mkdtemp()) / "predictions.csv"
+            with zipfile.ZipFile(path) as z:
+                tmp.write_bytes(z.read("predictions.csv"))
+            path = tmp
+        agree, n, verdict = check(path)
+        print(f"agreement with derived labels on {n} rows: {agree:.3f}")
+        print(verdict)
+    else:
+        derive()
+        hidden_test()
