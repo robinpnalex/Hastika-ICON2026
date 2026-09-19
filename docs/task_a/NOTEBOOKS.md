@@ -71,7 +71,7 @@ Four ZIPs: each arm alone and each blended with the SVM. Upload the control blen
 
 | notebook | run | what it does | time |
 |---|---|---|---|
-| `16_funnel.ipynb` | 16 | screens seven component-level arms on the cheap split, promotes the leaders to five folds | ~6 h stage 1 |
+| `16_funnel.ipynb` | 16 | screens six component-level arms on the cheap split, promotes the leaders to five folds | ~5.2 h stage 1 |
 
 **Run this instead of Runs 12 to 15 individually.** Those test one factor each against
 their own control, cost about 30 hours in total, and never put the factors on one table.
@@ -80,8 +80,9 @@ leaders. Task B ran this exact funnel and recorded that the holdout ranked all f
 promoted arms in the same order five folds did, reading about two points high — so stage 1
 orders arms and never reports a number.
 
-Arms: `control` (one layer, 6 epochs), `reinit2`, `tapt`, `ext_mix`, `ext_stage`,
-`epochs10`, `large`. Every one changes the MuRIL component only; the SVM half of the blend
+Arms as shipped: `control` (one layer, 6 epochs), `reinit2`, `ext_mix`, `ext_stage`,
+`epochs10`, `large`. **`tapt` is deliberately excluded** because Run 12 answers it at five
+folds, which beats a holdout screen; add it back with `--arms` if Run 12 was never run. Every one changes the MuRIL component only; the SVM half of the blend
 is fixed because nothing queued touches it. Each arm's predicted class balance is checked
 against Task A's 0.491 prior, and a collapsed arm is not promoted.
 
