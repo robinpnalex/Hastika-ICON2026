@@ -10,6 +10,7 @@ session dies with the browser tab and they all run for hours.
 | notebook | what it answers | time | score |
 |---|---|---|---|
 | `10_context_decode.ipynb` | Run 10. Does a violent action word mean Violence only when no target group is named? Five folds of the current recipe, then a per-cell prior correction fitted and nested on the OOF. Writes a ZIP only if the nested check wins. | ~2.6 h | yes, 5-fold OOF |
+| `11_context_tags.ipynb` | Run 11. Compare the winning TAPT + one-layer + R-Drop recipe with the same recipe augmented by fold-safe topic, mood and address tags. Reports matched OOF macro-F1 and preserves both probability matrices. | ~3.5--4 h | yes, matched 5-fold OOF |
 
 A violent word's meaning depends on its company. Among the 420 training comments
 containing one: with media context present, Others is 0.27 and Violence 0.18; with no
@@ -29,6 +30,7 @@ in 108 minutes of GPU.
 | notebook | what it does | time | score |
 |---|---|---|---|
 | `09_rdrop_one_layer.ipynb` | Full-data one-layer R-Drop fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. | ~2.7 h | **0.6410 CodaBench** |
+| `12_full_data_context_tags.ipynb` | Full-data context-tagged fit: TAPT on all 6,406 comments, five tagged models on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. | ~2--3 h | CodaBench pending |
 | `08_full_data_fit_reinit1.ipynb` | Full-data one-layer fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, inference on the 395 official validation inputs, and ZIP packaging. | ~2 h | **0.6299 CodaBench** |
 | `04_full_data_fit.ipynb` | The current recipe, `D0_V0_noaux`, on 100% of the data. TAPT on all 6,406 comments with nothing held out, then five seeds on all 3,159 rows with no deduplication and no auxiliary head. Reads its own logs and stops if either count is short. | ~2 h | CodaBench only |
 
