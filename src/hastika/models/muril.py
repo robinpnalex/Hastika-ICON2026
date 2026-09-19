@@ -733,7 +733,15 @@ def main():
         # Use the tuned threshold only if it is a real gain, not noise.
         thr = t if tf1 - f1_score(y, pred, average="macro") > 0.002 else 0.5
     else:
+        # A holdout run printed no score at all until 2026-09-20, so anything parsing
+        # these logs -- experiments/task_a/funnel.py did -- found nothing and reported
+        # a dash. The probabilities were always saved; only the line was missing.
         thr = 0.5
+        m = oof.sum(1) > 0
+        if m.any():
+            hp = oof[m].argmax(1)
+            print(f"\nholdout macro-F1 {f1_score(y[m], hp, average='macro'):.4f} "
+                  f"acc {accuracy_score(y[m], hp):.4f}  ({int(m.sum())} rows)")
         np.save(run / "holdout_probs.npy", oof)
 
     np.save(run / "test_probs.npy", test_probs)

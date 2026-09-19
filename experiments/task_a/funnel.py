@@ -132,7 +132,10 @@ def holdout_score(tag):
         return None
     t = p.read_text()
     m = (re.search(r"holdout macro-F1 ([\d.]+) with the last checkpoint", t)
-         or re.search(r"holdout macro-F1 ([\d.]+)\s+acc", t))
+         or re.search(r"holdout macro-F1 ([\d.]+)\s+acc", t)
+         # fallback: muril.py printed no holdout score before 2026-09-20, but
+         # train_fold has always logged the selected checkpoint's own number
+         or re.search(r"\[s\d+holdout\] best [\d.]+\s+last ([\d.]+)", t))
     return float(m.group(1)) if m else None
 
 

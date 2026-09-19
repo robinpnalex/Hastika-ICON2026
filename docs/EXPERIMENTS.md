@@ -13,13 +13,14 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 
 | item | current state |
 |---|---|
-| Best Task A result | Full-data MuRIL + TF-IDF ensemble, **`0.8187`** macro-F1 and `0.8189` accuracy on validation A |
+| Best Task A result | Runs 9 and 11 tied at **`0.8187`** / **`0.8188`** macro-F1 on validation A |
+| Best Task A component | TAPT MuRIL alone, `0.8128` five-fold OOF, against the `0.8073` TF-IDF floor |
 | Best Task B local result | One-layer reinitialization, `0.614` averaged five-fold OOF macro-F1, Run 6 |
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Optional: Run 10, the context-conditional decode correction, ~2.6 h |
 | Current Task A work | Run 10 completed and rejected at 0.71; Runs 5, 7 and 11--15 written and unrun |
-| Next Task A step | Run 11 (~3.4 h), then Run 16's funnel; Runs 12--15 are superseded by the funnel |
+| Next Task A step | Combine the winners: TAPT + 10 epochs + two reinitialized layers, five-fold |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -39,8 +40,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 9 | 2026-09-18, completed | `08_muril_tfidf_ensemble.ipynb` | train both ensemble components on all data | **0.8187 CodaBench macro-F1, 0.8189 accuracy** |
 | Task A 10 | 2026-09-19, completed | `10_frozen_embeddings_svm.ipynb` | test an RBF SVM on frozen MuRIL embeddings | **0.71 macro-F1, 0.70 accuracy**; rejected, and rejected as a blend member too |
 | Task A 11 | 2026-09-19, completed | `11_reinit1_full_data.ipynb` | one reinitialized layer, with the blend weight and threshold refitted to match | **0.8188 macro-F1, 0.8189 accuracy** — a tie with Run 9's 0.8187 |
-| Task A 16 | 2026-09-19, ready; not run | `16_funnel.ipynb` | which component-level ideas actually help? Seven arms screened, leaders confirmed | holdout rank then 5-fold; ~6 h stage 1 |
-| Task A 12 | 2026-09-19, ready; not run | `12_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | 5-fold OOF; measurement only |
+| Task A 16 | 2026-09-20, stage 1 completed | `16_funnel.ipynb` | which component-level ideas actually help? Six arms screened | **epochs10 +0.028, large +0.021, reinit2 +0.016; both external arms dead** |
+| Task A 12 | 2026-09-20, completed | `12_tapt_oof.ipynb` | does TAPT help Task A, as it did Task B at +2.9? | **yes: 0.8128 vs 0.7894, +0.0234** |
 | Task A 13 | 2026-09-19, ready; not run | `13_external_labels.ipynb` | can the external corpus's labels be trained on? control vs mix vs stage | 5-fold OOF; rules question attached |
 | Task A 14 | 2026-09-19, ready; not run | `14_third_member_blend.ipynb` | does XLM-R as a third ensemble member help? | 5-fold OOF, nested three-way blend |
 | Task A 15 | 2026-09-19, ready; not run | `15_capacity_and_schedule.ipynb` | is the recipe underfitting? MuRIL-large and 10 epochs | 5-fold OOF; collapse check first |
@@ -350,6 +351,75 @@ did on Task B at a learning rate that suited the base model. And every stage ski
 whose output exists, so a session that dies partway resumes rather than restarts.
 
 Record the whole table here when it runs, **including the arms that lose**.
+
+## Experiment 12: does TAPT help Task A? 2026-09-20
+
+[The notebook](../notebooks/task_a/12_tapt_oof.ipynb) trained two five-fold arms differing
+only in the starting encoder, both with one reinitialized layer, six epochs and seed 42.
+The TAPT corpus was 9,693 unique comments: Task A's own text plus the external Kannada
+corpus, no labels read from either.
+
+| arm | OOF macro-F1 |
+|---|---|
+| `task_a_tapt_5f` | **0.8128** |
+| `task_a_stock_5f` | 0.7894 |
+| **TAPT effect** | **+0.0234** |
+
+Fold noise on 6,401 rows is about 0.006, so +0.0234 is roughly four times it. **TAPT
+transfers to Task A.** Task B measured +0.0286 under the same convention, so the two agree
+closely.
+
+It also clears the TF-IDF floor: TAPT MuRIL alone scores 0.8128 against the floor's 0.8073,
+where stock MuRIL at 0.7894 does not. This is the first Task A encoder to beat the floor on
+identical folds.
+
+**The stated caveat still applies.** The MLM stage read every Task A training comment,
+including the rows each fold later scored itself on. No labels were read, but the TAPT arm
+saw the wording of its own out-of-fold rows and the control did not, so the comparison is
+biased in TAPT's favour. At +0.0234 the bias is unlikely to account for all of it.
+[Run 7](../notebooks/task_a/07_tapt_holdout.ipynb) is the leak-free version and is now
+worth running to bound it.
+
+## Experiment 16: the funnel, stage 1 results, 2026-09-20
+
+Six arms screened on the fixed 15% holdout, 960 rows, 3.6 hours. Noise on that split is
+about 0.013, so treat anything smaller as unresolved. All six predicted positive rates
+landed between 0.42 and 0.48 against a 0.491 prior: **nothing collapsed, including
+MuRIL-large.**
+
+| arm | holdout macro-F1 | vs control | read |
+|---|---|---|---|
+| `epochs10` | **0.8103** | +0.0283 | real, and the largest |
+| `large` | **0.8029** | +0.0209 | real; MuRIL-large did not collapse |
+| `reinit2` | **0.7980** | +0.0160 | real |
+| `control` | 0.7820 | — | one layer, six epochs |
+| `ext_mix` | 0.7798 | -0.0022 | noise; dead |
+| `ext_stage` | 0.7754 | -0.0066 | noise; dead |
+
+### Three conclusions
+
+**Ten epochs is the biggest single lever found on Task A.** The prediction from the epoch
+curve was "a few tenths"; the measurement is +2.8 points. Six epochs was badly
+undertrained, and the extrapolation understated it because a longer cosine schedule changes
+the shape of training rather than merely extending it.
+
+**Two reinitialized layers beats one, by +1.6.** This is the opposite of Task B, where one
+beat none by +3.0 and one beat two by +0.5. It also explains Run 11's tie: changing 2 to 1
+was neutral-to-negative, and the refitted weight and threshold absorbed the difference.
+**Task A should keep `--reinit-layers 2`.**
+
+**The external corpus's labels do not help Task A.** Both arms land inside noise and both
+are negative. The one opening Task A had that Task B did not is closed. The rules question
+attached to training on external labels no longer needs answering.
+
+### Bug found and fixed
+
+`muril.py` never printed a holdout macro-F1 for `--folds 0`; it only saved
+`holdout_probs.npy`. `funnel.py` parsed for a line that did not exist, so every arm came
+back as a dash and the table it wrote was empty. The scores above were recovered from the
+per-fold `[s42holdout] best ... last ...` lines the trainer has always logged. Both sides
+are fixed: `muril.py` now prints the score, and `funnel.py` has a fallback that reads the
+older form.
 
 ## Task B
 

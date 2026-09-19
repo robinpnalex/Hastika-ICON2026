@@ -55,15 +55,15 @@ Any feature built from a word list targets rows that are already right.
 
 | # | idea | task | expected | cost | status |
 |---|---|---|---|---|---|
-| 1 | TAPT | A | +0.5 to +2.0 | 6 h | notebook written |
-| 2 | External corpus **labels** | A | +0.3 to +1.0 | 4 h full-data | notebook written, 5-fold |
-| 3 | One reinitialized layer instead of two | A | **measured: tie, +0.0001** | — | Run 11, done |
+| 1 | TAPT | A | **measured: +0.0234** | done | Run 12 |
+| 2 | External corpus **labels** | A | **measured: -0.002 and -0.007, dead** | done | Run 16 |
+| 3 | One reinitialized layer instead of two | A | **measured: -0.016, two is better** | done | Runs 11, 16 |
 | 4 | Five seeds instead of one | A | +0.2 to +0.5, cannot hurt | 3 h | in Run 5 |
 | 5 | Tuned decision threshold on the blend | A | **folded into Run 11's tie** | free | done |
 | 6 | Refit the blend weight | A | **folded into Run 11's tie** | free | done |
 | 7 | R-Drop | A | unknown | 6.5 h | notebook written |
-| 8 | Ten epochs instead of six | A | +0.1 to +0.4 | 4.5 h | notebook written |
-| 9 | MuRIL-large | A, B | -8 to +1.5 | 8 h | notebook written |
+| 8 | Ten epochs instead of six | A | **measured: +0.0283, the largest** | done | Run 16 |
+| 9 | MuRIL-large | A, B | **measured: +0.0209 on A, no collapse** | done | Run 16 |
 | 10 | Whole-word masking in TAPT | B | +0.3 to +1.0 | 2 h | not built |
 | 11 | Self-distillation from OOF soft labels | B | +0.3 to +1.0 | 4 h | not built |
 | 12 | Ensemble of independently TAPT'd encoders | B | +0.3 to +0.8 | 6 h | not built |
@@ -262,6 +262,37 @@ Do not rebuild these. Each cost a run and each is written down so it does not co
 | XLM-R as a standalone Task B encoder | 0.5561 against MuRIL's 0.5948 | Task B Run 1 |
 | HingRoBERTa | 0.5678 | Task B Run 1 |
 | mDeBERTa | collapsed to 0.1002; 3e-5 is too high for it | Task B Run 1 |
+
+## What is now known, 2026-09-20
+
+Runs 11, 12 and 16 settled five of the sixteen ideas. Holdout figures are on 960 rows with
+about 0.013 of noise; five-fold figures are on 6,401 rows with about 0.006.
+
+| idea | effect | where |
+|---|---|---|
+| Ten epochs instead of six | **+0.0283** holdout | Run 16 |
+| TAPT | **+0.0234** five-fold | Run 12 |
+| MuRIL-large | **+0.0209** holdout, no collapse | Run 16 |
+| Two reinitialized layers instead of one | **+0.0160** holdout | Run 16 |
+| External corpus labels, mixed in | -0.0022, dead | Run 16 |
+| External corpus labels, as a first stage | -0.0066, dead | Run 16 |
+| One layer + refitted weight + tuned threshold, together | +0.0001, a tie | Run 11 |
+
+Three of these contradict what was expected, and the contradictions are the useful part:
+
+* **Ten epochs was predicted to be worth "a few tenths" and is worth 2.8 points.** The
+  epoch curve extrapolation understated it, because a longer cosine schedule changes the
+  shape of training rather than merely extending it.
+* **Two reinitialized layers beats one on Task A**, the opposite of Task B. It also
+  explains Run 11's tie.
+* **The external corpus's labels do not help**, despite matching Task A's label space
+  exactly and helping the TF-IDF floor by +0.0030. The one opening Task A had that Task B
+  did not is closed, and the rules question attached to it no longer needs answering.
+
+The obvious next step is the combination none of these tested: TAPT, ten epochs and two
+reinitialized layers together. Each is individually above noise and they act on different
+things — the encoder's starting point, how long it trains, and how much of its top is
+discarded — so they are plausibly additive.
 
 ## How the experiments fit together
 
