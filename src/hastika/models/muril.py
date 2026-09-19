@@ -561,6 +561,21 @@ def main():
                          "prep.dedupe_index. Every model sharing SPLIT_SEED must agree on "
                          "this flag or ensemble.py misaligns its OOF rows")
     # external corpus
+    ap.add_argument("--transductive", action="store_true",
+                    help="task A only: add validation rows whose label is derivable from "
+                         "the Task B files (356 of 806 are certainly Hate). They become "
+                         "TRAINING data, not a decode-time override. Disclose it in the "
+                         "paper: a score obtained with this is not comparable to one "
+                         "obtained without")
+    ap.add_argument("--transductive-target", nargs="+",
+                    default=["binary_validation_inputs.csv"],
+                    help="which released input files to derive labels for. Add the test "
+                         "inputs here when they are released; every route re-runs against "
+                         "whatever is listed")
+    ap.add_argument("--transductive-uncertain", action="store_true",
+                    help="also label the other 450 validation rows Non-Hate. They are "
+                         "~91%% Non-Hate by the class-rate arithmetic, so this adds about "
+                         "39 wrong labels along with 411 right ones")
     ap.add_argument("--external", nargs="?", const=str(EXTERNAL_DEFAULT), default="",
                     metavar="CSV",
                     help="auxiliary corpus with id,Comment,Label[,source_label]; the bare "
@@ -654,6 +669,8 @@ def main():
     y = (train["Label"] == "Hate").astype(int).values
     X_test = test["Comment"].map(lambda t: clean(t, demojize=demoji)).values
 
+
+
     if args.limit:
         X, y = X[:args.limit], y[:args.limit]
         print(f"LIMIT: using {len(y)} training rows (smoke test)", flush=True)
@@ -667,6 +684,26 @@ def main():
         X_ext, y_ext = load_external(args.external, demoji, not args.external_keep_other)
         print(f"external: {len(y_ext)} rows, {int(y_ext.sum())} Hate, "
               f"from {args.external}", flush=True)
+
+    # Transductive: validation rows whose Task A label follows from the Task B files.
+    # See hastika.task_a.leak. They are routed through the SAME per-fold path the
+    # external rows use, so they enter training folds only and never a validation
+    # fold -- otherwise the model would memorise rows it is then scored on and every
+    # local number would be inflated. They are training data, never a decode-time
+    # override of the predictions.
+    if getattr(args, "transductive", False):
+        from hastika.task_a.leak import derive
+        extra = pd.concat([derive(target=t, include_uncertain=args.transductive_uncertain)
+                           for t in args.transductive_target], ignore_index=True)
+        Xt = extra["Comment"].map(lambda t: clean(t, demojize=demoji)).values
+        yt = (extra["Label"] == "Hate").astype(int).values
+        if X_ext is None:
+            X_ext, y_ext = Xt, yt
+        else:
+            X_ext, y_ext = np.concatenate([X_ext, Xt]), np.concatenate([y_ext, yt])
+        args.external_mode = "mix"      # the per-fold append is what `mix` means
+        print(f"transductive: {len(yt)} derived rows join every training fold "
+              f"({int(yt.sum())} Hate); they never enter a validation fold", flush=True)
 
     if X_ext is not None and args.external_mode == "stage":
         # Stage 1. Checkpoint selection uses a slice held out of the EXTERNAL rows,

@@ -310,6 +310,15 @@ MuRIL's 0.8128. See the analysis section in EXPERIMENTS.md for why: MuRIL splits
 `soole` into entirely different fragment sequences, while character n-grams generalize
 across spelling variants by construction.
 
+### New idea, implemented: transductive training on derivable labels
+
+Task A validation comments recur in the released Task B files. Because Task B is the hate
+subset of the same corpus, 365 of the 806 validation rows have a derivable Task A label:
+359 Hate, 6 Non-Hate. `--transductive` adds them to the training set, through training
+folds only, so the model learns from them rather than having predictions overwritten. See
+the cross-task overlap section in EXPERIMENTS.md for the verification and the disclosure
+requirement. Not yet run on a GPU.
+
 ## How the experiments fit together
 
 The ideas above are not independent, and running them as independent submissions would not

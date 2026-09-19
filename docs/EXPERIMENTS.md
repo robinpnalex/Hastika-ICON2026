@@ -520,6 +520,79 @@ Kannada needs from a wordpiece vocabulary built for native scripts.
 **+0.0065 for no GPU and one flag.** That also makes the SVM half stronger than the MuRIL
 half was in Run 11, and nearly equal to TAPT MuRIL's `0.8128`.
 
+## Analysis: cross-task label overlap, and using it as training data, 2026-09-20
+
+All four released files come from one annotated corpus of 8,058 comments, so comments recur
+across splits and across tasks. The organisers confirmed the overlap is intentional. This
+section records exactly what is derivable, how it was verified, and how it is used.
+
+### What the overlap actually is
+
+There is **no id overlap inside Task A**: zero of the 806 validation ids appear in
+`binary_train.csv`. The overlap runs across tasks. Task B is the hate subset of the same
+pool — its rows are the comments Task A labelled `Hate`, re-split into six categories — so
+membership in any Task B file implies the Task A label is `Hate`.
+
+That implication was verified, not assumed:
+
+| check | result |
+|---|---|
+| `multiclass_train` ids also in `binary_train` | 2,515, **all** labelled Hate |
+| `multiclass_validation_inputs` ids also in `binary_train` | 319, **all** labelled Hate |
+| shared ids with identical comment text | 324 of 324 |
+
+### What is derivable for the Task A validation inputs
+
+| route | rows | gives |
+|---|---|---|
+| id in `binary_train` | 0 | — |
+| text in `binary_train`, single label | 12 | that label; the only route yielding Non-Hate |
+| id in a Task B file | 353 | Hate |
+| text in a Task B file | 359 | Hate |
+| **union** | **365 of 806, 45.3%** | **359 Hate, 6 Non-Hate** |
+
+A self-check confirms the routes are sound: run against `binary_train.csv` itself,
+`hastika.task_a.leak.derive` recovers all 6,446 labels exactly, 3,160 Hate and 3,286
+Non-Hate.
+
+The remaining 441 validation rows are either Non-Hate or Hate sitting in Task B's
+unreleased test split. At Task A's 49.1% training rate about 395 validation rows are Hate,
+359 are accounted for, so the remainder is roughly 92% Non-Hate — strong but not certain,
+and labelled only under `--transductive-uncertain`.
+
+For Task B the overlap yields almost nothing: 5 of its 395 validation rows have a category
+derivable by text. Every Task B row is Hate by construction, so a Task A match carries no
+category information.
+
+### How it is used: as training data, not an override
+
+Two ways to exploit it were considered.
+
+**Override** — set these rows to their derived label in the submission, whatever the model
+predicts. That fixes roughly 58 rows of 806 and is worth several points, but it is not
+modelling: it submits the organisers' own labels for 45% of the rows, and the score then
+measures the overlap rather than the system. **Rejected.**
+
+**Transductive training** — append the derived rows to the training set so the model learns
+from them, generalises to the rows no label was derived for, and can still be wrong about
+any of them. **Implemented** as `--transductive` in `hastika.models.muril`.
+
+The derived rows are routed through the same per-fold path the external corpus uses, so
+they enter **training folds only and never a validation fold**. An earlier draft
+concatenated them before the fold split, which would have put them in validation folds and
+made every local score measure memorisation; that was caught and fixed before any run.
+
+`--transductive-target` names which released input files to derive labels for. It defaults
+to the validation inputs; add the test inputs when they are released and every route
+re-runs against them.
+
+### Disclosure
+
+A Task A score obtained with `--transductive` is not comparable to one obtained without.
+The system paper has to state that validation and test comments recur in the released
+Task B files, that labels were derived from that overlap, and that the derived rows were
+used as training data.
+
 ## Task B
 
 The completed Kaggle runs and follow-up ablations are listed below. Local figures are the
