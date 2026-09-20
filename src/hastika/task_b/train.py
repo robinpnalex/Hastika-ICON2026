@@ -174,6 +174,10 @@ def main():
                     help="path to training CSV (default: data/raw/multiclass_train.csv)")
     ap.add_argument("--extra-train-data", default=None,
                     help="optional additional CSV to append to the training set")
+    ap.add_argument("--score-train", action="store_true",
+                    help="after fitting, report macro-F1 on the TRAINING rows. A fit "
+                         "diagnostic only: a full fit has seen every row, so this measures "
+                         "memorisation, not generalisation")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--threads", type=int, default=0)
     ap.add_argument("--limit", type=int, default=0,
@@ -280,6 +284,12 @@ def main():
                                     np.array([], dtype=y.dtype), Xte, device,
                                     f"s{seed}full")
             test_probs += p_te / n_seeds
+            if args.score_train:
+                tp = args.train_probs
+                print(f"  [s{seed}full] TRAINING-set macro-F1 "
+                      f"{f1_score(y, tp.argmax(1), average='macro'):.4f} "
+                      f"acc {accuracy_score(y, tp.argmax(1)):.4f} on {len(y)} rows "
+                      f"(memorisation, not a held-out score)", flush=True)
         else:
             tr_i, va_i = train_test_split(np.arange(len(y)), test_size=0.15,
                                           stratify=y, random_state=SPLIT_SEED)

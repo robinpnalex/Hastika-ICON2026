@@ -514,6 +514,15 @@ def train_fold(args, tok, X_tr, y_tr, X_va, y_va, X_test, device, tag, return_st
         tail = "no val" if no_val else f"best {best['f1']:.4f}"
         print(f"  [{tag}] ep{ep} done {(time.time()-t0)/60:.1f}min  {tail}", flush=True)
 
+    # --score-train: how well does the fitted model reproduce its own training rows?
+    # This is a fit diagnostic, not a generalisation estimate. A full fit has seen
+    # every row, so a high number here means memorisation and says nothing about
+    # held-out performance. It is useful only for comparing capacity or spotting a
+    # model that failed to fit at all.
+    if getattr(args, "score_train", False):
+        tr_loader = DataLoader(Comments(X_tr), batch_size=args.eval_bs, collate_fn=collate)
+        args.train_probs = predict(model, tr_loader, device, dtype)
+
     del model
     if device.type == "cuda":
         torch.cuda.empty_cache()
@@ -568,6 +577,10 @@ def main():
                          "plus the 364 Task A test comments already public in the Task B "
                          "files. They become TRAINING data, not a decode-time override. "
                          "Disclose it in the paper")
+    ap.add_argument("--score-train", action="store_true",
+                    help="after fitting, report macro-F1 on the TRAINING rows. A fit "
+                         "diagnostic only: a full fit has seen every row, so this measures "
+                         "memorisation, not generalisation")
     ap.add_argument("--transductive-target", nargs="+",
                     default=["binary_validation_inputs.csv"],
                     help="which released input files to derive labels for. Add the test "
@@ -758,6 +771,12 @@ def main():
             f1, p_va, p_te = train_fold(args, tok, X_tr, y_tr, np.array([]), np.array([]),
                                          X_test, device, f"s{seed}full")
             test_probs += p_te / n_seeds
+            if args.score_train:
+                tp = args.train_probs
+                print(f"  [s{seed}full] TRAINING-set macro-F1 "
+                      f"{f1_score(y_tr, tp.argmax(1), average='macro'):.4f} "
+                      f"acc {accuracy_score(y_tr, tp.argmax(1)):.4f} on {len(y_tr)} rows "
+                      f"(memorisation, not a held-out score)", flush=True)
         else:
             from sklearn.model_selection import train_test_split
             tr_i, va_i = train_test_split(np.arange(len(y)), test_size=0.15,
