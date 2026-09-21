@@ -47,6 +47,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 17 | 2026-09-20, ready; not run | `17_final_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 3 seeds, transductive, 0.4 SVM blend | CodaBench pending |
 | Task A 18 | 2026-09-20, ready; not run | `18_rdrop_short.ipynb` | paired 80-minute holdout test of R-Drop 0.5 vs control on Task A | bootstrapped interval pending |
 | Task A 19 | 2026-09-20, ready; not run | `19_optimized_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 5 seeds, R-Drop 0.5, transductive, 0.25 SVM blend | CodaBench pending |
+| Task A 20 | 2026-09-21, ready; not run | `20_translate_to_english.ipynb` | translate to English, then fine-tune hateBERT; gated on slur survival | 5-fold OOF, plus disagreement with the char SVM |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -644,6 +645,41 @@ A Task A score obtained with `--transductive` is not comparable to one obtained 
 The system paper has to state that validation and test comments recur in the released
 Task B files, that labels were derived from that overlap, and that the derived rows were
 used as training data.
+
+## Experiment 20: translate to English, from the organisers' own pipeline, 2026-09-21
+
+The organisers' repository `shankarb14/SLM-Impact` is their published method on HASTIKA,
+for both tasks, with this project's exact label sets:
+
+```
+romanized comment -> IndicXlit -> Kannada script -> IndicTrans2 -> English
+                  -> frozen encoder -> Bi-LSTM -> classifier
+```
+
+The two halves are worth very different things. **The model half is not worth copying**:
+every encoder is frozen, only the Bi-LSTM and dense layers train, and the paper is an
+efficiency study using TinyBERT, MobileBERT and DistilBERT. Run 10 already measured a frozen
+encoder here at 0.71. **The normalisation half is worth testing.** It is not the
+"transliteration-lite" the Task B setup notes measured at +0.001, which only merged
+characters; it is real transliteration behind word-level language ID that masks English
+words, handles and emoji, followed by real machine translation.
+
+Why it could matter: MuRIL's tokenizer splits `sule` into `su` + `##le` and 74.4% of word
+types appear once. Translation removes that at the root, and `GroNLP/hateBERT` is pretrained
+on English abusive language. It would also be the most decorrelated ensemble member
+available, which matters because Run 10 showed the existing members failing on the same
+rows.
+
+The risk is that translation sanitises profanity, and 18% of Task A rows carry a slur. So
+[the notebook](../notebooks/task_a/20_translate_to_english.ipynb) translates 300
+slur-bearing comments first and measures how many come out carrying an English abusive
+term; below 25% it stops itself before spending the remaining two hours. It then translates
+the corpus, fine-tunes hateBERT five-fold, and reports disagreement and `either right`
+against the char n-gram SVM. About 2 hours if the gate passes.
+
+Uses the distilled 200M IndicTrans2 rather than the 1B for speed. Both external library
+calls are written to accept every documented shape of their API, and a probe asserts that
+transliteration actually produced Kannada script before anything else runs.
 
 ## Task B
 

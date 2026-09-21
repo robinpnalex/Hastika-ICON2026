@@ -319,6 +319,14 @@ folds only, so the model learns from them rather than having predictions overwri
 the cross-task overlap section in EXPERIMENTS.md for the verification and the disclosure
 requirement. Not yet run on a GPU.
 
+### New idea, from the organisers' own repository: translate to English
+
+`shankarb14/SLM-Impact` transliterates with IndicXlit, translates with IndicTrans2, then
+classifies English text. Their frozen-encoder model is an efficiency study and not worth
+copying, but the normalisation removes MuRIL's tokenizer problem at its root and opens
+`GroNLP/hateBERT`, pretrained on English abuse. The risk is profanity being sanitised in
+translation, so Run 20 gates on slur survival before spending GPU on the full pipeline.
+
 ## How the experiments fit together
 
 The ideas above are not independent, and running them as independent submissions would not
