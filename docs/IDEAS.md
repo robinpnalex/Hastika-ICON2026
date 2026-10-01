@@ -103,10 +103,11 @@ pass on clean labels overwrites whatever boundary the external annotation set.
 **Rules note.** This trains on external *labels*, not just text. TAPT deliberately avoids
 that and every Task B decision kept external labels out. Settle it before submitting.
 
-### 3. One reinitialized layer instead of two — Run 11, ready
+### 3. One reinitialized layer instead of two — Run 11, completed
 
-**This is the one to run first.** Forty minutes, and it decides the base recipe that every
-other idea stacks on.
+Run 11 was measured and submitted. Its one-layer MuRIL plus refitted blend scored 0.8188
+on CodaBench, essentially tied with Run 9's 0.8187. A later combined-corpus OOF comparison
+(Run 23) slightly favored the two-layer Run 9 blend: 0.8213 versus 0.8204 macro-F1.
 
 
 Task B measured one layer against none at **+3.0**, and one against two at +0.5, which is
@@ -140,10 +141,10 @@ to the MuRIL component changes the weight it deserves. Reinitialization cannot i
 with the ensemble — it touches only MuRIL's top layers and the SVM is untouched — but it
 does move the optimum.
 
-Free, given out-of-fold probabilities for both components — which no Task A run has yet
-stored, so ideas 5 and 6 are both blocked on the one five-fold pass described at the end of
-this file. Run 11 deliberately holds the weights and the threshold fixed so its result is
-attributable to the reinitialization alone.
+The needed out-of-fold probabilities now exist for both components. Run 11's original
+OOF stage fitted its weight and threshold, and Run 23 provides a locked five-fold
+comparison on the enlarged labelled corpus. Further blend changes should therefore be
+treated as new experiments rather than prerequisites.
 
 ### 7. R-Drop
 

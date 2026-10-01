@@ -147,11 +147,10 @@ blend, and packages predictions for `hastika_binary_test.csv`. It is a final fit
 its output cannot be scored locally unless labels for that test file are released.
 
 The first released-test attempt stopped during setup, before any training, because the
-Kaggle clone did not contain `data/raw/hastika_binary_validation.csv`. The corrected
-Run 22 notebook refreshes the `task-b` branch when a clone already exists and falls back
-to downloading the four released CSVs from the fork before asserting that all inputs are
-present. This makes the data dependency explicit and prevents a missing-file failure from
-being mistaken for a completed model run.
+Kaggle clone did not contain `data/raw/hastika_binary_validation.csv`. Run 22 was then
+repurposed as an evaluation-only OOF notebook, so the released-test final fit remains
+separate from the OOF comparison. The failed attempt is retained in
+`results/task_a/logs/run21_train_validation_test_failed_missing_validation.log`.
 
 ## Evaluation-only OOF comparison
 
@@ -167,3 +166,6 @@ scores. The completed run used 7,252 combined rows, deduplicated to 7,193, and r
 0.8204 macro-F1 for Run 11 versus 0.8213 for Run 9. It does not produce a ZIP. These are
 local OOF scores, not CodaBench scores, and should not be compared as though they were
 the official 806-row result.
+
+Run 23 already evaluates the same Run 9 configuration as Run 22 while also comparing it
+with Run 11, so Run 22 is optional rather than a required additional GPU run.

@@ -9,7 +9,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 * **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
   `Political`, `Religion`, and `Violence`.
 
-## Current status — 2026-09-20
+## Current status — 2026-10-01
 
 | item | current state |
 |---|---|
@@ -21,7 +21,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
 | Next Task B step | Run 17: evaluate MuRIL-large with five-fold out-of-fold predictions; no CodaBench submission required |
 | Current Task A work | Run 7 trained but its summary assertion failed; Run 12 and Run 16 stage 1 are measured; Run 10 is rejected |
-| Next Task A step | Finish the leak-free Run 7 readout, then confirm the Run 16 leaders (`epochs10` and `large`) with five-fold OOF |
+| Next Task A step | Treat Run 23 as the current combined-corpus local ranking; only submit a new full-data recipe after deciding whether the 0.8213 Run 9 OOF result justifies it |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -357,6 +357,22 @@ by +0.009.
 **Implication for the next submission.** Run 12's TAPT MuRIL scores 0.8128 out-of-fold,
 against 0.7894 for this one. Blending that against the same SVM should beat 0.8164, and
 this time the weight should move toward MuRIL rather than away from it.
+
+## Experiment 23: combined-corpus OOF comparison, 2026-10-01
+
+[`23_oof_compare_run11_run9.ipynb`](../notebooks/task_a/23_oof_compare_run11_run9.ipynb)
+repeated the comparison after adding the 806 released labelled validation rows. The
+combined corpus contained 7,252 rows and was deduplicated to 7,193 before the same five
+folds were used for the SVM and both MuRIL variants. The locked blends scored:
+
+| recipe | macro-F1 | accuracy |
+|---|---:|---:|
+| Run 11, one reinitialized layer, SVM 0.62 / MuRIL 0.38 at threshold 0.48 | 0.8204 | 0.8204 |
+| Run 9, two reinitialized layers, SVM 0.57 / MuRIL 0.43 at threshold 0.50 | **0.8213** | **0.8215** |
+
+This is a local OOF comparison, not a new CodaBench score. It slightly favors the Run 9
+two-layer recipe on the enlarged labelled corpus, while the official 806-row CodaBench
+results remain Run 11 at 0.8188 and Run 9 at 0.8187. No submission ZIP was produced.
 
 ## Experiment 16: the funnel over component-level ideas, created 2026-09-19
 
