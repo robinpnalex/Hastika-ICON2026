@@ -138,3 +138,10 @@ Everything lands in `/kaggle/working`. Download the ZIPs, the logs and any `*_pr
 individually rather than using Download All, because a TAPT checkpoint is about a gigabyte.
 Keep the probability matrices: they are the only way to rebuild a blend or retune a
 threshold later without retraining.
+
+## Released test-data fit
+
+`21_train_validation_test.ipynb` combines the original labelled training corpus with
+the released labelled validation corpus, refits the Run 11 one-layer MuRIL + TF-IDF
+blend, and packages predictions for `hastika_binary_test.csv`. It is a final fit, so
+its output cannot be scored locally unless labels for that test file are released.

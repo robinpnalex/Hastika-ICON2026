@@ -18,7 +18,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 | Best Task B local result | One-layer reinitialization, `0.614` averaged five-fold OOF macro-F1, Run 6 |
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
-| Next Task B step | Run 14 (expanded TAPT) or Run 15 (MuRIL-large); both are full-data CodaBench submissions |
+| Next Task B step | Run 17: evaluate MuRIL-large with five-fold out-of-fold predictions; no CodaBench submission required |
 | Current Task A work | Run 7 trained but its summary assertion failed; Run 12 and Run 16 stage 1 are measured; Run 10 is rejected |
 | Next Task A step | Finish the leak-free Run 7 readout, then confirm the Run 16 leaders (`epochs10` and `large`) with five-fold OOF |
 | Current branch | `task-b` |
@@ -48,6 +48,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 18 | 2026-09-20, ready; not run | `18_rdrop_short.ipynb` | paired 80-minute holdout test of R-Drop 0.5 vs control on Task A | bootstrapped interval pending |
 | Task A 19 | 2026-09-20, ready; not run | `19_optimized_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 5 seeds, R-Drop 0.5, transductive, 0.25 SVM blend | CodaBench pending |
 | Task A 20 | 2026-09-21, ready; not run | `20_translate_to_english.ipynb` | translate to English, then fine-tune hateBERT; gated on slur survival | 5-fold OOF, plus disagreement with the char SVM |
+| Task A 21 | ready; not run | `21_train_validation_test.ipynb` | refit the Run 11 one-layer MuRIL + TF-IDF blend on original train plus released labelled validation, then predict the released test file | ZIP pending; no CodaBench score required |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -64,6 +65,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 14 | ready; not run | `14_full_data_tapt_taska_text.ipynb` | add permitted Task A training comments as unlabelled TAPT text, then train the current Task B recipe | CodaBench pending, ~3--4 h; transductive |
 | Task B 15 | ready; not run | `15_full_data_muril_large.ipynb` | train a memory-safe MuRIL-large version of the current Task B recipe | CodaBench pending, ~5--8 h |
 | Task B 16 | ready; not run | `16_full_data_rdrop_augmented.ipynb` | train the 0.6410 recipe on all 3,159 gold rows plus 779 multiclass-labeled binary comments | CodaBench pending, ~3--5 h |
+| Task B 17 | attempted; OOM in fold 1 | `17_muril_large_oof.ipynb` | evaluate MuRIL-large with five-fold held-out predictions while submissions are closed | no score; retry with 128-token cap, micro-batch 2, and eval batch 4 |
+| Task B 18 | ready; not run | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | ZIP pending; no CodaBench score required |
 
 ## Ordered next steps
 
