@@ -155,12 +155,12 @@ being mistaken for a completed model run.
 
 ## Evaluation-only OOF comparison
 
-`22_run9_ensemble_train_validation_test.ipynb` is now evaluation-only. It measures the
+`22_run9_oof_evaluation.ipynb` is now evaluation-only. It measures the
 second-best Run 9 recipe—demojized MuRIL with two-layer reinitialization plus demojized
 TF-IDF/SVM—on five matched folds of the combined labelled corpus, using the fixed 57/43
 blend and threshold 0.50. It does not produce a submission ZIP.
 
-`23_oof_compare_best_and_run9.ipynb` combines the original labels with the released
+`23_oof_compare_run11_run9.ipynb` combines the original labels with the released
 labelled validation rows, trains the SVM once and both MuRIL variants over the same
 five folds, then reports the individual scores and the locked Run 11 and Run 9 ensemble
 scores. It does not produce a ZIP. This gives a direct local comparison after adding

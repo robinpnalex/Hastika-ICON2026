@@ -49,8 +49,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 19 | 2026-09-20, ready; not run | `19_optimized_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 5 seeds, R-Drop 0.5, transductive, 0.25 SVM blend | CodaBench pending |
 | Task A 20 | 2026-09-21, ready; not run | `20_translate_to_english.ipynb` | translate to English, then fine-tune hateBERT; gated on slur survival | 5-fold OOF, plus disagreement with the char SVM |
 | Task A 21 | attempted; setup failed | `21_train_validation_test.ipynb` | refit the Run 11 one-layer MuRIL + TF-IDF blend on original train plus released labelled validation, then predict the released test file | stopped before training because the released validation CSV was missing from the stale Kaggle clone; no ZIP |
-| Task A 22 | evaluation-only; ready | `22_run9_ensemble_train_validation_test.ipynb` | measure the second-best Run 9 demojized MuRIL + TF-IDF ensemble on the combined labelled corpus with five-fold OOF predictions | locked macro-F1/accuracy pending; no ZIP by design |
-| Task A 23 | ready; not run | `23_oof_compare_best_and_run9.ipynb` | measure Run 11 and Run 9 on the same five-fold OOF split after adding the released labels | locked ensemble macro-F1/accuracy pending; no ZIP by design |
+| Task A 22 | evaluation-only; ready | `22_run9_oof_evaluation.ipynb` | measure the second-best Run 9 demojized MuRIL + TF-IDF ensemble on the combined labelled corpus with five-fold OOF predictions | locked macro-F1/accuracy pending; no ZIP by design |
+| Task A 23 | ready; not run | `23_oof_compare_run11_run9.ipynb` | measure Run 11 and Run 9 on the same five-fold OOF split after adding the released labels | locked ensemble macro-F1/accuracy pending; no ZIP by design |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -69,7 +69,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 16 | ready; not run | `16_full_data_rdrop_augmented.ipynb` | train the 0.6410 recipe on all 3,159 gold rows plus 779 multiclass-labeled binary comments | CodaBench pending, ~3--5 h |
 | Task B 17 | attempted; OOM in fold 1 | `17_muril_large_oof.ipynb` | evaluate MuRIL-large with five-fold held-out predictions while submissions are closed | no score; retry with 128-token cap, micro-batch 2, and eval batch 4 |
 | Task B 18 | ready; not run | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | ZIP pending; no CodaBench score required |
-| Task B 19 | ready; not run | `19_oof_best_train_validation.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | transductive OOF macro-F1/accuracy pending; no ZIP by design |
+| Task B 19 | ready; not run | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | transductive OOF macro-F1/accuracy pending; no ZIP by design |
 
 ## Ordered next steps
 
