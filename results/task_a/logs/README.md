@@ -10,3 +10,4 @@ depending on the original upload filenames.
 | `run10_muril_embeddings_svm.log` | frozen MuRIL embeddings + RBF SVM | ZIP was written; the 0.71 CodaBench result was rejected |
 | `task_a_full_data_svm_failed.log` | obsolete full-data SVM attempt | failed because the runner did not accept the `--full-fit` argument |
 | `run21_train_validation_test_failed_missing_validation.log` | Task A Run 21 train-plus-validation final-fit notebook | stopped before training because the released validation CSV was missing from the Kaggle clone; no ZIP was produced |
+| `run23_oof_compare_run11_run9.log` | Task A Run 23: five-fold OOF comparison of Run 11 and Run 9 on the combined labelled corpus | completed; Run 11 locked ensemble 0.8204 macro-F1, Run 9 locked ensemble 0.8213 macro-F1 |

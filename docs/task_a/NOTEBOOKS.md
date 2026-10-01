@@ -163,5 +163,7 @@ blend and threshold 0.50. It does not produce a submission ZIP.
 `23_oof_compare_run11_run9.ipynb` combines the original labels with the released
 labelled validation rows, trains the SVM once and both MuRIL variants over the same
 five folds, then reports the individual scores and the locked Run 11 and Run 9 ensemble
-scores. It does not produce a ZIP. This gives a direct local comparison after adding
-data instead of relying on a final fit whose test labels are unavailable.
+scores. The completed run used 7,252 combined rows, deduplicated to 7,193, and reported
+0.8204 macro-F1 for Run 11 versus 0.8213 for Run 9. It does not produce a ZIP. These are
+local OOF scores, not CodaBench scores, and should not be compared as though they were
+the official 806-row result.

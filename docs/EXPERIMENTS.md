@@ -15,6 +15,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 |---|---|
 | Best Task A result | Run 11 at **`0.8188`** macro-F1 / `0.8189` accuracy on validation A; Run 9 is next at `0.8187` / `0.8189` |
 | Best Task A component | TAPT MuRIL alone, `0.8128` five-fold OOF, against the `0.8073` TF-IDF floor |
+| Latest combined-corpus Task A OOF result | Run 9 locked ensemble `0.8213` macro-F1 / `0.8215` accuracy on 7,193 deduplicated rows; local OOF only |
 | Best Task B local result | One-layer reinitialization, `0.614` averaged five-fold OOF macro-F1, Run 6 |
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
@@ -50,7 +51,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 20 | 2026-09-21, ready; not run | `20_translate_to_english.ipynb` | translate to English, then fine-tune hateBERT; gated on slur survival | 5-fold OOF, plus disagreement with the char SVM |
 | Task A 21 | attempted; setup failed | `21_train_validation_test.ipynb` | refit the Run 11 one-layer MuRIL + TF-IDF blend on original train plus released labelled validation, then predict the released test file | stopped before training because the released validation CSV was missing from the stale Kaggle clone; no ZIP |
 | Task A 22 | evaluation-only; ready | `22_run9_oof_evaluation.ipynb` | measure the second-best Run 9 demojized MuRIL + TF-IDF ensemble on the combined labelled corpus with five-fold OOF predictions | locked macro-F1/accuracy pending; no ZIP by design |
-| Task A 23 | ready; not run | `23_oof_compare_run11_run9.ipynb` | measure Run 11 and Run 9 on the same five-fold OOF split after adding the released labels | locked ensemble macro-F1/accuracy pending; no ZIP by design |
+| Task A 23 | completed | `23_oof_compare_run11_run9.ipynb` | measure Run 11 and Run 9 on the same five-fold OOF split after adding the released labels | Run 11: **0.8204 / 0.8204**; Run 9: **0.8213 / 0.8215** macro-F1/accuracy; no ZIP by design |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
