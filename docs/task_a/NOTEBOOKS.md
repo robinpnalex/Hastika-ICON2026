@@ -146,6 +146,22 @@ the released labelled validation corpus, refits the Run 11 one-layer MuRIL + TF-
 blend, and packages predictions for `hastika_binary_test.csv`. It is a final fit, so
 its output cannot be scored locally unless labels for that test file are released.
 
-`22_run9_ensemble_train_validation_test.ipynb` is the faithful second-best Run 9
-variant: demojized MuRIL with two-layer reinitialization plus demojized TF-IDF/SVM,
-using the fixed 57/43 blend and threshold 0.50.
+The first released-test attempt stopped during setup, before any training, because the
+Kaggle clone did not contain `data/raw/hastika_binary_validation.csv`. The corrected
+Run 22 notebook refreshes the `task-b` branch when a clone already exists and falls back
+to downloading the four released CSVs from the fork before asserting that all inputs are
+present. This makes the data dependency explicit and prevents a missing-file failure from
+being mistaken for a completed model run.
+
+## Evaluation-only OOF comparison
+
+`22_run9_ensemble_train_validation_test.ipynb` is now evaluation-only. It measures the
+second-best Run 9 recipe—demojized MuRIL with two-layer reinitialization plus demojized
+TF-IDF/SVM—on five matched folds of the combined labelled corpus, using the fixed 57/43
+blend and threshold 0.50. It does not produce a submission ZIP.
+
+`23_oof_compare_best_and_run9.ipynb` combines the original labels with the released
+labelled validation rows, trains the SVM once and both MuRIL variants over the same
+five folds, then reports the individual scores and the locked Run 11 and Run 9 ensemble
+scores. It does not produce a ZIP. This gives a direct local comparison after adding
+data instead of relying on a final fit whose test labels are unavailable.
