@@ -145,3 +145,7 @@ threshold later without retraining.
 the released labelled validation corpus, refits the Run 11 one-layer MuRIL + TF-IDF
 blend, and packages predictions for `hastika_binary_test.csv`. It is a final fit, so
 its output cannot be scored locally unless labels for that test file are released.
+
+`22_run9_ensemble_train_validation_test.ipynb` is the faithful second-best Run 9
+variant: demojized MuRIL with two-layer reinitialization plus demojized TF-IDF/SVM,
+using the fixed 57/43 blend and threshold 0.50.

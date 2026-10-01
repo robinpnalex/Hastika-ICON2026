@@ -49,6 +49,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 19 | 2026-09-20, ready; not run | `19_optimized_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 5 seeds, R-Drop 0.5, transductive, 0.25 SVM blend | CodaBench pending |
 | Task A 20 | 2026-09-21, ready; not run | `20_translate_to_english.ipynb` | translate to English, then fine-tune hateBERT; gated on slur survival | 5-fold OOF, plus disagreement with the char SVM |
 | Task A 21 | ready; not run | `21_train_validation_test.ipynb` | refit the Run 11 one-layer MuRIL + TF-IDF blend on original train plus released labelled validation, then predict the released test file | ZIP pending; no CodaBench score required |
+| Task A 22 | ready; not run | `22_run9_ensemble_train_validation_test.ipynb` | refit the second-best Run 9 demojized MuRIL + TF-IDF ensemble on original train plus released labelled validation, then predict the released test file | ZIP pending; fixed 0.57/0.43 blend |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
