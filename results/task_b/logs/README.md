@@ -9,6 +9,8 @@ These are the captured Kaggle logs for the completed Task B experiments:
 | `run08_full_data_reinit1.log` | Run 8: five-seed full-data one-layer fit submitted to CodaBench |
 | `run09_rdrop_full.log` | Run 9: five-seed full-data one-layer R-Drop fit, scored 0.6410 on CodaBench |
 | `run12_context_tags_full.log` | Run 12: all five context-tagged full-data fits completed; packaging stopped on an incorrect post-training R-Drop log assertion |
+| `run17_muril_large_oof_oom.log` | Run 17: MuRIL-large five-fold OOF evaluation | TAPT completed, but classifier fold 1 stopped with CUDA out-of-memory; no OOF score |
+| `run18_train_validation_test_failed_clone.log` | Run 18: train-plus-validation final fit for released Task B test data | stopped before training because Kaggle could not clone the GitHub repository; no ZIP was produced |
 
 The logs are retained as raw captured output. The corresponding experiment descriptions
 and results are recorded in `docs/EXPERIMENTS.md`.

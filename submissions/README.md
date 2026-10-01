@@ -13,6 +13,8 @@ git. The zip is the artifact of record; the CSV is there to be read.
 | `d0v0_noaux_full` | TAPT on every comment, 5 seeds on all 3,159 rows | none, full fit | not run yet | no |
 | `b_reinit1_full` | TAPT MuRIL, one-layer reinit, 5 seeds on all 3,159 rows | none, full fit | **0.6299** | no (Kaggle output) |
 | `b_reinit1_rdrop_full` | TAPT MuRIL, one-layer reinit + R-Drop 0.5, 5 seeds on all 3,159 rows | none, full fit | **0.6410** | no (Kaggle output) |
+| `run12_context_tags_full` | TAPT MuRIL with context tags, five full-data fits | none, full fit | pending | recovered under `submissions/task_b/run12_context_tags_full/` |
+| `run14_tapt_taska_full` | Task A comments added as unlabelled TAPT text | none, full fit | pending | recovered under `submissions/task_b/run14_tapt_taska_full/` |
 
 ¹ Inferred, not confirmed: the `scoring_result.zip` reading 0.6007 was downloaded a few
 minutes after `f_tapt.zip`. Check the CodaBench submission list, then add

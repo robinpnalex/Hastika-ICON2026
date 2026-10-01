@@ -62,13 +62,13 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 9 | 2026-09-17, completed | `09_rdrop_one_layer.ipynb` | submit full-data R-Drop on the current one-layer recipe | **0.6410 CodaBench macro-F1, 0.6937 accuracy** |
 | Task B 10 | ready; not run | `10_context_decode.ipynb` | does a violent word mean Violence only when no target group is named? | 5-fold OOF, nested; ZIP written only if it wins |
 | Task B 11 | ready; not run | `11_context_tags.ipynb` | compare the winning recipe with fold-safe topic, mood and address tags | matched 5-fold OOF, ~3.5--4 h |
-| Task B 12 | 2026-09-20, training completed; packaging failed | `12_full_data_context_tags.ipynb` | train the context-tagged winning recipe on all labelled rows and package a submission | all five fits completed; no ZIP because a post-training R-Drop log assertion stopped packaging |
+| Task B 12 | 2026-09-20, training completed; assertion failed | `12_full_data_context_tags.ipynb` | train the context-tagged winning recipe on all labelled rows and package a submission | all five fits completed; ZIP recovered separately, but a post-training R-Drop log assertion stopped the notebook; CodaBench score pending |
 | Task B 13 | ready; not run | `experiments/task_b/stack_full.py` | four full-data arms stacked on the 0.6410 recipe: 10 epochs, unchanged control, tags, no-FGM | CodaBench pending, ~8.9 h |
-| Task B 14 | ready; not run | `14_full_data_tapt_taska_text.ipynb` | add permitted Task A training comments as unlabelled TAPT text, then train the current Task B recipe | CodaBench pending, ~3--4 h; transductive |
+| Task B 14 | artifact recovered; score pending | `14_full_data_tapt_taska_text.ipynb` | add permitted Task A training comments as unlabelled TAPT text, then train the current Task B recipe | ZIP recovered under `submissions/task_b/run14_tapt_taska_full/`; CodaBench pending, ~3--4 h; transductive |
 | Task B 15 | ready; not run | `15_full_data_muril_large.ipynb` | train a memory-safe MuRIL-large version of the current Task B recipe | CodaBench pending, ~5--8 h |
 | Task B 16 | ready; not run | `16_full_data_rdrop_augmented.ipynb` | train the 0.6410 recipe on all 3,159 gold rows plus 779 multiclass-labeled binary comments | CodaBench pending, ~3--5 h |
-| Task B 17 | attempted; OOM in fold 1 | `17_muril_large_oof.ipynb` | evaluate MuRIL-large with five-fold held-out predictions while submissions are closed | no score; retry with 128-token cap, micro-batch 2, and eval batch 4 |
-| Task B 18 | ready; not run | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | ZIP pending; no CodaBench score required |
+| Task B 17 | attempted; OOM in fold 1 | `17_muril_large_oof.ipynb` | evaluate MuRIL-large with five-fold held-out predictions while submissions are closed | no score; captured log retained; retry with 128-token cap, micro-batch 2, and eval batch 4 |
+| Task B 18 | attempted; setup failed | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | stopped before training because Kaggle could not clone GitHub; no ZIP |
 | Task B 19 | ready; not run | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | transductive OOF macro-F1/accuracy pending; no ZIP by design |
 
 ## Ordered next steps

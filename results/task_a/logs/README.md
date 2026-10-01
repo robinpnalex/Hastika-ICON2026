@@ -9,3 +9,4 @@ depending on the original upload filenames.
 | `run09_task_a_ensemble.log` | full-data MuRIL + TF-IDF ensemble | ZIPs were written; the preferred ensemble scored 0.8187 macro-F1 on CodaBench |
 | `run10_muril_embeddings_svm.log` | frozen MuRIL embeddings + RBF SVM | ZIP was written; the 0.71 CodaBench result was rejected |
 | `task_a_full_data_svm_failed.log` | obsolete full-data SVM attempt | failed because the runner did not accept the `--full-fit` argument |
+| `run21_train_validation_test_failed_missing_validation.log` | Task A Run 21 train-plus-validation final-fit notebook | stopped before training because the released validation CSV was missing from the Kaggle clone; no ZIP was produced |

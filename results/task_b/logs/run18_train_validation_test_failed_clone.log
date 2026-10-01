@@ -1,0 +1,47 @@
+7.6s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+7.6s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+7.6s 3 0.00s - to python to disable frozen modules.
+7.6s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+8.2s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.2s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.2s 7 0.00s - to python to disable frozen modules.
+8.2s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+41.6s 9 fatal: unable to access 'https://github.com/robinpnalex/Hastika-ICON2026.git/': Could not resolve host: github.com
+41.6s 10 fatal: unable to access 'https://github.com/robinpnalex/Hastika-ICON2026.git/': Could not resolve host: github.com
+41.6s 11 
+41.6s 12 fatal: unable to access 'https://github.com/robinpnalex/Hastika-ICON2026.git/': Could not resolve host: github.com
+41.8s 13 Traceback (most recent call last):
+41.8s 14 File "<string>", line 1, in <module>
+41.8s 15 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 131, in execute_notebook
+41.8s 16 raise_for_execution_errors(nb, output_path)
+41.8s 17 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 251, in raise_for_execution_errors
+41.8s 18 raise error
+41.8s 19 papermill.exceptions.PapermillExecutionError:
+41.8s 20 ---------------------------------------------------------------------------
+41.8s 21 Exception encountered at "In [1]":
+41.8s 22 ---------------------------------------------------------------------------
+41.8s 23 CalledProcessError                        Traceback (most recent call last)
+41.8s 24 /tmp/ipykernel_24/2256624255.py in <cell line: 0>()
+41.8s 25 4     subprocess.run(["git", "-C", WORK, "pull", "--ff-only"], check=True)
+41.8s 26 5 else:
+41.8s 27 ----> 6     subprocess.run(["git", "clone", "-q", "-b", "task-b", "--depth", "1", "https://github.com/robinpnalex/Hastika-ICON2026.git", WORK], check=True)
+41.8s 28 7 os.chdir(WORK)
+41.8s 29 8 os.environ["PYTHONPATH"] = os.path.join(WORK, "src")
+41.8s 30 
+41.8s 31 /usr/lib/python3.12/subprocess.py in run(input, capture_output, timeout, check, *popenargs, **kwargs)
+41.8s 32 569         retcode = process.poll()
+41.8s 33 570         if check and retcode:
+41.8s 34 --> 571             raise CalledProcessError(retcode, process.args,
+41.8s 35 572                                      output=stdout, stderr=stderr)
+41.8s 36 573     return CompletedProcess(process.args, retcode, stdout, stderr)
+41.8s 37 
+41.8s 38 CalledProcessError: Command '['git', 'clone', '-q', '-b', 'task-b', '--depth', '1', 'https://github.com/robinpnalex/Hastika-ICON2026.git', '/kaggle/working/hastika']' returned non-zero exit status 128.
+41.8s 39 
+44.0s 40 /usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+44.0s 41 cells[i][c] = re.sub('\\\\\|', '|', cell)
+44.1s 42 /usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+44.1s 43 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+44.8s 44 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+45.1s 45 [NbConvertApp] Writing 13213 bytes to __notebook__.ipynb
+47.4s 46 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+48.2s 47 [NbConvertApp] Writing 304631 bytes to __results__.html
