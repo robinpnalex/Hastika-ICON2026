@@ -157,7 +157,8 @@ separate from the OOF comparison. The failed attempt is retained in
 `22_run9_oof_evaluation.ipynb` is now evaluation-only. It measures the
 second-best Run 9 recipe—demojized MuRIL with two-layer reinitialization plus demojized
 TF-IDF/SVM—on five matched folds of the combined labelled corpus, using the fixed 57/43
-blend and threshold 0.50. It does not produce a submission ZIP.
+blend and threshold 0.50. The completed run scored **0.8213 macro-F1 / 0.8215 accuracy**
+on 7,193 deduplicated rows. It does not produce a submission ZIP.
 
 `23_oof_compare_run11_run9.ipynb` combines the original labels with the released
 labelled validation rows, trains the SVM once and both MuRIL variants over the same
@@ -167,5 +168,5 @@ scores. The completed run used 7,252 combined rows, deduplicated to 7,193, and r
 local OOF scores, not CodaBench scores, and should not be compared as though they were
 the official 806-row result.
 
-Run 23 already evaluates the same Run 9 configuration as Run 22 while also comparing it
-with Run 11, so Run 22 is optional rather than a required additional GPU run.
+Run 23 evaluates the same Run 9 configuration while also comparing it with Run 11; its
+Run 9 result matches Run 22, providing a consistency check across the two logs.

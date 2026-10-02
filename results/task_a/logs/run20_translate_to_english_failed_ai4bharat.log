@@ -1,0 +1,218 @@
+9.0s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+9.0s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+9.0s 3 0.00s - to python to disable frozen modules.
+9.0s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+9.8s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+9.8s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+9.8s 7 0.00s - to python to disable frozen modules.
+9.8s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+12.3s 9 a76c693 Add OOF evaluation notebooks
+12.5s 10 repo: /kaggle/working/hastika
+12.5s 11 a76c693 Add OOF evaluation notebooks
+15.4s 12 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 1.1 MB/s eta 0:00:00
+15.6s 13 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 1.1 MB/s eta 0:00:00
+28.9s 14 gpu: Tesla T4
+29.0s 15 dedupe task A: 6446 -> 6401 rows (39 duplicate, 6 in label-conflict groups)
+29.0s 16 raw labelled rows: 6446; deduplicated rows used for fitting: 6401
+31.9s 17 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 56.1 MB/s eta 0:00:00
+32.1s 18 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 56.1 MB/s eta 0:00:00
+51.2s 19 WARNING: Ignoring version 2.0.6 of omegaconf since it has invalid metadata:
+51.2s 20 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/d0/eb/9d63ce09dd8aa85767c65668d5414958ea29648a0eec80a4a7d311ec2684/omegaconf-2.0.6-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.2s 21 PyYAML (>=5.1.*)
+51.2s 22 ~~~~~~^
+51.2s 23 Please use pip<24.1 if you need to use this version.
+51.3s 24 WARNING: Ignoring version 2.0.5 of omegaconf since it has invalid metadata:
+51.3s 25 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/e5/f6/043b6d255dd6fbf2025110cea35b87f4c5100a181681d8eab496269f0d5b/omegaconf-2.0.5-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.3s 26 PyYAML (>=5.1.*)
+51.3s 27 ~~~~~~^
+51.3s 28 Please use pip<24.1 if you need to use this version.
+51.3s 29 WARNING: Ignoring version 2.0.4 of omegaconf since it has invalid metadata:
+51.3s 30 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/92/b1/4f3023143436f12c98bab53f0b3db617bd18a7d223627d5030e13a7b4fc2/omegaconf-2.0.4-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.3s 31 PyYAML (>=5.1.*)
+51.3s 32 ~~~~~~^
+51.3s 33 Please use pip<24.1 if you need to use this version.
+51.4s 34 WARNING: Ignoring version 2.0.3 of omegaconf since it has invalid metadata:
+51.4s 35 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/29/08/a88210c2c1aa0a3f65f05d8a6c98939ccb84b6fb982aa6567dec4e6773f9/omegaconf-2.0.3-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 36 PyYAML (>=5.1.*)
+51.4s 37 ~~~~~~^
+51.4s 38 Please use pip<24.1 if you need to use this version.
+51.4s 39 WARNING: Ignoring version 2.0.6 of omegaconf since it has invalid metadata:
+51.4s 40 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/d0/eb/9d63ce09dd8aa85767c65668d5414958ea29648a0eec80a4a7d311ec2684/omegaconf-2.0.6-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 41 PyYAML (>=5.1.*)
+51.4s 42 ~~~~~~^
+51.4s 43 Please use pip<24.1 if you need to use this version.
+51.4s 44 WARNING: Ignoring version 2.0.5 of omegaconf since it has invalid metadata:
+51.4s 45 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/e5/f6/043b6d255dd6fbf2025110cea35b87f4c5100a181681d8eab496269f0d5b/omegaconf-2.0.5-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 46 PyYAML (>=5.1.*)
+51.4s 47 ~~~~~~^
+51.4s 48 Please use pip<24.1 if you need to use this version.
+51.4s 49 WARNING: Ignoring version 2.0.4 of omegaconf since it has invalid metadata:
+51.4s 50 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/92/b1/4f3023143436f12c98bab53f0b3db617bd18a7d223627d5030e13a7b4fc2/omegaconf-2.0.4-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 51 PyYAML (>=5.1.*)
+51.4s 52 ~~~~~~^
+51.4s 53 Please use pip<24.1 if you need to use this version.
+51.4s 54 WARNING: Ignoring version 2.0.3 of omegaconf since it has invalid metadata:
+51.4s 55 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/29/08/a88210c2c1aa0a3f65f05d8a6c98939ccb84b6fb982aa6567dec4e6773f9/omegaconf-2.0.3-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 56 PyYAML (>=5.1.*)
+51.4s 57 ~~~~~~^
+51.4s 58 Please use pip<24.1 if you need to use this version.
+51.4s 59 
+51.4s 60 WARNING: Ignoring version 2.0.6 of omegaconf since it has invalid metadata:
+51.4s 61 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/d0/eb/9d63ce09dd8aa85767c65668d5414958ea29648a0eec80a4a7d311ec2684/omegaconf-2.0.6-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 62 PyYAML (>=5.1.*)
+51.4s 63 ~~~~~~^
+51.4s 64 Please use pip<24.1 if you need to use this version.
+51.4s 65 WARNING: Ignoring version 2.0.5 of omegaconf since it has invalid metadata:
+51.4s 66 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/e5/f6/043b6d255dd6fbf2025110cea35b87f4c5100a181681d8eab496269f0d5b/omegaconf-2.0.5-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 67 PyYAML (>=5.1.*)
+51.4s 68 ~~~~~~^
+51.4s 69 Please use pip<24.1 if you need to use this version.
+51.4s 70 WARNING: Ignoring version 2.0.4 of omegaconf since it has invalid metadata:
+51.4s 71 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/92/b1/4f3023143436f12c98bab53f0b3db617bd18a7d223627d5030e13a7b4fc2/omegaconf-2.0.4-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 72 PyYAML (>=5.1.*)
+51.4s 73 ~~~~~~^
+51.4s 74 Please use pip<24.1 if you need to use this version.
+51.4s 75 WARNING: Ignoring version 2.0.3 of omegaconf since it has invalid metadata:
+51.4s 76 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/29/08/a88210c2c1aa0a3f65f05d8a6c98939ccb84b6fb982aa6567dec4e6773f9/omegaconf-2.0.3-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 77 PyYAML (>=5.1.*)
+51.4s 78 ~~~~~~^
+51.4s 79 Please use pip<24.1 if you need to use this version.
+51.4s 80 WARNING: Ignoring version 2.0.2 of omegaconf since it has invalid metadata:
+51.4s 81 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/72/fe/f8d162aa059fb4f327fd75144dd69aa7e8acbb6d8d37013e4638c8490e0b/omegaconf-2.0.2-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.4s 82 PyYAML (>=5.1.*)
+51.4s 83 ~~~~~~^
+51.4s 84 Please use pip<24.1 if you need to use this version.
+51.5s 85 WARNING: Ignoring version 2.0.1 of omegaconf since it has invalid metadata:
+51.5s 86 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/86/ec/605805e60abdb025b06664d107335031bb8ebdc52e0a90bdbad6a7130279/omegaconf-2.0.1-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.5s 87 PyYAML (>=5.1.*)
+51.5s 88 ~~~~~~^
+51.5s 89 Please use pip<24.1 if you need to use this version.
+51.6s 90 WARNING: Ignoring version 2.0.2 of omegaconf since it has invalid metadata:
+51.6s 91 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/72/fe/f8d162aa059fb4f327fd75144dd69aa7e8acbb6d8d37013e4638c8490e0b/omegaconf-2.0.2-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.6s 92 PyYAML (>=5.1.*)
+51.6s 93 ~~~~~~^
+51.6s 94 Please use pip<24.1 if you need to use this version.
+51.6s 95 WARNING: Ignoring version 2.0.1 of omegaconf since it has invalid metadata:
+51.6s 96 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/86/ec/605805e60abdb025b06664d107335031bb8ebdc52e0a90bdbad6a7130279/omegaconf-2.0.1-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.6s 97 PyYAML (>=5.1.*)
+51.6s 98 ~~~~~~^
+51.6s 99 Please use pip<24.1 if you need to use this version.
+51.6s 100 
+51.6s 101 WARNING: Ignoring version 2.0.2 of omegaconf since it has invalid metadata:
+51.6s 102 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/72/fe/f8d162aa059fb4f327fd75144dd69aa7e8acbb6d8d37013e4638c8490e0b/omegaconf-2.0.2-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.6s 103 PyYAML (>=5.1.*)
+51.6s 104 ~~~~~~^
+51.6s 105 Please use pip<24.1 if you need to use this version.
+51.6s 106 WARNING: Ignoring version 2.0.1 of omegaconf since it has invalid metadata:
+51.6s 107 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/86/ec/605805e60abdb025b06664d107335031bb8ebdc52e0a90bdbad6a7130279/omegaconf-2.0.1-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+51.6s 108 PyYAML (>=5.1.*)
+51.6s 109 ~~~~~~^
+51.6s 110 Please use pip<24.1 if you need to use this version.
+53.0s 111 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.3/47.3 kB 1.6 MB/s eta 0:00:00
+53.2s 112 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.3/47.3 kB 1.6 MB/s eta 0:00:00
+54.3s 113 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.3/45.3 kB 1.6 MB/s eta 0:00:00
+54.5s 114 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.3/45.3 kB 1.6 MB/s eta 0:00:00
+56.3s 115 WARNING: Ignoring version 2.0.6 of omegaconf since it has invalid metadata:
+56.3s 116 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/d0/eb/9d63ce09dd8aa85767c65668d5414958ea29648a0eec80a4a7d311ec2684/omegaconf-2.0.6-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+56.3s 117 PyYAML (>=5.1.*)
+56.3s 118 ~~~~~~^
+56.3s 119 Please use pip<24.1 if you need to use this version.
+56.3s 120 WARNING: Ignoring version 2.0.5 of omegaconf since it has invalid metadata:
+56.3s 121 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/e5/f6/043b6d255dd6fbf2025110cea35b87f4c5100a181681d8eab496269f0d5b/omegaconf-2.0.5-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+56.3s 122 PyYAML (>=5.1.*)
+56.3s 123 ~~~~~~^
+56.3s 124 Please use pip<24.1 if you need to use this version.
+56.5s 125 WARNING: Ignoring version 2.0.6 of omegaconf since it has invalid metadata:
+56.5s 126 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/d0/eb/9d63ce09dd8aa85767c65668d5414958ea29648a0eec80a4a7d311ec2684/omegaconf-2.0.6-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+56.5s 127 PyYAML (>=5.1.*)
+56.5s 128 ~~~~~~^
+56.5s 129 Please use pip<24.1 if you need to use this version.
+56.5s 130 WARNING: Ignoring version 2.0.5 of omegaconf since it has invalid metadata:
+56.5s 131 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/e5/f6/043b6d255dd6fbf2025110cea35b87f4c5100a181681d8eab496269f0d5b/omegaconf-2.0.5-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+56.5s 132 PyYAML (>=5.1.*)
+56.5s 133 ~~~~~~^
+56.5s 134 Please use pip<24.1 if you need to use this version.
+56.5s 135 
+56.5s 136 WARNING: Ignoring version 2.0.6 of omegaconf since it has invalid metadata:
+56.5s 137 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/d0/eb/9d63ce09dd8aa85767c65668d5414958ea29648a0eec80a4a7d311ec2684/omegaconf-2.0.6-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+56.5s 138 PyYAML (>=5.1.*)
+56.5s 139 ~~~~~~^
+56.5s 140 Please use pip<24.1 if you need to use this version.
+56.5s 141 WARNING: Ignoring version 2.0.5 of omegaconf since it has invalid metadata:
+56.5s 142 Requested omegaconf<2.1 from https://files.pythonhosted.org/packages/e5/f6/043b6d255dd6fbf2025110cea35b87f4c5100a181681d8eab496269f0d5b/omegaconf-2.0.5-py3-none-any.whl (from fairseq->ai4bharat-transliteration) has invalid metadata: .* suffix can only be used with `==` or `!=` operators
+56.5s 143 PyYAML (>=5.1.*)
+56.5s 144 ~~~~~~^
+56.5s 145 Please use pip<24.1 if you need to use this version.
+56.6s 146 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 78.6 MB/s eta 0:00:00
+56.8s 147 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 78.6 MB/s eta 0:00:00
+65.6s 148 error: subprocess-exited-with-error
+65.6s 149 
+65.6s 150 × Getting requirements to build wheel did not run successfully.
+65.6s 151 │ exit code: 1
+65.6s 152 ╰─> See above for output.
+65.6s 153 
+65.6s 154 note: This error originates from a subprocess, and is likely not a problem with pip.
+65.6s 155 error: subprocess-exited-with-error
+65.6s 156 
+65.6s 157 × Getting requirements to build wheel did not run successfully.
+65.6s 158 │ exit code: 1
+65.6s 159 ╰─> See above for output.
+65.6s 160 
+65.6s 161 note: This error originates from a subprocess, and is likely not a problem with pip.
+65.8s 162 error: subprocess-exited-with-error
+65.8s 163 
+65.8s 164 × Getting requirements to build wheel did not run successfully.
+65.8s 165 │ exit code: 1
+65.8s 166 ╰─> See above for output.
+65.8s 167 
+65.8s 168 note: This error originates from a subprocess, and is likely not a problem with pip.
+65.8s 169 error: subprocess-exited-with-error
+65.8s 170 
+65.8s 171 × Getting requirements to build wheel did not run successfully.
+65.8s 172 │ exit code: 1
+65.8s 173 ╰─> See above for output.
+65.8s 174 
+65.8s 175 note: This error originates from a subprocess, and is likely not a problem with pip.
+65.8s 176 
+65.8s 177 error: subprocess-exited-with-error
+65.8s 178 
+65.8s 179 × Getting requirements to build wheel did not run successfully.
+65.8s 180 │ exit code: 1
+65.8s 181 ╰─> See above for output.
+65.8s 182 
+65.8s 183 note: This error originates from a subprocess, and is likely not a problem with pip.
+65.8s 184 error: subprocess-exited-with-error
+65.8s 185 
+65.8s 186 × Getting requirements to build wheel did not run successfully.
+65.8s 187 │ exit code: 1
+65.8s 188 ╰─> See above for output.
+65.8s 189 
+65.8s 190 note: This error originates from a subprocess, and is likely not a problem with pip.
+72.3s 191 Traceback (most recent call last):
+72.3s 192 File "<string>", line 1, in <module>
+72.3s 193 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 131, in execute_notebook
+72.3s 194 raise_for_execution_errors(nb, output_path)
+72.3s 195 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 251, in raise_for_execution_errors
+72.3s 196 raise error
+72.3s 197 papermill.exceptions.PapermillExecutionError:
+72.3s 198 ---------------------------------------------------------------------------
+72.3s 199 Exception encountered at "In [2]":
+72.3s 200 ---------------------------------------------------------------------------
+72.3s 201 ModuleNotFoundError                       Traceback (most recent call last)
+72.3s 202 /tmp/ipykernel_23/1574195878.py in <cell line: 0>()
+72.3s 203 30     return text
+72.3s 204 31
+72.3s 205 ---> 32 from ai4bharat.transliteration import XlitEngine
+72.3s 206 33 xlit = XlitEngine("kn", beam_width=4, rescore=False)
+72.3s 207 34
+72.3s 208 
+72.3s 209 ModuleNotFoundError: No module named 'ai4bharat'
+72.3s 210 
+75.1s 211 /usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+75.1s 212 cells[i][c] = re.sub('\\\\\|', '|', cell)
+75.3s 213 /usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+75.3s 214 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+76.0s 215 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+76.4s 216 [NbConvertApp] Writing 31968 bytes to __notebook__.ipynb
+79.4s 217 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+80.5s 218 [NbConvertApp] Writing 351975 bytes to __results__.html
