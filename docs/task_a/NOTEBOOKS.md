@@ -35,6 +35,11 @@ These follow the standing constraint: stacked on the `0.8187` recipe, `--folds 1
 | `05_rdrop_full_data.ipynb` | 5 | `--rdrop 0.5`, against a matched control, 5 seeds each | ~6.5 h |
 | `20_translate_to_english.ipynb` | 20 | translate to English, fine-tune hateBERT, gated on slur survival | ~2 h |
 
+Run 20's first Kaggle attempt failed during dependency installation: current pip rejected
+the legacy `omegaconf` metadata pulled by IndicXlit/Fairseq. The notebook now pins pip
+24.0 before installing `ai4bharat-transliteration`; the experiment is fixed and pending a
+rerun. The failed setup log is retained under `results/task_a/logs/`.
+
 **Run 11 first.** It is 40 minutes and it decides the base for everything after it. If one
 reinitialized layer beats `0.8187`, the queued experiments stack on one layer; if it loses
 by more than about 3 points, they keep two.
