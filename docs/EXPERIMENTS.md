@@ -700,9 +700,22 @@ term; below 25% it stops itself before spending the remaining two hours. It then
 the corpus, fine-tunes hateBERT five-fold, and reports disagreement and `either right`
 against the char n-gram SVM. About 2 hours if the gate passes.
 
-Uses the distilled 200M IndicTrans2 rather than the 1B for speed. Both external library
-calls are written to accept every documented shape of their API, and a probe asserts that
-transliteration actually produced Kannada script before anything else runs.
+**Revised 2026-10-03, before its first run.** Three changes:
+
+- **Translator chosen by measurement.** The gate now runs two backends on the same 300
+  comments and keeps the one whose raw output preserves more abuse. The first is
+  `bodhan-ai/indic-translate`, a Gemma-4 fine-tune that translates romanized text directly
+  and skips the lossy transliteration step. The second is IndicXlit followed by IndicTrans2
+  **1B**, replacing the distilled 200M. A backend that fails to install is skipped.
+- **Spelling-robust slur lexicon.** A phonetic skeleton, bounded edit distance, compound
+  splitting and bigram joining are used, and the lexicon is expanded with fastText
+  neighbours that must be both semantically and orthographically close. Matched slurs are
+  replaced by English glosses before translation, so the translator cannot sanitise them.
+  Stage 4 also scores the char SVM on canonicalised spellings.
+- **Stale-clone fix.** Setup fetches and hard-resets to the remote tip and asserts the SHA.
+  Translated data goes into a copy of the repo instead of overwriting `data/raw` in the
+  clone, and hateBERT runs with `--no-dedupe` so its OOF rows stay aligned with the
+  SVM's.
 
 ## Task B
 
