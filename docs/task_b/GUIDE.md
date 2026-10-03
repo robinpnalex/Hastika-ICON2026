@@ -54,14 +54,17 @@ generic insults against TV channels and politicians, so the lexical cue points a
 tags in `features.py` measured as noise. Task B is target identification wearing
 a slur-detection costume.
 
-## Current recipe (start here)
+## Current recipe and notebook choices
 
-Three Kaggle runs settled the recipe; the results are in `docs/EXPERIMENTS.md` and the
-summary is in the README's Task B section. It is **`D0_V0_noaux`**: TAPT on Kannada text
-only (D0), MuRIL's tokenizer as shipped (V0), a plain six-way head (no aux). What remains
-is to train it on everything and let CodaBench score it.
+Three Kaggle runs settled the base recipe; the results are in `docs/EXPERIMENTS.md` and the
+summary is in the README's Task B section. The confirmed submission recipe is TAPT MuRIL
+with one-layer reinitialization, R-Drop `0.5`, FGM, EMA and five full-data seeds. The
+current best submission is Run 9 at `0.6410` CodaBench macro-F1. Run 19 is the latest
+evaluation-only notebook, scoring `0.6123` transductive OOF macro-F1 on 3,554 combined
+rows with one seed; it does not replace Run 9 and does not produce a ZIP.
 
-On Kaggle, upload `notebooks/task_b/04_full_data_fit.ipynb` and Save & Run All (~2 h). By hand:
+For the confirmed full-data candidate, upload `notebooks/task_b/09_rdrop_one_layer.ipynb`
+and Save & Run All (~3 h). By hand:
 
 ```bash
 # 1. TAPT on all 6,406 comments: nothing held out, one-word and repeated comments kept
@@ -69,13 +72,14 @@ python -u -m hastika.task_b.tapt --model google/muril-base-cased \
     --corpus data/raw/multiclass_train.csv data/external/offenseval_kn.csv --epochs 8 \
     --val-frac 0 --min-words 1 --no-dedupe --out artifacts/runs/tapt-d0v0-100
 
-# 2. five seeds, each on all 3,159 rows, no auxiliary head
-python -u -m hastika.task_b.train --tag b_d0v0_noaux_full --model artifacts/runs/tapt-d0v0-100 \
-    --folds 1 --no-dedupe --aux-weight 0 --seeds 42 43 44 45 46 --epochs 6
+# 2. five seeds, each on all 3,159 rows, one reinitialized layer and R-Drop
+python -u -m hastika.task_b.train --tag b_reinit1_rdrop_full --model artifacts/runs/tapt-d0v0-100 \
+    --folds 1 --no-dedupe --reinit-layers 1 --rdrop 0.5 --aux-weight 0 \
+    --seeds 42 43 44 45 46 --epochs 6
 
 # 3. package, then upload to the Task B validation phase
 python -m hastika.common.submission --task b \
-    --pred artifacts/runs/b_d0v0_noaux_full/predictions.csv --out d0v0_noaux_full.zip
+    --pred artifacts/runs/b_reinit1_rdrop_full/predictions.csv --out b_reinit1_rdrop_full.zip
 ```
 
 Check the logs before uploading. TAPT should print `MLM trains on 6406 of 6406 comments,

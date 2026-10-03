@@ -251,9 +251,9 @@ unzip -l artifacts/runs/task_a/submission.zip
 The archive should contain only `predictions.csv`. Upload
 `artifacts/runs/task_a/submission.zip` to the matching Task A phase on CodaBench.
 
-### Task-A TAPT notebook — created, not yet run
+### Historical Task-A TAPT holdout notebook — Run 7
 
-The next experiment is [the Task A TAPT notebook](../../notebooks/task_a/07_tapt_holdout.ipynb).
+The historical TAPT holdout experiment is [the Task A TAPT notebook](../../notebooks/task_a/07_tapt_holdout.ipynb).
 Upload that notebook to Kaggle, enable GPU and Internet, and choose **Save Version ->
 Save & Run All**. It creates a fixed 85/15 classifier split, adapts MuRIL only on the
 85% training-side comments plus OffensEval Kannada text, then compares stock MuRIL with
@@ -268,12 +268,11 @@ task_a_muril_control.zip
 task_a_muril_tapt.zip
 ```
 
-The TAPT ZIP is the experiment candidate. Use the holdout macro-F1 comparison to decide
-whether a later full-data TAPT fit is worth submitting against the current `0.8163`
-MuRIL result. The notebook intentionally excludes Task A validation inputs and Task B
-files from TAPT because those comments overlap with hidden evaluation data. Expected
-runtime is approximately 2--4 hours on a T4 or RTX 3070. The notebook has been checked
-for valid JSON and compilable code, but no experiment score has been recorded yet.
+The notebook's result was not recorded because its post-training summary assertion failed.
+The later [Run 12 TAPT OOF notebook](../../notebooks/task_a/12_tapt_oof.ipynb) measured
+demojized TAPT MuRIL at `0.8128` five-fold macro-F1, versus `0.7894` for stock MuRIL.
+For the current next steps, use the evaluation-only [Run 24](../../notebooks/task_a/24_tapt_epochs10_reinit2_oof.ipynb),
+which combines TAPT with ten epochs and two-layer reinitialization.
 
 ### Task A MuRIL + TF-IDF ensemble notebook — completed, not retained
 
@@ -299,16 +298,30 @@ full-data fit, while the SVM uses `--full-fit` to skip its OOF pass.
 The notebook applies the fixed 57% SVM / 43% MuRIL blend from the previous OOF run. It
 does not learn weights from hidden validation labels. The output was
 `task_a_full_ensemble.zip` in the Kaggle Output tab. It scored **`0.8187` macro-F1** and
-`0.8189` accuracy on CodaBench, making it the current Task A candidate.
+`0.8189` accuracy on CodaBench. Run 11's one-layer variant later scored `0.8188` and is
+the slightly stronger confirmed Task A submission.
 
-### Task A MuRIL embeddings + SVM — ready to run
+### Task A MuRIL embeddings + SVM — completed and rejected
 
 The [embedding-SVM notebook](../../notebooks/task_a/10_frozen_embeddings_svm.ipynb) freezes
 MuRIL, extracts masked mean+max embeddings from demojized text, and trains an RBF SVM
 classifier on top. It evaluates first on the fixed 15% stratified holdout, then refits
 the SVM on all 6,401 deduplicated labelled rows and writes
 `task_a_muril_embeddings_svm_rbf.zip`. This is distinct from the rejected TF-IDF
-probability ensemble because the SVM operates on MuRIL semantic embeddings.
+probability ensemble because the SVM operates on MuRIL semantic embeddings. It reached
+roughly `0.71` macro-F1 and was rejected as both a standalone model and an ensemble
+member. The complete notebook status is in [docs/task_a/NOTEBOOKS.md](NOTEBOOKS.md).
+
+### Current evaluation-only notebooks
+
+Before another full-data submission, run the three notebooks below. They produce OOF
+probabilities and diagnostics, not submission ZIPs:
+
+| notebook | experiment | output |
+|---|---|---|
+| [Run 24](../../notebooks/task_a/24_tapt_epochs10_reinit2_oof.ipynb) | TAPT + ten epochs + two-layer reinitialization | five-fold OOF and nested blend |
+| [Run 25](../../notebooks/task_a/25_char_svm_third_member_oof.ipynb) | character-only SVM as a third ensemble member | three-way OOF and nested blend |
+| [Run 26](../../notebooks/task_a/26_transductive_derivable_labels_oof.ipynb) | certain cross-task-derived labels | OOF plus derived/non-derived validation diagnostics |
 
 ## Useful training options
 

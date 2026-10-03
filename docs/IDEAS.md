@@ -318,7 +318,28 @@ subset of the same corpus, 365 of the 806 validation rows have a derivable Task 
 359 Hate, 6 Non-Hate. `--transductive` adds them to the training set, through training
 folds only, so the model learns from them rather than having predictions overwritten. See
 the cross-task overlap section in EXPERIMENTS.md for the verification and the disclosure
-requirement. Not yet run on a GPU.
+requirement. Run 26 now provides a matched OOF diagnostic using only the 365 certain rows;
+its derived validation slice is reported separately from the honest non-derived slice.
+
+## Three next Task A notebooks — created 2026-10-02
+
+The next pass is deliberately diagnostic rather than submission-first:
+
+1. **Run 24 — TAPT + ten epochs + two reinitialized layers.** These are the three largest
+   positive component signals measured so far. The notebook combines them in one MuRIL arm,
+   compares it with a matched SVM, and reports a nested two-way blend.
+2. **Run 25 — character-only SVM as a third member.** Character-only TF-IDF reached
+   `0.8138` alone, but that does not prove it adds diversity to the existing blend. The
+   notebook trains word+char SVM, char-only SVM and MuRIL on identical folds, then checks
+   whether the three-way nested blend beats the best single member.
+3. **Run 26 — certain cross-task transduction.** The notebook compares an identical MuRIL
+   control with a model that receives only the 365 certain labels derivable from Task B
+   overlap. It excludes uncertain absent-everywhere rows and hidden-test rows, and treats
+   the non-derived released-validation subset as the honest external readout.
+
+All three notebooks are under [`notebooks/task_a/`](../notebooks/task_a/) and produce no
+submission ZIP. A full-data submission should be built only after these diagnostics agree
+on a recipe.
 
 ### New idea, from the organisers' own repository: translate to English
 

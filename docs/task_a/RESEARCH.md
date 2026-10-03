@@ -36,9 +36,8 @@ Output lands in `artifacts/runs/<tag>/` and the final upload is
 ## Expected numbers
 
 - TF-IDF char n-gram + LinearSVC floor: **0.803** OOF macro-F1 (measured, 8 seconds)
-- The latest MuRIL validation submission scored **0.8163 macro-F1** and **0.8164 accuracy**;
-  this is an official validation result, not directly comparable to local OOF numbers until
-  the exact training recipe is recorded.
+- The best confirmed Task A validation submission is Run 11 at **0.8188 macro-F1** and
+  **0.8189 accuracy**; Run 9 is effectively tied at `0.8187`/`0.8189`.
 - XLM-R, 3 epochs, CPU: 0.566 → 0.716 → (epoch 3) — under the floor, too few epochs
 - MuRIL is the best single prior: its pretraining included transliterated Indic,
   which is what Kanglish is. Expect roughly +2–5 over XLM-R based on published
@@ -48,15 +47,17 @@ Output lands in `artifacts/runs/<tag>/` and the final upload is
   yet only `0.7890` on CodaBench, so future blends must be treated as candidates until
   externally validated.
 
-## Next experiment: Task-A-domain TAPT
+## Historical experiment: Task-A-domain TAPT holdout
 
-`notebooks/task_a/07_tapt_holdout.ipynb` is the next controlled experiment. It
+`notebooks/task_a/07_tapt_holdout.ipynb` was the controlled experiment. It
 compares stock MuRIL against MuRIL first adapted with masked-language modeling on only
 the classifier-training side of a fixed 85/15 Task A split, plus permitted OffensEval
 Kannada text. Both arms then use the same demojized MuRIL fine-tuning recipe. The holdout,
 Task A validation inputs, labels, and Task B files are excluded from TAPT. The notebook
-is ready for Kaggle, but no score has been recorded yet; compare its holdout result with
-the current official MuRIL result (`0.8163` macro-F1) before considering a full-data fit.
+completed training but did not record a score because its post-training summary assertion
+failed. The later Run 12 five-fold OOF experiment measured TAPT MuRIL at `0.8128`.
+The current follow-up is Run 24, which combines TAPT with ten epochs and two-layer
+reinitialization; see `docs/task_a/NOTEBOOKS.md` for the full notebook index.
 
 ## Measured: why transliteration is NOT worth building
 

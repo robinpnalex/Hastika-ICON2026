@@ -33,7 +33,7 @@ through `uv` from the repository root. Task B has its operational guide in
 | `sweep_b.sh` | The same arms as a shell ablation, one flag apart, for a local GPU box. |
 | `fullfit_b.py` | Run 2: every idea trained on all rows with five seeds. No scores; ranks on the Run 1 holdout and reports agreement and class-rate drift. |
 | `grid_b.py` | Run 3: factorial over TAPT corpus, vocabulary and auxiliary head on the fixed holdout. |
-| `notebooks/task_b/*.ipynb` | One notebook per Kaggle run, indexed in [`../task_b/NOTEBOOKS.md`](../task_b/NOTEBOOKS.md). **`04_full_data_fit.ipynb` is the current one.** |
+| `notebooks/task_b/*.ipynb` | One notebook per Kaggle run, indexed in [`../task_b/NOTEBOOKS.md`](../task_b/NOTEBOOKS.md). Run 9 is the confirmed best submission; Run 19 is the latest evaluation-only diagnostic. |
 
 ## Usage
 

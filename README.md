@@ -47,21 +47,19 @@ Commands below assume they are run from the repository root.
 
 ## Task A
 
-The latest Task A validation submission is the full-data MuRIL + TF-IDF ensemble, scoring
-**`0.8187` macro-F1** with `0.8189` accuracy. It improves on the previous MuRIL result
-(`0.8163`/`0.8164`) by a small margin.
-The exact flags for that submitted MuRIL artifact are not yet recorded; see the experiment
-ledger before treating it as a reproducible recipe.
+The best confirmed Task A validation submission is Run 11, a full-data MuRIL + TF-IDF
+ensemble scoring **`0.8188` macro-F1** with `0.8189` accuracy. Run 9 is effectively tied
+at `0.8187`/`0.8189`; the combined-corpus OOF comparison slightly favors Run 9 locally
+(`0.8213` versus `0.8204`). See the experiment ledger before treating either small
+difference as decisive.
 
-The current Task A candidate is the [full-data MuRIL + TF-IDF ensemble](notebooks/task_a/08_muril_tfidf_ensemble.ipynb).
-It trains both demojized components on all 6,401 deduplicated labelled rows and applies
-the fixed 57% SVM / 43% MuRIL blend from the earlier OOF experiment. The earlier OOF
-ensemble scored `0.8233` locally but only `0.7890` on CodaBench; the corrected full-data
-fit scored `0.8187`. The separate [TAPT +
-demojized MuRIL notebook](notebooks/task_a/07_tapt_holdout.ipynb) remains a
-follow-up experiment using an 85/15 holdout. We are also testing [MuRIL embeddings +
-SVM](notebooks/task_a/10_frozen_embeddings_svm.ipynb), which uses a fixed 85/15 holdout
-for measurement before its final full-data refit.
+The current Task A submission candidates are the [Run 9/11 ensemble notebook](notebooks/task_a/08_muril_tfidf_ensemble.ipynb)
+and [Run 11's one-layer full-data fit](notebooks/task_a/11_reinit1_full_data.ipynb).
+Both train demojized components on all 6,401 deduplicated labelled rows. The next
+experiments are evaluation-only: [Run 24](notebooks/task_a/24_tapt_epochs10_reinit2_oof.ipynb),
+[Run 25](notebooks/task_a/25_char_svm_third_member_oof.ipynb), and
+[Run 26](notebooks/task_a/26_transductive_derivable_labels_oof.ipynb). Their notebook
+index and status are in [docs/task_a/NOTEBOOKS.md](docs/task_a/NOTEBOOKS.md).
 
 ```bash
 uv run --extra cu128 hastika-task-a-train \
@@ -85,7 +83,7 @@ The complete walkthrough is in [docs/task_a/GUIDE.md](docs/task_a/GUIDE.md).
 
 The strongest observed Task B recipe is task-adaptive pretraining of MuRIL followed by
 six-way fine-tuning with R-Drop and only the final encoder layer reinitialized. Its
-five-fold OOF macro-F1 was `0.6102` at seed 42, and the five-seed full-data submission
+best confirmed local result is `0.614` averaged five-fold OOF, and the five-seed full-data submission
 scored **`0.6410`** macro-F1 and `0.6937` accuracy on CodaBench. The full-data commands are:
 
 ```bash

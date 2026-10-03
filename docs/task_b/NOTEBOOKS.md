@@ -1,9 +1,17 @@
-# Kaggle notebooks
+# Kaggle notebooks — Task B
 
 Upload one of these to Kaggle, set **Accelerator** to `GPU T4 x2` or `GPU P100` and
 **Internet** on, then **Save Version -> Save & Run All**. Each clones the `task-b` branch
 itself, so the notebook file is all you upload. Never run these interactively: the
 session dies with the browser tab and they all run for hours.
+
+## How to read this index
+
+`OOF` means every labelled row receives a prediction from a model that did not train on
+its label. `Full fit` means every labelled row is used and there is no local F1; only a
+CodaBench submission can score it. `Transductive` means unlabelled wording from the
+evaluation-side file was visible during TAPT, so its OOF score must be labelled as such.
+Only notebooks marked **ZIP** produce a submission artifact.
 
 ## Queued, not yet run
 
@@ -32,13 +40,13 @@ in 108 minutes of GPU.
 | `16_full_data_rdrop_augmented.ipynb` | Full-data one-layer R-Drop fit with multiclass-augmented binary data: merges `multiclass_train.csv` (3,159 gold rows) with `hate_only_compiled_multiclass.csv` (779 new rows), TAPT on combined corpus, five seeds on all 3,938 rows, and ZIP packaging. | ~3--5 h | CodaBench pending |
 | `17_muril_large_oof.ipynb` | Local MuRIL-large evaluation: one shared large TAPT checkpoint, five held-out folds, one model seed, and macro-F1/accuracy from out-of-fold predictions. The first T4 attempt OOMed in fold 1; the notebook now uses a 128-token cap, micro-batch 2, and eval batch 4. No submission ZIP. | ~6--10 h | local OOF score |
 | `18_train_validation_test.ipynb` | Final released-test fit: combines the original 3,159 labelled rows with the 395 labelled validation rows, trains the Run 9 one-layer R-Drop recipe with five seeds, and packages predictions for `hastika_multiclass_test.csv`. | ~3--5 h | ZIP pending |
-| `19_oof_best_recipe.ipynb` | Evaluation-only run: combines the original and released labelled rows, performs five-fold OOF evaluation of the current one-layer R-Drop recipe, and reports macro-F1, accuracy and a classification report. No submission ZIP. | ~3--5 h with one seed; ~5x with five seeds | transductive OOF score |
+| `19_oof_best_recipe.ipynb` | Evaluation-only run: combines the original and released labelled rows, performs five-fold OOF evaluation of the current one-layer R-Drop recipe, and reports macro-F1, accuracy and a classification report. No submission ZIP. | ~3 h with one seed; ~5x with five seeds | **0.6123 / 0.6609** transductive OOF (3,554 rows, seed 42) |
 | `09_rdrop_one_layer.ipynb` | Full-data one-layer R-Drop fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. | ~2.7 h | **0.6410 CodaBench** |
 | `12_full_data_context_tags.ipynb` | Full-data context-tagged fit: TAPT on all 6,406 comments, five tagged models on all 3,159 labelled rows, averaged validation predictions, and ZIP packaging. The uploaded log shows training completed, but the final packaging assertion failed because the trainer log did not print the expected R-Drop string. | ~2--3 h | training complete; recover artifacts or rerun packaging |
 | `14_full_data_tapt_taska_text.ipynb` | Full-data expanded-TAPT fit: TAPT on Task B text, OffensEval and permitted Task A training comments, then five Task B models on all 3,159 labelled rows and ZIP packaging. Task A labels are not read. | ~3--4 h | CodaBench pending |
 | `15_full_data_muril_large.ipynb` | Full-data MuRIL-large fit: separate large TAPT checkpoint, memory-safe classifier settings, five seeds on all 3,159 rows, and ZIP packaging. | ~5--8 h | CodaBench pending |
 | `08_full_data_fit_reinit1.ipynb` | Full-data one-layer fit: TAPT on all 6,406 comments, five seeds on all 3,159 labelled rows, inference on the 395 official validation inputs, and ZIP packaging. | ~2 h | **0.6299 CodaBench** |
-| `04_full_data_fit.ipynb` | The current recipe, `D0_V0_noaux`, on 100% of the data. TAPT on all 6,406 comments with nothing held out, then five seeds on all 3,159 rows with no deduplication and no auxiliary head. Reads its own logs and stops if either count is short. | ~2 h | CodaBench only |
+| `04_full_data_fit.ipynb` | Historical base recipe, `D0_V0_noaux`, on 100% of the data. TAPT on all 6,406 comments with nothing held out, then five seeds on all 3,159 rows with no deduplication and no auxiliary head. Reads its own logs and stops if either count is short. | ~2 h | historical baseline; superseded by Run 9 |
 
 `D0_V0_noaux` means TAPT on Kannada text only (D0), MuRIL's tokenizer as shipped (V0),
 and a plain six-way head (no aux). It led the data-processing grid. The current
@@ -78,6 +86,11 @@ Run 9 is the current preferred Task B candidate: full-data TAPT plus one-layer
 reinitialization and R-Drop (`--rdrop 0.5`) across five seeds. It scored **0.6410
 macro-F1** and **0.6937 accuracy** on CodaBench, improving on Run 8's 0.6299 macro-F1
 and 0.6886 accuracy. Further GPU budget should now prioritize Task A experiments.
+
+Run 19 is a diagnostic, not a new candidate. Its `0.6123` OOF result is slightly below
+Run 6's `0.614` averaged multi-seed local result and is not directly comparable because
+it uses the larger released train-plus-validation corpus and a shared transductive TAPT
+pass. Keep Run 9's `b_reinit1_rdrop_full.zip` as the best confirmed Task B submission.
 
 ## Earlier runs, kept for reproducibility
 

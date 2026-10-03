@@ -9,6 +9,38 @@ on, then **Save Version -> Save & Run All**. Each clones the `task-b` branch its
 notebook file is all you upload. Never run these interactively: the session dies with the
 browser tab and most of them run for hours.
 
+## Master index
+
+This is the authoritative status view. `OOF` and holdout notebooks produce a local score;
+`full fit` notebooks train on every labelled row and need CodaBench for evaluation. A
+notebook marked **no ZIP** is diagnostic-only.
+
+| notebook | status | purpose/result |
+|---|---|---|
+| `05_rdrop_full_data.ipynb` | ready; not run | full-data R-Drop versus matched control; ZIPs, no local score |
+| `07_tapt_holdout.ipynb` | trained; reporting assertion failed | leak-free TAPT holdout comparison; score not recorded |
+| `08_muril_tfidf_ensemble.ipynb` | completed | Run 8 OOF blend rejected at `0.7890`; Run 9 full fit scored `0.8187` CodaBench |
+| `10_frozen_embeddings_svm.ipynb` | completed; rejected | frozen MuRIL embeddings + RBF SVM, about `0.71` macro-F1 |
+| `11_reinit1_full_data.ipynb` | completed | one-layer MuRIL blend scored `0.8188` CodaBench |
+| `12_tapt_oof.ipynb` | completed | TAPT MuRIL scored `0.8128` five-fold OOF |
+| `13_external_labels.ipynb` | ready; not run | external labelled-data ablation; rules-sensitive |
+| `14_third_member_blend.ipynb` | ready; not run | XLM-R third-member blend; lower priority after Run 10 |
+| `15_capacity_and_schedule.ipynb` | ready; not run | MuRIL-large and ten-epoch screen; superseded by Run 16 stage 1 |
+| `16_funnel.ipynb` | stage 1 completed | epochs10, MuRIL-large and reinit2 ranked highest on the screen |
+| `17_final_submission.ipynb` | ready; not run | full-data TAPT/10-epoch/reinit2 candidate; CodaBench pending |
+| `18_rdrop_short.ipynb` | ready; not run | short Task A R-Drop control comparison |
+| `19_optimized_submission.ipynb` | ready; not run | full-data TAPT + 10 epochs + reinit2 + R-Drop candidate |
+| `20_translate_to_english.ipynb` | setup fixed; rerun pending | translation pipeline; first attempt failed during dependency installation |
+| `21_train_validation_test.ipynb` | setup failed | released-test final fit; clone lacked the labelled validation CSV |
+| `22_run9_oof_evaluation.ipynb` | completed; no ZIP | Run 9 combined-corpus OOF: `0.8213` / `0.8215` |
+| `23_oof_compare_run11_run9.ipynb` | completed; no ZIP | same-fold comparison: Run 11 `0.8204`, Run 9 `0.8213` |
+| `24_tapt_epochs10_reinit2_oof.ipynb` | ready; no ZIP | TAPT + 10 epochs + two-layer reinitialization |
+| `25_char_svm_third_member_oof.ipynb` | ready; no ZIP | character-only SVM as a third ensemble member |
+| `26_transductive_derivable_labels_oof.ipynb` | ready; no ZIP | certain cross-task-derived labels, with honest/non-derived diagnostics |
+
+The detailed sections below retain the reasoning and commands for each group; this table
+is the authoritative run-status summary.
+
 ## Completed
 
 | notebook | run | what it did | result |
@@ -24,10 +56,31 @@ Run 10's artifact is preserved at `submissions/task_a_embeddings_svm/`. It is re
 blend member too: it disagrees with the best submission on 184 of 806 rows and is right on
 only 24% of them, so no weight gains. The derivation is in that directory's README.
 
-## Queued — full data, one change on the current best
+## Queued — evaluation-only next experiments
 
-These follow the standing constraint: stacked on the `0.8187` recipe, `--folds 1` on all
-6,401 rows, no holdout, CodaBench as the only readout. Each writes a submission ZIP.
+These three notebooks deliberately produce five-fold out-of-fold probabilities and a
+nested diagnostic instead of a submission ZIP. They use the original labels plus the
+released labelled validation rows where stated, so their scores are local rankings and
+not CodaBench results.
+
+| notebook | run | question | time |
+|---|---|---|---|
+| `24_tapt_epochs10_reinit2_oof.ipynb` | 24 | does the strongest combination—TAPT, 10 epochs and two reinitialized layers—beat the current recipe? | ~6–10 h |
+| `25_char_svm_third_member_oof.ipynb` | 25 | does character-only TF-IDF add complementary errors to word+char SVM plus MuRIL? | ~3–5 h |
+| `26_transductive_derivable_labels_oof.ipynb` | 26 | do the 365 certain labels derivable from Task B overlap improve Task A? | ~3–4 h |
+
+Run 24 uses text-only TAPT over the staged combined corpus and the permitted external
+Kannada text. Run 25 trains all three members on identical folds and lets `ensemble.py`
+fit the weights, with a nested estimate to expose weight-search optimism. Run 26 excludes
+uncertain labels and hidden-test rows; its derived validation slice is not an honest score
+because those labels enter training, so the non-derived slice is the primary readout. Any
+submission built from Run 26 must disclose the transductive labels.
+
+## Full-data candidates and pending runs
+
+These are stacked on the Task A submission recipes and use `--folds 1` on all 6,401 rows.
+They write submission ZIPs and have no honest local F1. Run 11 is already completed;
+Runs 5 and 20 remain pending.
 
 | notebook | run | the one change | time |
 |---|---|---|---|
@@ -40,9 +93,9 @@ the legacy `omegaconf` metadata pulled by IndicXlit/Fairseq. The notebook now pi
 24.0 before installing `ai4bharat-transliteration`; the experiment is fixed and pending a
 rerun. The failed setup log is retained under `results/task_a/logs/`.
 
-**Run 11 first.** It is 40 minutes and it decides the base for everything after it. If one
-reinitialized layer beats `0.8187`, the queued experiments stack on one layer; if it loses
-by more than about 3 points, they keep two.
+Run 11 is historical rather than queued. Its `0.8188` CodaBench result is effectively
+tied with Run 9's `0.8187`; the newer OOF comparison in Run 23 slightly favors the
+two-layer Run 9 recipe.
 
 ### Run 11 in detail — run this first
 

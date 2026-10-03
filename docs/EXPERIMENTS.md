@@ -9,19 +9,19 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 * **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
   `Political`, `Religion`, and `Violence`.
 
-## Current status — 2026-10-01
+## Current status — 2026-10-03
 
 | item | current state |
 |---|---|
 | Best Task A result | Run 11 at **`0.8188`** macro-F1 / `0.8189` accuracy on validation A; Run 9 is next at `0.8187` / `0.8189` |
 | Best Task A component | TAPT MuRIL alone, `0.8128` five-fold OOF, against the `0.8073` TF-IDF floor |
 | Latest combined-corpus Task A OOF result | Run 9 locked ensemble `0.8213` macro-F1 / `0.8215` accuracy on 7,193 deduplicated rows; local OOF only |
-| Best Task B local result | One-layer reinitialization, `0.614` averaged five-fold OOF macro-F1, Run 6 |
+| Best Task B local result | Run 6 at **`0.614`** averaged five-fold OOF macro-F1; Run 19 scored `0.6123` on a larger transductive corpus with one seed |
 | Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
 | Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
-| Next Task B step | Run 17: evaluate MuRIL-large with five-fold out-of-fold predictions; no CodaBench submission required |
-| Current Task A work | Run 7 trained but its summary assertion failed; Run 12 and Run 16 stage 1 are measured; Run 10 is rejected |
-| Next Task A step | Treat Run 23 as the current combined-corpus local ranking; only submit a new full-data recipe after deciding whether the 0.8213 Run 9 OOF result justifies it |
+| Next Task B step | Keep Run 9 as the confirmed candidate; Run 19 is complete and does not justify replacing it |
+| Current Task A work | Runs 22 and 23 completed the combined-corpus OOF comparison; Runs 24--26 are prepared; Run 10 is rejected |
+| Next Task A step | Run 24, 25 and 26 are prepared as evaluation-only OOF diagnostics before any new full-data submission |
 | Current branch | `task-b` |
 | Official validation size | 395 rows with hidden labels; score via CodaBench |
 
@@ -52,6 +52,9 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 21 | attempted; setup failed | `21_train_validation_test.ipynb` | refit the Run 11 one-layer MuRIL + TF-IDF blend on original train plus released labelled validation, then predict the released test file | stopped before training because the released validation CSV was missing from the stale Kaggle clone; no ZIP |
 | Task A 22 | completed | `22_run9_oof_evaluation.ipynb` | measure the second-best Run 9 demojized MuRIL + TF-IDF ensemble on the combined labelled corpus with five-fold OOF predictions | **0.8213 macro-F1 / 0.8215 accuracy** on 7,193 deduplicated rows; no ZIP by design |
 | Task A 23 | completed | `23_oof_compare_run11_run9.ipynb` | measure Run 11 and Run 9 on the same five-fold OOF split after adding the released labels | Run 11: **0.8204 / 0.8204**; Run 9: **0.8213 / 0.8215** macro-F1/accuracy; no ZIP by design |
+| Task A 24 | ready; not run | `24_tapt_epochs10_reinit2_oof.ipynb` | combine TAPT, ten epochs and two-layer reinitialization, then compare with a matched SVM and searched ensemble | five-fold OOF and nested blend pending; no ZIP by design |
+| Task A 25 | ready; not run | `25_char_svm_third_member_oof.ipynb` | test character-only TF-IDF as a third member beside word+char SVM and MuRIL | three-way five-fold OOF and nested blend pending; no ZIP by design |
+| Task A 26 | ready; not run | `26_transductive_derivable_labels_oof.ipynb` | add only the 365 certain cross-task-derived labels to each training fold | matched control, original-train OOF, and derived/non-derived released-validation diagnostics pending; no ZIP by design |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -70,21 +73,25 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 16 | ready; not run | `16_full_data_rdrop_augmented.ipynb` | train the 0.6410 recipe on all 3,159 gold rows plus 779 multiclass-labeled binary comments | CodaBench pending, ~3--5 h |
 | Task B 17 | attempted; OOM in fold 1 | `17_muril_large_oof.ipynb` | evaluate MuRIL-large with five-fold held-out predictions while submissions are closed | no score; captured log retained; retry with 128-token cap, micro-batch 2, and eval batch 4 |
 | Task B 18 | attempted; setup failed | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | stopped before training because Kaggle could not clone GitHub; no ZIP |
-| Task B 19 | ready; not run | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | transductive OOF macro-F1/accuracy pending; no ZIP by design |
+| Task B 19 | completed, 2026-10-02 | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | **0.6123 macro-F1 / 0.6609 accuracy** on 3,554 rows, seed 42; last-checkpoint score `0.6120`; no ZIP by design |
 
 ## Ordered next steps
 
 1. Finish [Task A Run 7](../notebooks/task_a/07_tapt_holdout.ipynb) by inspecting its
    saved holdout predictions and correcting the summary assertion if needed.
-2. Confirm the Run 16 funnel leaders (`epochs10` and `large`) with five-fold OOF before
+2. Run Task A 24--26 as evaluation-only diagnostics before spending another full-data
+   CodaBench submission.
+3. Confirm the Run 16 funnel leaders (`epochs10` and `large`) with five-fold OOF before
    spending another full-data CodaBench submission.
-3. Treat the Run 8 ensemble as rejected for submission: its local OOF macro-F1 was
+4. Treat the Run 8 ensemble as rejected for submission: its local OOF macro-F1 was
    `0.8233`, but its official CodaBench score was only `0.7890`.
-4. If the confirmed Task A recipe improves locally, train a full-data, multi-seed
+5. If the confirmed Task A recipe improves locally, train a full-data, multi-seed
    candidate and submit it against Run 11's `0.8188`.
-5. For Task B, either recover/package Run 12's saved artifacts or run Run 14/15; keep
+6. Prefer a Task A recipe only when its nested estimate and the honest non-derived
+   validation slice agree; disclose Run 26's transductive labels.
+7. For Task B, either recover/package Run 12's saved artifacts or run Run 14/15; keep
    `b_reinit1_rdrop_full` as the `0.6410` baseline.
-6. Keep the full-data Task B runs separate from local OOF measurements: their only valid
+8. Keep the full-data Task B runs separate from local OOF measurements: their only valid
    evaluation is CodaBench.
 
 Do not compare a full-data fit to a local OOF score as though they were the same
@@ -972,3 +979,25 @@ The notebook validated the 395-row prediction file and wrote the single candidat
 macro-F1 **`0.6410`** and accuracy **`0.6937`**, improving on Run 8's `0.6299` macro-F1
 and `0.6886` accuracy by `+0.0111` and `+0.0051`, respectively. This is now the best
 confirmed Task B result. The captured log is [run09_rdrop_full.log](../results/task_b/logs/run09_rdrop_full.log).
+
+### Run 19 -- current recipe OOF after adding released labels, 2026-10-02
+
+`notebooks/task_b/19_oof_best_recipe.ipynb` is an evaluation-only notebook. It combines
+the original 3,159 labelled Task B rows with the released 395-row labelled validation
+file, deduplicates to **3,554 rows**, runs one shared eight-epoch TAPT pass, and trains
+the current one-layer R-Drop recipe over five folds with model seed 42. The classifier
+uses R-Drop `0.5`, FGM, EMA, balanced class weights, six epochs, and no auxiliary head.
+It does not create a submission ZIP.
+
+| checkpoint selection | macro-F1 | accuracy |
+|---|---:|---:|
+| per-fold best (reported by the notebook) | **0.6123** | **0.6609** |
+| per-fold last checkpoint | `0.6120` | not separately printed |
+
+The score is a transductive OOF diagnostic: TAPT saw the wording of all 3,554 combined
+rows, although each fold's labels were held out from classifier training. It is therefore
+not directly comparable to Run 6's `0.614` averaged multi-seed OOF result or Run 9's
+`0.6410` CodaBench score. Run 19 provides no evidence to replace the confirmed Run 9
+candidate. The uploaded execution log completed without a traceback; loading the TAPT
+MLM checkpoint emitted the expected architecture-mismatch warnings because the classifier
+uses its encoder while discarding the MLM head.
