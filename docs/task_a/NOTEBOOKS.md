@@ -33,7 +33,7 @@ These follow the standing constraint: stacked on the `0.8187` recipe, `--folds 1
 |---|---|---|---|
 | `11_reinit1_full_data.ipynb` | 11 | `--reinit-layers 1`, **and the blend weight refitted to match** | ~3.4 h |
 | `05_rdrop_full_data.ipynb` | 5 | `--rdrop 0.5`, against a matched control, 5 seeds each | ~6.5 h |
-| `20_translate_to_english.ipynb` | 20 | translate to English, fine-tune hateBERT, gated on slur survival | ~2 h |
+| `20_translate_to_english.ipynb` | 20 | spelling-robust slur glossing, best-of-two translator (indic-translate / IndicTrans2 1B), fine-tune hateBERT; needs T4 x2 | ~3 h |
 
 Run 20's first Kaggle attempt failed during dependency installation: current pip rejected
 the legacy `omegaconf` metadata pulled by IndicXlit/Fairseq. The notebook now pins pip
