@@ -43,10 +43,10 @@ from sklearn.metrics import f1_score
 from hastika.common.preprocessing import clean
 
 LABELS = ["Gender", "Geo-political", "Others", "Political", "Religion", "Violence"]
-PROMPT = ("Below is a hateful YouTube comment written in Kannada-English code-mixed text "
-          "(Kannada typed in Roman letters, mixed with English).\n"
-          "Which category does the hate fall under? Options: Gender, Political, Religion, "
-          "Geo-political, Violence, Others.\n\nComment: {}\n\nCategory:")
+# Short on purpose: the prompt is paid for on every row, every step, and Run 20's longer
+# version roughly doubled the sequence length of a median comment.
+PROMPT = ("Kannada-English (romanized) hateful YouTube comment: {}\n"
+          "Category (Gender, Political, Religion, Geo-political, Violence, Others):")
 LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 
 
@@ -107,6 +107,18 @@ def encode(tok, texts, max_len, max_chars=700):
             for t in texts]
 
 
+def bucketed_order(lens, bs, rng, pool=50):
+    """Shuffled, but batches hold similar lengths: shuffle, sort within pools of
+    bs * pool rows, cut into batches, shuffle the batches. Padding is wasted compute,
+    and on a T4 it was most of it."""
+    order = rng.permutation(len(lens))
+    out = []
+    for i in range(0, len(order), bs * pool):
+        chunk = sorted(order[i:i + bs * pool], key=lambda j: lens[j])
+        out += [chunk[k:k + bs] for k in range(0, len(chunk), bs)]
+    return np.concatenate([out[k] for k in rng.permutation(len(out))])
+
+
 def batches(ids, bs, pad_id, order):
     for i in range(0, len(order), bs):
         idx = order[i:i + bs]
@@ -164,6 +176,16 @@ def main():
     dtype = torch.bfloat16 if torch.cuda.get_device_capability(0)[0] >= 8 else torch.float16
     token = os.environ.get("HF_TOKEN") or None
 
+    import peft.import_utils
+    # peft probes torchao for every target layer and *raises* when an old one is
+    # installed (Kaggle ships 0.10). It is never used here, so report it as absent.
+    # This is what crashed Gemma-4-12B in Run 20 after three minutes.
+    peft.import_utils.is_torchao_available = lambda: False
+    try:
+        import peft.tuners.lora.torchao as _lora_torchao
+        _lora_torchao.is_torchao_available = lambda: False
+    except ImportError:
+        pass
     from peft import LoraConfig, get_peft_model
     from transformers import AutoTokenizer, get_cosine_schedule_with_warmup
 
@@ -212,9 +234,11 @@ def main():
     torch.cuda.reset_peak_memory_stats()
 
     bad, step, history = 0, 0, []
+    rng = np.random.default_rng(args.seed)
+    t_train = time.time()
     model.train()
     for epoch in range(args.epochs):
-        order = np.random.permutation(len(X))
+        order = bucketed_order(lens, args.bs, rng)
         run_loss, n = 0.0, 0
         opt.zero_grad(set_to_none=True)     # drop any partial accumulation window
         for b, (idx, x, m) in enumerate(batches(X, args.bs, pad_id, order)):
@@ -241,10 +265,10 @@ def main():
                 sched.step()
                 step += 1
                 if step % 25 == 0:
-                    el = time.time() - t0
+                    el = time.time() - t_train
                     print(f"epoch {epoch + 1} step {step}/{steps} loss {run_loss / max(n, 1):.4f} "
-                          f"{el / 60:.1f} min, peak {torch.cuda.max_memory_allocated() / 2**30:.1f} GB",
-                          flush=True)
+                          f"{el / 60:.1f} min, eta {el / step * (steps - step) / 60:.0f} min, "
+                          f"peak {torch.cuda.max_memory_allocated() / 2**30:.1f} GB", flush=True)
         rec = {"epoch": epoch + 1, "train_loss": run_loss / max(n, 1), "non_finite": bad}
         if ev is not None:
             p = predict(model, Xev, pad_id, args.eval_bs, dtype)

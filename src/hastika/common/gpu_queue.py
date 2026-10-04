@@ -4,6 +4,12 @@ Kaggle's T4 x2 is two separate 15 GB cards, not one 30 GB pool, so the useful
 parallelism is "a different job on each card". Each job is pinned with
 CUDA_VISIBLE_DEVICES, logs to its own file, and the queue prints the last line of every
 running job once a minute so a Kaggle cell shows progress without interleaved output.
+
+Two controls exist for a 12-hour Kaggle session:
+  * on_done(name, returncode) may return follow-up jobs, so later work can depend on
+    how an earlier job ended (retry after OOM, fall back to another model, ...).
+  * stop_at (a time.time() value): no job starts after it, and running jobs are
+    terminated at it, so the notebook still finishes and saves what it has.
 """
 import os
 import subprocess
@@ -23,15 +29,22 @@ def _tail(path):
         return ""
 
 
-def run_queue(jobs, n_gpus=None, poll=60, raise_on_fail=True):
+def run_queue(jobs, n_gpus=None, poll=60, raise_on_fail=True, on_done=None, stop_at=None):
     """jobs: list of dicts with name, cmd (str, run with bash), log, optional env/cwd.
-    Returns {name: returncode}."""
+    Returns {name: returncode}; a job killed at stop_at gets -9, one never started is
+    absent."""
     import torch
     n_gpus = n_gpus or max(1, torch.cuda.device_count())
     todo, running, codes = deque(jobs), {}, {}
     free = list(range(n_gpus))
     t0 = time.time()
+    stamp = lambda: f"[{(time.time() - t0) / 60:6.1f} min]"
     while todo or running:
+        late = stop_at is not None and time.time() >= stop_at
+        if late and todo:
+            print(f"{stamp()} deadline reached, not starting: {[j['name'] for j in todo]}",
+                  flush=True)
+            todo.clear()
         while todo and free:
             job, gpu = todo.popleft(), free.pop(0)
             env = {**os.environ, **job.get("env", {}), "CUDA_VISIBLE_DEVICES": str(gpu)}
@@ -39,22 +52,30 @@ def run_queue(jobs, n_gpus=None, poll=60, raise_on_fail=True):
             p = subprocess.Popen(["bash", "-c", job["cmd"]], stdout=fh, stderr=subprocess.STDOUT,
                                  env=env, cwd=job.get("cwd"))
             running[job["name"]] = (p, gpu, fh, job["log"])
-            print(f"[{(time.time() - t0) / 60:6.1f} min] start {job['name']} on GPU {gpu}",
-                  flush=True)
-        time.sleep(poll)
+            print(f"{stamp()} start {job['name']} on GPU {gpu}", flush=True)
+        if late:
+            for name, (p, *_rest) in running.items():
+                if p.poll() is None:
+                    print(f"{stamp()} deadline: terminating {name}", flush=True)
+                    p.kill()
+        time.sleep(poll if not late else 5)
         for name, (p, gpu, fh, log) in list(running.items()):
             if p.poll() is None:
-                print(f"[{(time.time() - t0) / 60:6.1f} min] {name:24s} {_tail(log)}", flush=True)
+                print(f"{stamp()} {name:24s} {_tail(log)}", flush=True)
                 continue
             fh.close()
             codes[name] = p.returncode
             free.append(gpu)
             del running[name]
             state = "done" if p.returncode == 0 else f"FAILED ({p.returncode})"
-            print(f"[{(time.time() - t0) / 60:6.1f} min] {state} {name}; log {log}", flush=True)
+            print(f"{stamp()} {state} {name}; log {log}", flush=True)
             if p.returncode:
                 with open(log, errors="replace") as fh2:
                     sys.stdout.write("".join(fh2.readlines()[-40:]))
+            if on_done is not None:
+                for nxt in on_done(name, p.returncode) or []:
+                    print(f"{stamp()} queued {nxt['name']}", flush=True)
+                    todo.append(nxt)
     failed = [n for n, c in codes.items() if c]
     if failed and raise_on_fail:
         raise RuntimeError(f"jobs failed: {failed}")

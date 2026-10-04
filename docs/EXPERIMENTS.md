@@ -75,8 +75,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 17 | attempted; OOM in fold 1 | `17_muril_large_oof.ipynb` | evaluate MuRIL-large with five-fold held-out predictions while submissions are closed | no score; captured log retained; retry with 128-token cap, micro-batch 2, and eval batch 4 |
 | Task B 18 | attempted; setup failed | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | stopped before training because Kaggle could not clone GitHub; no ZIP |
 | Task B 19 | completed, 2026-10-02 | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | **0.6123 macro-F1 / 0.6609 accuracy** on 3,554 rows, seed 42; last-checkpoint score `0.6120`; no ZIP by design |
-| Task B 20 | ready; not run | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM with a last-token head beat the Run 9 MuRIL recipe on the fixed 530-row holdout of train + released validation? Bits-per-character screen of five candidates, top two fine-tuned | holdout macro-F1 per arm, paired bootstrap; no ZIP by design |
-| Task B 21 | ready; not run | `21_llm_confirm_final.ipynb` | confirm the Run 20 winner with fresh seeds 43/44, test a fixed 50/50 ensemble with MuRIL, then fit LLM, MuRIL and ensemble on all 3,532 rows for the released test file | holdout decision rule picks the RECOMMENDED ZIP |
+| Task B 20 | 2026-10-04, completed; main arm crashed | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM beat the Run 9 MuRIL recipe on the fixed 530-row holdout? | MuRIL **0.6151**; Sarvam-1 0.5567 (-0.058, CI [-0.104, -0.014]); 50/50 ensemble 0.6187. Gemma-4-12B screened best but crashed on a peft/torchao version check, so the main arm is untested |
+| Task B 21 | ready; not run | `21_llm_confirm_final.ipynb` | Gemma-4-12B (torchao crash fixed, length-bucketed batches, shorter prompt) on the holdout, with an automatic Qwen3-8B fallback; MuRIL holdout reused from Run 20; full fits on 3,532 rows; three test ZIPs | holdout decision rule picks the RECOMMENDED ZIP; 11 h hard stop |
 
 ## Ordered next steps
 
@@ -1033,4 +1033,31 @@ candidates on the full 3,532 rows. A decision rule fixed in advance marks one ZI
 Kaggle feasibility: every candidate fits one 15 GB T4 in 4-bit (12B is about 7.5 GB of
 weights). T4s have no bf16, so training is fp16, and a model that overflows aborts with
 exit code 3 instead of training garbage.
+
+### Run 20 result, 2026-10-04
+
+Screen, bits per character on 600 unlabelled training comments (lower reads the text
+better): Gemma-4-12B **3.011**, Sarvam-1 3.081, Qwen3-8B-Base 3.192, Gemma-4-E4B 4.295.
+`bodhan-ai/indic-translate` is gated and was skipped. Gemma-4 itself downloaded without a
+token.
+
+| arm, 530-row holdout | macro-F1 | Gender | Geo-pol | Others | Political | Religion | Violence |
+|---|---|---|---|---|---|---|---|
+| MuRIL, Run 9 recipe, 5 seeds | **0.6151** | 0.704 | 0.642 | 0.500 | 0.789 | 0.672 | 0.383 |
+| Sarvam-1 QLoRA, seed 42 | 0.5567 | 0.685 | 0.488 | 0.437 | 0.757 | 0.714 | 0.259 |
+| 50/50 ensemble | 0.6187 | 0.734 | 0.585 | 0.528 | 0.792 | 0.724 | 0.349 |
+
+- **Gemma-4-12B, the arm the run was built for, never trained.** `get_peft_model` raised
+  `ImportError: Found an incompatible version of torchao. Found version 0.10.0`. peft
+  probes torchao while dispatching each LoRA layer, and Kaggle ships an old one.
+  `llm_classifier.py` now reports torchao as absent.
+- **Sarvam-1 lost clearly:** -0.058, 95% CI [-0.104, -0.014]. It was still improving at
+  the last epoch (0.115, 0.469, 0.557), so three epochs undertrained a 2B model. That is
+  not evidence against the 12B.
+- **The two models disagree on 28.7% of rows,** and even this weak member lifts the
+  ensemble slightly above MuRIL alone. A stronger LLM member has room to help.
+- **Cost:** 32 min for a 2B model, mostly padding and a 60-token prompt. Run 21 adds
+  length-bucketed batches (about 3.5x less padding) and a shorter prompt.
+- MuRIL's TAPT log shows `nan` epoch losses from epoch 2 to 6 (fp16 batches skipped by
+  the gradient scaler). It recovered to 3.42, and the holdout score is in the usual range.
 
