@@ -322,6 +322,7 @@ probabilities and diagnostics, not submission ZIPs:
 | [Run 24](../../notebooks/task_a/24_tapt_epochs10_reinit2_oof.ipynb) | TAPT + ten epochs + two-layer reinitialization | five-fold OOF and nested blend |
 | [Run 25](../../notebooks/task_a/25_char_svm_third_member_oof.ipynb) | character-only SVM as a third ensemble member | three-way OOF and nested blend |
 | [Run 26](../../notebooks/task_a/26_transductive_derivable_labels_oof.ipynb) | certain cross-task-derived labels | OOF plus derived/non-derived validation diagnostics |
+| [Run 27](../../notebooks/task_a/27_run25_validation_and_test.ipynb) | fixed Run 25 weights on released validation, then train-plus-validation refit | validation report plus released-test `predictions.csv` |
 
 ## Useful training options
 

@@ -55,6 +55,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 24 | ready; not run | `24_tapt_epochs10_reinit2_oof.ipynb` | combine TAPT, ten epochs and two-layer reinitialization, then compare with a matched SVM and searched ensemble | five-fold OOF and nested blend pending; no ZIP by design |
 | Task A 25 | ready; not run | `25_char_svm_third_member_oof.ipynb` | test character-only TF-IDF as a third member beside word+char SVM and MuRIL | three-way five-fold OOF and nested blend pending; no ZIP by design |
 | Task A 26 | ready; not run | `26_transductive_derivable_labels_oof.ipynb` | add only the 365 certain cross-task-derived labels to each training fold | matched control, original-train OOF, and derived/non-derived released-validation diagnostics pending; no ZIP by design |
+| Task A 27 | ready; not run | `27_run25_validation_and_test.ipynb` | fit the fixed Run 25 0.60/0.33/0.07 blend on original training data for an honest released-validation score, then refit on train plus validation for released-test predictions | validation score and `test_predictions.csv` pending; no ZIP by design |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |

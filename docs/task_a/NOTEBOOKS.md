@@ -37,6 +37,7 @@ notebook marked **no ZIP** is diagnostic-only.
 | `24_tapt_epochs10_reinit2_oof.ipynb` | ready; no ZIP | TAPT + 10 epochs + two-layer reinitialization |
 | `25_char_svm_third_member_oof.ipynb` | ready; no ZIP | character-only SVM as a third ensemble member |
 | `26_transductive_derivable_labels_oof.ipynb` | ready; no ZIP | certain cross-task-derived labels, with honest/non-derived diagnostics |
+| `27_run25_validation_and_test.ipynb` | ready; no ZIP | fixed Run 25 blend: evaluate on released validation using original training only, then refit on train plus validation and predict released test |
 
 The detailed sections below retain the reasoning and commands for each group; this table
 is the authoritative run-status summary.
@@ -58,10 +59,12 @@ only 24% of them, so no weight gains. The derivation is in that directory's READ
 
 ## Queued — evaluation-only next experiments
 
-These three notebooks deliberately produce five-fold out-of-fold probabilities and a
-nested diagnostic instead of a submission ZIP. They use the original labels plus the
-released labelled validation rows where stated, so their scores are local rankings and
-not CodaBench results.
+These notebooks deliberately produce evaluation artifacts rather than a CodaBench ZIP and
+are listed in the master index above. Runs 24--26 produce five-fold out-of-fold
+probabilities and nested diagnostics. Run 27 measures the fixed Run 25 blend on the
+released validation set using original training data only, then creates released-test
+predictions after a train-plus-validation refit. These are local diagnostics and are not
+CodaBench results.
 
 | notebook | run | question | time |
 |---|---|---|---|
