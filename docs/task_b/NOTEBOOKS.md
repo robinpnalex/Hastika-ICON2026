@@ -117,3 +117,15 @@ missing local score as a good sign, and do not copy a holdout number onto it.
 Everything lands in `/kaggle/working`. Download the zip, the logs and any
 `*_test_probs.npy` individually rather than using Download All, because the TAPT
 checkpoints in there are about a gigabyte each.
+
+## Runs 20 and 21 -- LLM encoder, 15% holdout of train + released validation
+
+| notebook | run | what | time on T4 x2 |
+|---|---|---|---|
+| `20_llm_screen_holdout.ipynb` | 20 | screen five LLMs (bits per character) while the MuRIL baseline trains; QLoRA the top two; paired bootstrap on the 530-row holdout | ~4 h |
+| `21_llm_confirm_final.ipynb` | 21 | seeds 43/44 on the holdout, 50/50 ensemble check, full fits on 3,532 rows, three ZIPs for the released test file | ~5-9 h |
+
+Run 21 reads Run 20's output when attached with **Add Input -> Notebook Output**. Gemma
+models need a Hugging Face token with the license accepted, stored as the Kaggle secret
+`HF_TOKEN`; without it they are skipped.
+

@@ -52,6 +52,18 @@ class RepositoryStructureTests(unittest.TestCase):
         )
         self.assertEqual(stored["id"].tolist(), frame.iloc[val_idx]["id"].tolist())
 
+    def test_combined_task_b_holdout_is_committed_and_reproducible(self):
+        from hastika.task_b.combined_holdout import fingerprint, split
+        stored = pd.read_csv(
+            PROJECT_ROOT / "data" / "derived" / "task_b_combined_holdout" / "holdout.csv"
+        )
+        self.assertEqual(len(stored), 530)
+        self.assertEqual(fingerprint(stored["id"]), "f85f4f049b")
+        frame, _, ho_idx = split()
+        self.assertEqual(stored["id"].tolist(), frame.iloc[ho_idx]["id"].tolist())
+        test = pd.read_csv(RAW_DATA_DIR / "hastika_multiclass_test.csv")
+        self.assertFalse(test["id"].isin(frame["id"]).any())
+
     def test_submission_contracts_reference_raw_inputs(self):
         self.assertEqual(set(INPUTS), {"a", "b"})
         self.assertEqual(VALID["a"], {"Hate", "Non-Hate"})

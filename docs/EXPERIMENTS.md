@@ -75,6 +75,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 17 | attempted; OOM in fold 1 | `17_muril_large_oof.ipynb` | evaluate MuRIL-large with five-fold held-out predictions while submissions are closed | no score; captured log retained; retry with 128-token cap, micro-batch 2, and eval batch 4 |
 | Task B 18 | attempted; setup failed | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | stopped before training because Kaggle could not clone GitHub; no ZIP |
 | Task B 19 | completed, 2026-10-02 | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | **0.6123 macro-F1 / 0.6609 accuracy** on 3,554 rows, seed 42; last-checkpoint score `0.6120`; no ZIP by design |
+| Task B 20 | ready; not run | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM with a last-token head beat the Run 9 MuRIL recipe on the fixed 530-row holdout of train + released validation? Bits-per-character screen of five candidates, top two fine-tuned | holdout macro-F1 per arm, paired bootstrap; no ZIP by design |
+| Task B 21 | ready; not run | `21_llm_confirm_final.ipynb` | confirm the Run 20 winner with fresh seeds 43/44, test a fixed 50/50 ensemble with MuRIL, then fit LLM, MuRIL and ensemble on all 3,532 rows for the released test file | holdout decision rule picks the RECOMMENDED ZIP |
 
 ## Ordered next steps
 
@@ -1002,3 +1004,33 @@ not directly comparable to Run 6's `0.614` averaged multi-seed OOF result or Run
 candidate. The uploaded execution log completed without a traceback; loading the TAPT
 MLM checkpoint emitted the expected architecture-mismatch warnings because the classifier
 uses its encoder while discarding the MLM head.
+
+### Runs 20 and 21 -- a multilingual LLM as the encoder, planned 2026-10-04
+
+Every Task B gain so far came from the representation (TAPT +2.9, one re-initialised layer
++3.0), and macro-F1 is lost on three classes: Violence `0.35`, Others `0.48`,
+Geo-political `0.59` (Run 5 per-class F1). Violence hinges on romanized verbs
+(`saayisbeku`, `encounter maadlebeku`, `odiri`) that MuRIL's wordpieces shatter. These two
+runs replace the encoder with a decoder LLM fine-tuned in 4-bit QLoRA, with a
+classification head on the last token of a prompt naming the six options
+([`llm_classifier.py`](../src/hastika/task_b/llm_classifier.py)).
+
+**Split.** Train + released labelled validation, deduplicated to 3,532 rows. A fixed
+stratified 15% holdout of 530 rows, fingerprint `f85f4f049b`, is committed under
+`data/derived/task_b_combined_holdout/` so it cannot drift with library versions on
+Kaggle. No cross-task label derivation, and the released test text is never used for
+training, TAPT or screening.
+
+**Run 20** screens five candidates with an unlabelled bits-per-character score that is
+comparable across tokenizers ([`llm_screen.py`](../src/hastika/task_b/llm_screen.py)):
+Qwen3-8B-Base, Gemma-4-12B, Gemma-4-E4B, `bodhan-ai/indic-translate` and Sarvam-1. Run 9's
+MuRIL recipe trains on the other GPU at the same time. The top two LLMs are fine-tuned
+with seed 42, and each is compared with MuRIL by paired bootstrap on the same rows.
+**Run 21** adds seeds 43 and 44, checks a fixed 50/50 ensemble, and fits all three
+candidates on the full 3,532 rows. A decision rule fixed in advance marks one ZIP
+`RECOMMENDED`.
+
+Kaggle feasibility: every candidate fits one 15 GB T4 in 4-bit (12B is about 7.5 GB of
+weights). T4s have no bf16, so training is fp16, and a model that overflows aborts with
+exit code 3 instead of training garbage.
+

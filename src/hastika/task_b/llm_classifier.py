@@ -1,0 +1,271 @@
+"""Task B with a decoder LLM as the encoder: 4-bit QLoRA plus a classification head on
+the last token.
+
+Why: on this corpus only representation-level changes have ever helped (TAPT, layer
+re-initialisation), and MuRIL's wordpiece vocabulary shatters romanized Kannada. A
+multilingual LLM has seen far more romanized Indic web text, and the
+last-token-embedding + LoRA recipe matches or beats fine-tuned BERTs from about 1.5k
+labelled rows (arXiv 2512.12677).
+
+Design choices, each for a reason measured or known on this hardware:
+  * Classification head on the last token's hidden state, not label generation:
+    calibrated probabilities over the six classes, which the ensemble needs, and no
+    constrained decoding.
+  * The prompt names the task and the six options, so the last token's state is
+    "about to answer the question" rather than "end of an arbitrary comment".
+  * Fixed epoch count, no checkpoint selection on the evaluation rows; per-epoch eval
+    scores are printed as diagnostics only, so the holdout stays honest.
+  * Balanced class weights + label smoothing 0.05, as in the MuRIL recipe it is
+    compared against, so the comparison isolates the encoder.
+  * fp16 on T4 (no bf16). Non-finite losses are counted; persistent ones abort with
+    exit code 3 rather than silently training garbage (Gemma is known to overflow).
+  * The LM head is never loaded (AutoModel), and prepare_model_for_kbit_training is
+    not used: it upcasts the embedding table to fp32, 4 GB for a 262k vocabulary.
+
+    python -m hastika.task_b.llm_classifier --model Qwen/Qwen3-8B-Base \
+        --train train.csv --eval holdout.csv --predict holdout.csv --out runs/qwen_s42
+"""
+import argparse
+import json
+import math
+import os
+import pathlib
+import random
+import sys
+import time
+
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+from sklearn.metrics import f1_score
+
+from hastika.common.preprocessing import clean
+
+LABELS = ["Gender", "Geo-political", "Others", "Political", "Religion", "Violence"]
+PROMPT = ("Below is a hateful YouTube comment written in Kannada-English code-mixed text "
+          "(Kannada typed in Roman letters, mixed with English).\n"
+          "Which category does the hate fall under? Options: Gender, Political, Religion, "
+          "Geo-political, Violence, Others.\n\nComment: {}\n\nCategory:")
+LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+
+def text_backbone(m):
+    """The decoder stack of a text-only or multimodal checkpoint."""
+    if hasattr(m, "layers"):
+        return m
+    for path in ("language_model", "model.language_model", "model", "text_model"):
+        obj = m
+        try:
+            for p in path.split("."):
+                obj = getattr(obj, p)
+        except AttributeError:
+            continue
+        if hasattr(obj, "layers") or hasattr(obj, "embed_tokens"):
+            return obj
+    raise ValueError(f"no decoder stack found in {type(m).__name__}")
+
+
+def load_backbone(name, token=None, cache_dir=None, compute_dtype=torch.float16):
+    import transformers
+    from transformers import BitsAndBytesConfig
+    q = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
+                           bnb_4bit_compute_dtype=compute_dtype, bnb_4bit_use_double_quant=True)
+    kw = dict(quantization_config=q, dtype=compute_dtype, device_map={"": 0}, token=token,
+              cache_dir=cache_dir)
+    err = None
+    for cls in ("AutoModel", "AutoModelForCausalLM", "AutoModelForMultimodalLM"):
+        auto = getattr(transformers, cls, None)
+        if auto is None:
+            continue
+        try:
+            return text_backbone(auto.from_pretrained(name, **kw))
+        except (ValueError, KeyError, TypeError) as e:
+            err = e
+    raise err
+
+
+class LLMClassifier(nn.Module):
+    def __init__(self, backbone, n_classes, dropout=0.1):
+        super().__init__()
+        self.backbone = backbone
+        hidden = backbone.config.hidden_size
+        self.drop = nn.Dropout(dropout)
+        self.head = nn.Linear(hidden, n_classes)      # fp32, trained from scratch
+
+    def forward(self, input_ids, attention_mask):
+        h = self.backbone(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state
+        last = attention_mask.sum(1) - 1                # right padding
+        pooled = h[torch.arange(h.size(0), device=h.device), last].float()
+        return self.head(self.drop(pooled))
+
+
+def encode(tok, texts, max_len, max_chars=700):
+    """The comment is cut by characters before it enters the prompt, so token truncation
+    (rare) can never cut off the closing "Category:" cue the head reads."""
+    return [tok(PROMPT.format(t[:max_chars]), truncation=True, max_length=max_len)["input_ids"]
+            for t in texts]
+
+
+def batches(ids, bs, pad_id, order):
+    for i in range(0, len(order), bs):
+        idx = order[i:i + bs]
+        L = max(len(ids[j]) for j in idx)
+        x = torch.full((len(idx), L), pad_id, dtype=torch.long)
+        m = torch.zeros((len(idx), L), dtype=torch.long)
+        for r, j in enumerate(idx):
+            x[r, :len(ids[j])] = torch.tensor(ids[j])
+            m[r, :len(ids[j])] = 1
+        yield idx, x, m
+
+
+@torch.no_grad()
+def predict(model, ids, pad_id, bs, dtype):
+    model.eval()
+    out = np.zeros((len(ids), len(LABELS)), dtype=np.float32)
+    order = np.argsort([len(x) for x in ids])          # length-sorted: less padding
+    for idx, x, m in batches(ids, bs, pad_id, order):
+        with torch.autocast("cuda", dtype=dtype):
+            logits = model(x.cuda(), m.cuda())
+        out[idx] = torch.softmax(logits.float(), -1).cpu().numpy()
+    model.train()
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model", required=True)
+    ap.add_argument("--train", required=True, help="CSV with Comment and Hate Category")
+    ap.add_argument("--eval", default="", help="labelled CSV, printed per epoch, diagnostic only")
+    ap.add_argument("--predict", nargs="*", default=[], help="CSVs to write probabilities for")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--epochs", type=int, default=3)
+    ap.add_argument("--lr", type=float, default=1e-4)
+    ap.add_argument("--head-lr", type=float, default=5e-4)
+    ap.add_argument("--r", type=int, default=16)
+    ap.add_argument("--lora-dropout", type=float, default=0.05)
+    ap.add_argument("--bs", type=int, default=8)
+    ap.add_argument("--grad-accum", type=int, default=2)
+    ap.add_argument("--eval-bs", type=int, default=16)
+    ap.add_argument("--max-len", type=int, default=320)
+    ap.add_argument("--warmup", type=float, default=0.06)
+    ap.add_argument("--weight-decay", type=float, default=0.01)
+    ap.add_argument("--label-smoothing", type=float, default=0.05)
+    ap.add_argument("--class-weight", choices=["balanced", "sqrt", "none"], default="balanced")
+    ap.add_argument("--cache", default=os.environ.get("HF_HUB_CACHE"))
+    args = ap.parse_args()
+
+    out = pathlib.Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    dtype = torch.bfloat16 if torch.cuda.get_device_capability(0)[0] >= 8 else torch.float16
+    token = os.environ.get("HF_TOKEN") or None
+
+    from peft import LoraConfig, get_peft_model
+    from transformers import AutoTokenizer, get_cosine_schedule_with_warmup
+
+    tok = AutoTokenizer.from_pretrained(args.model, token=token, cache_dir=args.cache)
+    pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
+
+    tr = pd.read_csv(args.train)
+    y = torch.tensor(tr["Hate Category"].map(LABELS.index).to_numpy())
+    X = encode(tok, [clean(t) for t in tr["Comment"]], args.max_len)
+    lens = np.array([len(x) for x in X])
+    print(f"{len(X)} training rows; prompt+comment tokens median {int(np.median(lens))}, "
+          f"p99 {int(np.percentile(lens, 99))}, truncated {(lens >= args.max_len).sum()}", flush=True)
+    ev = None
+    if args.eval:
+        ev = pd.read_csv(args.eval)
+        Xev = encode(tok, [clean(t) for t in ev["Comment"]], args.max_len)
+        yev = ev["Hate Category"].map(LABELS.index).to_numpy()
+
+    t0 = time.time()
+    backbone = load_backbone(args.model, token, args.cache, dtype)
+    backbone.config.use_cache = False
+    backbone.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    backbone = get_peft_model(backbone, LoraConfig(
+        r=args.r, lora_alpha=2 * args.r, lora_dropout=args.lora_dropout,
+        target_modules=LORA_TARGETS, bias="none"))
+    backbone.print_trainable_parameters()
+    model = LLMClassifier(backbone, len(LABELS))
+    model.head.cuda()       # never .cuda() the whole wrapper: 4-bit weights refuse to move
+    print(f"loaded in {(time.time() - t0) / 60:.1f} min; "
+          f"{torch.cuda.memory_allocated() / 2**30:.1f} GB on GPU", flush=True)
+
+    counts = np.bincount(y.numpy(), minlength=len(LABELS))
+    w = {"balanced": len(y) / (len(LABELS) * counts),
+         "sqrt": np.sqrt(len(y) / (len(LABELS) * counts)),
+         "none": np.ones(len(LABELS))}[args.class_weight]
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor(w / w.mean(), dtype=torch.float32).cuda(),
+                                  label_smoothing=args.label_smoothing)
+
+    lora = [p for n, p in model.named_parameters() if p.requires_grad and "head" not in n.split(".")[0]]
+    opt = torch.optim.AdamW([{"params": lora, "lr": args.lr},
+                             {"params": model.head.parameters(), "lr": args.head_lr}],
+                            weight_decay=args.weight_decay)
+    steps = math.ceil(len(X) / args.bs / args.grad_accum) * args.epochs
+    sched = get_cosine_schedule_with_warmup(opt, int(args.warmup * steps), steps)
+    scaler = torch.amp.GradScaler("cuda", enabled=(dtype == torch.float16))
+    torch.cuda.reset_peak_memory_stats()
+
+    bad, step, history = 0, 0, []
+    model.train()
+    for epoch in range(args.epochs):
+        order = np.random.permutation(len(X))
+        run_loss, n = 0.0, 0
+        opt.zero_grad(set_to_none=True)     # drop any partial accumulation window
+        for b, (idx, x, m) in enumerate(batches(X, args.bs, pad_id, order)):
+            with torch.autocast("cuda", dtype=dtype):
+                logits = model(x.cuda(), m.cuda())
+            loss = loss_fn(logits.float(), y[idx].cuda()) / args.grad_accum
+            if not torch.isfinite(loss):
+                bad += 1
+                if bad > 20:
+                    print("ABORT: more than 20 non-finite losses -- fp16 overflow in this model",
+                          flush=True)
+                    sys.exit(3)
+                opt.zero_grad(set_to_none=True)
+                continue
+            scaler.scale(loss).backward()
+            run_loss += loss.item() * args.grad_accum
+            n += 1
+            if (b + 1) % args.grad_accum == 0:
+                scaler.unscale_(opt)
+                torch.nn.utils.clip_grad_norm_([p for g in opt.param_groups for p in g["params"]], 1.0)
+                scaler.step(opt)
+                scaler.update()
+                opt.zero_grad(set_to_none=True)
+                sched.step()
+                step += 1
+                if step % 25 == 0:
+                    el = time.time() - t0
+                    print(f"epoch {epoch + 1} step {step}/{steps} loss {run_loss / max(n, 1):.4f} "
+                          f"{el / 60:.1f} min, peak {torch.cuda.max_memory_allocated() / 2**30:.1f} GB",
+                          flush=True)
+        rec = {"epoch": epoch + 1, "train_loss": run_loss / max(n, 1), "non_finite": bad}
+        if ev is not None:
+            p = predict(model, Xev, pad_id, args.eval_bs, dtype)
+            rec["eval_macro_f1"] = float(f1_score(yev, p.argmax(1), average="macro"))
+            print(f"== epoch {epoch + 1}: eval macro-F1 {rec['eval_macro_f1']:.4f} "
+                  "(diagnostic only, not used for selection)", flush=True)
+        history.append(rec)
+
+    for path in args.predict:
+        df = pd.read_csv(path)
+        p = predict(model, encode(tok, [clean(t) for t in df["Comment"]], args.max_len),
+                    pad_id, args.eval_bs, dtype)
+        stem = pathlib.Path(path).stem
+        np.save(out / f"{stem}_probs.npy", p)
+        df[["id"]].to_csv(out / f"{stem}_ids.csv", index=False)
+        print(f"wrote {out / (stem + '_probs.npy')} {p.shape}", flush=True)
+    json.dump({"args": vars(args), "history": history, "minutes": (time.time() - t0) / 60,
+               "peak_gb": torch.cuda.max_memory_allocated() / 2**30},
+              open(out / "metrics.json", "w"), indent=2)
+    print(f"finished in {(time.time() - t0) / 60:.1f} min", flush=True)
+
+
+if __name__ == "__main__":
+    main()
