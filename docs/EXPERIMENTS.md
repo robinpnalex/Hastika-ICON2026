@@ -56,6 +56,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 25 | ready; not run | `25_char_svm_third_member_oof.ipynb` | test character-only TF-IDF as a third member beside word+char SVM and MuRIL | three-way five-fold OOF and nested blend pending; no ZIP by design |
 | Task A 26 | ready; not run | `26_transductive_derivable_labels_oof.ipynb` | add only the 365 certain cross-task-derived labels to each training fold | matched control, original-train OOF, and derived/non-derived released-validation diagnostics pending; no ZIP by design |
 | Task A 27 | ready; not run | `27_run25_validation_and_test.ipynb` | fit the fixed Run 25 0.60/0.33/0.07 blend on original training data for an honest released-validation score, then refit on train plus validation for released-test predictions | validation score and `test_predictions.csv` pending; no ZIP by design |
+| Task A 28 | ready; standalone | `28_gemma_holdout_final.ipynb` | Gemma-4-12B QLoRA on Task A: 2 seeds on the 1,079-row holdout vs the char SVM and a fixed 50/50 blend, then full fits on 7,193 rows and three test ZIPs | holdout bootstraps; RECOMMENDED ZIP by a pre-set rule |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -77,8 +78,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 19 | completed, 2026-10-02 | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | **0.6123 macro-F1 / 0.6609 accuracy** on 3,554 rows, seed 42; last-checkpoint score `0.6120`; no ZIP by design |
 | Task B 20 | 2026-10-04, completed; main arm crashed | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM beat the Run 9 MuRIL recipe on the fixed 530-row holdout? | MuRIL **0.6151**; Sarvam-1 0.5567 (-0.058, CI [-0.104, -0.014]); 50/50 ensemble 0.6187. Gemma-4-12B screened best but crashed on a peft/torchao version check, so the main arm is untested |
 | Task B 21 | 2026-10-05, completed | `21_llm_confirm_final.ipynb` | Gemma-4-12B QLoRA vs the Run 9 MuRIL recipe on the 530-row holdout, then full fits on 3,532 rows | **Gemma 2 seeds 0.6792** vs MuRIL 0.6151, **+0.064, CI [+0.024, +0.105]**; ensemble 0.6825 (+0.003 over Gemma, inside noise) -> LLM recommended. Packaging bug left only the MuRIL ZIP; Run 22 packages the saved Gemma probabilities |
-| Task B 22 | ready; not run | `22_package_run21.ipynb` | write Run 21's LLM, MuRIL and ensemble ZIPs from its saved output, CPU only | CodaBench pending for `RECOMMENDED_b21_llm.zip` |
-| Task B 23 | ready; not run | `23_gemma_epochs_seeds_final.ipynb` | Gemma-4-12B with 4 epochs vs Run 21's 3 on the same holdout (`3ep` / `4ep` / `mix` candidates), then four full-data models of the winner averaged for the test file | holdout candidates + bootstraps; `RECOMMENDED_b23_llm.zip`, CodaBench pending |
+| Task B 22 | ready; standalone | `22_package_run21.ipynb` | Run 21's 2-seed Gemma submission: reuses its full fits if attached, otherwise retrains them (~1.5 h) | `RECOMMENDED_b22_gemma_3ep_2seeds.zip`, CodaBench pending |
+| Task B 23 | ready; standalone | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout (vs Run 21's recorded 0.6792, or paired when attached), then four full-data models of the winner | `RECOMMENDED_b23_gemma.zip`, CodaBench pending |
 
 ## Ordered next steps
 
@@ -637,6 +638,8 @@ is a Task A row labelled Hate. So a Task B row whose id appears in **no** releas
 file can only be a Task A **test** row:
 
 | Task B file | ids | in Task A train | in Task A validation | in neither |
+| Task B 24 | ready; standalone | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma: TAPT (LoRA next-token on training-portion text + external corpus) and R-Drop 0.5, each vs Run 21's recipe on the holdout, 2 seeds | paired bootstraps; flags for Run 25 |
+| Task B 25 | ready; standalone | `25_gemma_final_recipe.ipynb` | final Gemma recipe on all 3,532 rows, four seeds; `EPOCHS`/`TAPT`/`RDROP` flags set from Runs 23-24 (defaults: Run 21's recipe) | `RECOMMENDED_b25_gemma.zip`, CodaBench pending |
 |---|---|---|---|---|
 | `multiclass_train` | 3,159 | 2,515 | 324 | **320** |
 | `multiclass_validation_inputs` | 395 | 319 | 32 | **44** |
@@ -1136,3 +1139,28 @@ the only translator was **Sarvam-Translate**. Translating 7,193 rows took about 
   the signal Task A depends on. The representation lever that worked on Task B, a QLoRA
   multilingual LLM reading the romanized text directly, is the one to try on Task A.
 
+
+### Gemma notebooks are standalone from Runs 22-25 and Task A 28, 2026-10-05
+
+Runs 22 and 23 failed at their first cell. They asserted that Run 21's output was
+attached, and Kaggle did not expose it at the expected path. Every Gemma notebook now:
+- **runs with nothing attached;**
+- **searches all inputs, following symlinks,** for earlier outputs and reuses them when
+  found, otherwise training what it needs;
+- **clones the repo to `/tmp`,** so the Kaggle output holds results only;
+- **stops at 11 h.**
+
+They are generated by `experiments/build_gemma_notebooks.py`.
+
+**What carries over from MuRIL:**
+
+| lesson | how it is applied |
+|---|---|
+| TAPT, +2.9 on MuRIL | LoRA next-token training on training-portion comments plus `offenseval_kn` (`llm_tapt.py`). The adapter is continued by the classifier (`--init-adapter`). |
+| R-Drop 0.5 | `--rdrop` |
+| seed averaging, about +2 on Gemma in Run 21 | the final runs average four seeds |
+| char SVM blend on Task A | Run 28 tests a fixed 50/50 Gemma + SVM blend |
+
+Balanced class weights, label smoothing and the fixed epoch count are already in the
+recipe. Layer re-initialisation and demojization were MuRIL-specific fixes and do not
+apply to Gemma.

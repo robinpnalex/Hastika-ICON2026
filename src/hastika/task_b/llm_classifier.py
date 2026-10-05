@@ -42,11 +42,20 @@ from sklearn.metrics import f1_score
 
 from hastika.common.preprocessing import clean
 
-LABELS = ["Gender", "Geo-political", "Others", "Political", "Religion", "Violence"]
-# Short on purpose: the prompt is paid for on every row, every step, and Run 20's longer
-# version roughly doubled the sequence length of a median comment.
-PROMPT = ("Kannada-English (romanized) hateful YouTube comment: {}\n"
-          "Category (Gender, Political, Religion, Geo-political, Violence, Others):")
+# Per task: label order (= probability column order), label column, prompt. Task A keeps
+# the repo-wide [Non-Hate, Hate] column order. Prompts are short on purpose: the prompt is
+# paid for on every row, every step, and Run 20's longer version roughly doubled the
+# sequence length of a median comment.
+TASKS = {
+    "b": (["Gender", "Geo-political", "Others", "Political", "Religion", "Violence"],
+          "Hate Category",
+          "Kannada-English (romanized) hateful YouTube comment: {}\n"
+          "Category (Gender, Political, Religion, Geo-political, Violence, Others):"),
+    "a": (["Non-Hate", "Hate"], "Label",
+          "Kannada-English (romanized) YouTube comment: {}\n"
+          "Is this hate speech (Hate or Non-Hate)?:"),
+}
+LABELS, LABEL_COL, PROMPT = TASKS["b"]
 LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 
 
@@ -100,10 +109,11 @@ class LLMClassifier(nn.Module):
         return self.head(self.drop(pooled))
 
 
-def encode(tok, texts, max_len, max_chars=700):
+def encode(tok, texts, max_len, max_chars=700, prompt=None):
     """The comment is cut by characters before it enters the prompt, so token truncation
     (rare) can never cut off the closing "Category:" cue the head reads."""
-    return [tok(PROMPT.format(t[:max_chars]), truncation=True, max_length=max_len)["input_ids"]
+    prompt = prompt or PROMPT
+    return [tok(prompt.format(t[:max_chars]), truncation=True, max_length=max_len)["input_ids"]
             for t in texts]
 
 
@@ -134,7 +144,7 @@ def batches(ids, bs, pad_id, order):
 @torch.no_grad()
 def predict(model, ids, pad_id, bs, dtype):
     model.eval()
-    out = np.zeros((len(ids), len(LABELS)), dtype=np.float32)
+    out = np.zeros((len(ids), model.head.out_features), dtype=np.float32)
     order = np.argsort([len(x) for x in ids])          # length-sorted: less padding
     for idx, x, m in batches(ids, bs, pad_id, order):
         with torch.autocast("cuda", dtype=dtype):
@@ -147,6 +157,7 @@ def predict(model, ids, pad_id, bs, dtype):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
+    ap.add_argument("--task", choices=["a", "b"], default="b")
     ap.add_argument("--train", required=True, help="CSV with Comment and Hate Category")
     ap.add_argument("--eval", default="", help="labelled CSV, printed per epoch, diagnostic only")
     ap.add_argument("--predict", nargs="*", default=[], help="CSVs to write probabilities for")
@@ -165,6 +176,12 @@ def main():
     ap.add_argument("--weight-decay", type=float, default=0.01)
     ap.add_argument("--label-smoothing", type=float, default=0.05)
     ap.add_argument("--class-weight", choices=["balanced", "sqrt", "none"], default="balanced")
+    ap.add_argument("--rdrop", type=float, default=0.0,
+                    help="R-Drop weight: two dropout passes tied by symmetric KL. In the 0.6410 "
+                         "MuRIL recipe at 0.5; doubles the cost of a step")
+    ap.add_argument("--init-adapter", default="",
+                    help="start from a LoRA adapter saved by llm_tapt.py (domain-adapted) "
+                         "instead of a fresh one")
     ap.add_argument("--cache", default=os.environ.get("HF_HUB_CACHE"))
     args = ap.parse_args()
 
@@ -186,41 +203,47 @@ def main():
         _lora_torchao.is_torchao_available = lambda: False
     except ImportError:
         pass
-    from peft import LoraConfig, get_peft_model
+    from peft import LoraConfig, PeftModel, get_peft_model
     from transformers import AutoTokenizer, get_cosine_schedule_with_warmup
 
+    labels, label_col, prompt = TASKS[args.task]
     tok = AutoTokenizer.from_pretrained(args.model, token=token, cache_dir=args.cache)
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
 
     tr = pd.read_csv(args.train)
-    y = torch.tensor(tr["Hate Category"].map(LABELS.index).to_numpy())
-    X = encode(tok, [clean(t) for t in tr["Comment"]], args.max_len)
+    y = torch.tensor(tr[label_col].map(labels.index).to_numpy())
+    X = encode(tok, [clean(t) for t in tr["Comment"]], args.max_len, prompt=prompt)
     lens = np.array([len(x) for x in X])
     print(f"{len(X)} training rows; prompt+comment tokens median {int(np.median(lens))}, "
           f"p99 {int(np.percentile(lens, 99))}, truncated {(lens >= args.max_len).sum()}", flush=True)
     ev = None
     if args.eval:
         ev = pd.read_csv(args.eval)
-        Xev = encode(tok, [clean(t) for t in ev["Comment"]], args.max_len)
-        yev = ev["Hate Category"].map(LABELS.index).to_numpy()
+        Xev = encode(tok, [clean(t) for t in ev["Comment"]], args.max_len, prompt=prompt)
+        yev = ev[label_col].map(labels.index).to_numpy()
 
     t0 = time.time()
     backbone = load_backbone(args.model, token, args.cache, dtype)
     backbone.config.use_cache = False
     backbone.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
-    backbone = get_peft_model(backbone, LoraConfig(
-        r=args.r, lora_alpha=2 * args.r, lora_dropout=args.lora_dropout,
-        target_modules=LORA_TARGETS, bias="none"))
+    if args.init_adapter:
+        # llm_tapt.py applies LoRA to the same decoder stack, so the keys line up
+        backbone = PeftModel.from_pretrained(backbone, args.init_adapter, is_trainable=True)
+        print("initialised from TAPT adapter", args.init_adapter, flush=True)
+    else:
+        backbone = get_peft_model(backbone, LoraConfig(
+            r=args.r, lora_alpha=2 * args.r, lora_dropout=args.lora_dropout,
+            target_modules=LORA_TARGETS, bias="none"))
     backbone.print_trainable_parameters()
-    model = LLMClassifier(backbone, len(LABELS))
+    model = LLMClassifier(backbone, len(labels))
     model.head.cuda()       # never .cuda() the whole wrapper: 4-bit weights refuse to move
     print(f"loaded in {(time.time() - t0) / 60:.1f} min; "
           f"{torch.cuda.memory_allocated() / 2**30:.1f} GB on GPU", flush=True)
 
-    counts = np.bincount(y.numpy(), minlength=len(LABELS))
-    w = {"balanced": len(y) / (len(LABELS) * counts),
-         "sqrt": np.sqrt(len(y) / (len(LABELS) * counts)),
-         "none": np.ones(len(LABELS))}[args.class_weight]
+    counts = np.bincount(y.numpy(), minlength=len(labels))
+    w = {"balanced": len(y) / (len(labels) * counts),
+         "sqrt": np.sqrt(len(y) / (len(labels) * counts)),
+         "none": np.ones(len(labels))}[args.class_weight]
     loss_fn = nn.CrossEntropyLoss(weight=torch.tensor(w / w.mean(), dtype=torch.float32).cuda(),
                                   label_smoothing=args.label_smoothing)
 
@@ -244,7 +267,18 @@ def main():
         for b, (idx, x, m) in enumerate(batches(X, args.bs, pad_id, order)):
             with torch.autocast("cuda", dtype=dtype):
                 logits = model(x.cuda(), m.cuda())
-            loss = loss_fn(logits.float(), y[idx].cuda()) / args.grad_accum
+            target = y[idx].cuda()
+            loss = loss_fn(logits.float(), target)
+            if args.rdrop:
+                # second pass sees different dropout masks (LoRA and head); the symmetric
+                # KL pulls the two predictive distributions together
+                with torch.autocast("cuda", dtype=dtype):
+                    logits2 = model(x.cuda(), m.cuda())
+                lp, lq = torch.log_softmax(logits.float(), -1), torch.log_softmax(logits2.float(), -1)
+                kl = 0.5 * (nn.functional.kl_div(lp, lq, log_target=True, reduction="batchmean")
+                            + nn.functional.kl_div(lq, lp, log_target=True, reduction="batchmean"))
+                loss = 0.5 * (loss + loss_fn(logits2.float(), target)) + args.rdrop * kl
+            loss = loss / args.grad_accum
             if not torch.isfinite(loss):
                 bad += 1
                 if bad > 20:
@@ -279,8 +313,8 @@ def main():
 
     for path in args.predict:
         df = pd.read_csv(path)
-        p = predict(model, encode(tok, [clean(t) for t in df["Comment"]], args.max_len),
-                    pad_id, args.eval_bs, dtype)
+        p = predict(model, encode(tok, [clean(t) for t in df["Comment"]], args.max_len,
+                                  prompt=prompt), pad_id, args.eval_bs, dtype)
         stem = pathlib.Path(path).stem
         np.save(out / f"{stem}_probs.npy", p)
         df[["id"]].to_csv(out / f"{stem}_ids.csv", index=False)
