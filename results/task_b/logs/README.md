@@ -14,6 +14,7 @@ These are the captured Kaggle logs for the completed Task B experiments:
 | `run20_llm_screen_holdout.log` | Run 20: LLM screen + MuRIL baseline on the 530-row holdout | MuRIL 0.6151; Sarvam-1 0.5567; Gemma-4-12B screened best but its fine-tune crashed on peft/torchao |
 | `run21_gemma12b_holdout_full.log` | Run 21: Gemma-4-12B QLoRA holdout + full fits | Gemma 2 seeds 0.6792 vs MuRIL 0.6151 (+0.064, CI [+0.024, +0.105]); packaging cell missed the LLM files |
 | `run22_gemma_3ep_2seeds_full.log` | Run 22: standalone Gemma-4-12B full fits, 3 epochs, seeds 42/43, on all 3,532 rows | both fits completed (77 and 93 min); `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written |
+| `run24_gemma_rdrop_tapt_holdout.log` | Run 24: MuRIL lessons on Gemma-4-12B, holdout | base 0.6753, R-Drop 0.6734 (-0.002, CI [-0.027, +0.023]); TAPT arm OOM in the LM-head logits, not measured |
 
 The logs are retained as raw captured output. The corresponding experiment descriptions
 and results are recorded in `docs/EXPERIMENTS.md`.

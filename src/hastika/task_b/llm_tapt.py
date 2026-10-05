@@ -41,8 +41,8 @@ def main():
     ap.add_argument("--epochs", type=int, default=1)
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--r", type=int, default=16)
-    # micro-batch 4: the LM loss materialises logits over a 262k vocabulary, about 1.3 GB
-    # of fp32 per 4 x 160 tokens plus its gradient, on top of the 4-bit 12B model
+    # the LM head's logits are chunked (--logit-chunk), so micro-batch size is bounded by
+    # the decoder's activations, not by the 262k-vocabulary logits
     ap.add_argument("--bs", type=int, default=4)
     ap.add_argument("--grad-accum", type=int, default=4)
     ap.add_argument("--max-len", type=int, default=160)
@@ -107,40 +107,44 @@ def main():
                 h = backbone(input_ids=x, attention_mask=m).last_hidden_state[:, :-1]
             flat_h = h.reshape(-1, h.size(-1))
             flat_target = target.reshape(-1)
-            valid = flat_target.ne(-100)
-            n_valid = int(valid.sum())
+            keep = flat_target.ne(-100)
+            n_valid = int(keep.sum())
             if n_valid == 0:
                 continue
-            batch_loss = 0.0
-            # The LM head has a ~262k vocabulary. Projecting all B*T positions at
-            # once creates a several-hundred-MB logits tensor on top of the 12B
-            # backbone. Backpropagate each small position chunk through the shared
-            # hidden-state graph instead; this preserves the exact token loss while
-            # keeping the logits and softmax workspace bounded.
-            chunks = list(range(0, flat_h.size(0), args.logit_chunk))
-            for chunk_no, start in enumerate(chunks):
-                end = min(start + args.logit_chunk, flat_h.size(0))
-                if not valid[start:end].any():
-                    continue
+            hv, tv = flat_h[keep], flat_target[keep]
+            # The LM head has a ~262k vocabulary, so all positions' logits at once do not
+            # fit next to the 12B model on a T4. The head is applied in chunks to a
+            # *detached* copy of the hidden states: each chunk's backward only reaches
+            # that copy (the head is frozen), and its logits are freed before the next.
+            # Then one backward carries the accumulated gradient through the decoder.
+            # Same gradients as the unchunked loss, one decoder backward per batch
+            # instead of one per chunk.
+            hd = hv.detach().requires_grad_(True)
+            batch_loss, ok = 0.0, True
+            for start in range(0, n_valid, args.logit_chunk):
+                end = min(start + args.logit_chunk, n_valid)
                 with torch.autocast("cuda", dtype=dtype):
-                    logits = lm_head(flat_h[start:end]).float()
-                    if softcap:
-                        logits = torch.tanh(logits / softcap) * softcap
-                chunk_loss = nn.functional.cross_entropy(
-                    logits, flat_target[start:end], ignore_index=-100, reduction="sum") / n_valid
+                    logits = lm_head(hd[start:end]).float()
+                if softcap:
+                    logits = torch.tanh(logits / softcap) * softcap
+                chunk_loss = nn.functional.cross_entropy(logits, tv[start:end],
+                                                         reduction="sum") / n_valid
                 if not torch.isfinite(chunk_loss):
-                    bad += 1
-                    if bad > 20:
-                        print("ABORT: more than 20 non-finite losses -- fp16 overflow", flush=True)
-                        sys.exit(3)
-                    opt.zero_grad(set_to_none=True)
+                    ok = False
                     break
-                retain = chunk_no < len(chunks) - 1
-                scaler.scale(chunk_loss / args.grad_accum).backward(retain_graph=retain)
+                scaler.scale(chunk_loss / args.grad_accum).backward()
                 batch_loss += chunk_loss.item()
                 del logits, chunk_loss
-            else:
+            if ok:
+                hv.backward(hd.grad)               # gradient is already loss-scaled
                 run, n = run + batch_loss, n + 1
+            else:
+                bad += 1
+                if bad > 20:
+                    print("ABORT: more than 20 non-finite losses -- fp16 overflow", flush=True)
+                    sys.exit(3)
+                opt.zero_grad(set_to_none=True)
+            del h, flat_h, hv, hd
             if (b + 1) % args.grad_accum == 0:
                 scaler.unscale_(opt)
                 torch.nn.utils.clip_grad_norm_(params, 1.0)

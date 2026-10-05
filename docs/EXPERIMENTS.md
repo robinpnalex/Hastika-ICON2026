@@ -78,7 +78,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 19 | completed, 2026-10-02 | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | **0.6123 macro-F1 / 0.6609 accuracy** on 3,554 rows, seed 42; last-checkpoint score `0.6120`; no ZIP by design |
 | Task B 20 | 2026-10-04, completed; main arm crashed | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM beat the Run 9 MuRIL recipe on the fixed 530-row holdout? | MuRIL **0.6151**; Sarvam-1 0.5567 (-0.058, CI [-0.104, -0.014]); 50/50 ensemble 0.6187. Gemma-4-12B screened best but crashed on a peft/torchao version check, so the main arm is untested |
 | Task B 21 | 2026-10-05, completed | `21_llm_confirm_final.ipynb` | Gemma-4-12B QLoRA vs the Run 9 MuRIL recipe on the 530-row holdout, then full fits on 3,532 rows | **Gemma 2 seeds 0.6792** vs MuRIL 0.6151, **+0.064, CI [+0.024, +0.105]**; ensemble 0.6825 (+0.003 over Gemma, inside noise) -> LLM recommended. Packaging bug left only the MuRIL ZIP; Run 22 packages the saved Gemma probabilities |
-| Task B 22 | 2026-10-05, completed | `22_package_run21.ipynb` | Run 21's 2-seed Gemma-4-12B submission, standalone (nothing attached, so both full fits retrained) | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written; predicted shares match the prior (Violence 7.6% vs 7.0%, Geo 8.8% vs 5.9%); **CodaBench pending** |
+| Task B 22 | 2026-10-05, completed | `22_package_run21.ipynb` | Run 21's 2-seed Gemma-4-12B submission, standalone (nothing attached, so both full fits retrained) | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written; predicted shares match the prior (Violence 7.6% vs 7.0%, Geo 8.8% vs 5.9%); final-submission candidate (3 epochs, 2 seeds) |
 | Task B 23 | ready; standalone | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout (vs Run 21's recorded 0.6792, or paired when attached), then four full-data models of the winner | `RECOMMENDED_b23_gemma.zip`, CodaBench pending |
 
 ## Ordered next steps
@@ -638,7 +638,7 @@ is a Task A row labelled Hate. So a Task B row whose id appears in **no** releas
 file can only be a Task A **test** row:
 
 | Task B file | ids | in Task A train | in Task A validation | in neither |
-| Task B 24 | ready; standalone | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma: TAPT (LoRA next-token on training-portion text + external corpus) and R-Drop 0.5, each vs Run 21's recipe on the holdout, 2 seeds | paired bootstraps; flags for Run 25 |
+| Task B 24 | 2026-10-05, completed; TAPT arm failed | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma-4-12B, 2 seeds each on the 530-row holdout | base **0.6753** (reproduces Run 21's 0.6792); **R-Drop 0.6734, -0.002, CI [-0.027, +0.023] -> rejected**; TAPT OOM in the 262k-vocabulary logits, unmeasured (fixed since) |
 | Task B 25 | ready; standalone | `25_gemma_final_recipe.ipynb` | final Gemma recipe on all 3,532 rows, four seeds; `EPOCHS`/`TAPT`/`RDROP` flags set from Runs 23-24 (defaults: Run 21's recipe) | `RECOMMENDED_b25_gemma.zip`, CodaBench pending |
 |---|---|---|---|---|
 | `multiclass_train` | 3,159 | 2,515 | 324 | **320** |
@@ -1185,3 +1185,52 @@ Predicted class shares on the 396 test rows, against the labelled prior:
 No class is starved, which matters under macro-F1. This is the submission to compare
 against the 0.6410 MuRIL best; record its CodaBench score here. Log:
 `results/task_b/logs/run22_gemma_3ep_2seeds_full.log`.
+
+### Run 24 result, 2026-10-05 -- R-Drop adds nothing to Gemma; TAPT still untested
+
+| arm, 530-row holdout | seed 42 | seed 43 | 2 seeds | Gender | Geo-pol | Others | Political | Religion | Violence |
+|---|---|---|---|---|---|---|---|---|---|
+| base (Run 21's recipe, retrained) | 0.6566 | 0.6631 | **0.6753** | 0.794 | 0.701 | 0.556 | 0.802 | 0.773 | 0.425 |
+| R-Drop 0.5 | 0.6690 | 0.6900 | 0.6734 | 0.773 | 0.676 | 0.557 | 0.829 | 0.791 | 0.415 |
+
+- **R-Drop:** -0.0019, 95% CI [-0.0271, +0.0228], P(better) 0.44, at twice the step cost.
+  Rejected for Gemma. Its 0.6900 on seed 43 is the best single seed so far, but the two
+  seeds average below base, which is seed noise and not an effect.
+- **The base reproduces Run 21:** seed 42 is identical (0.6566), seed 43 differs by
+  0.002, and the 2-seed average is 0.6753 against 0.6792. The Gemma result is stable
+  across sessions.
+- **TAPT did not run.** The causal-LM loss projected every position through the
+  262k-vocabulary head at once and ran out of memory on the T4. Robin Alex's `f818d4b`
+  chunked those logits, but each chunk then ran its own backward pass through the whole
+  12B decoder (`retain_graph`): about 10 full backward passes per step at micro-batch
+  4 x 160. `llm_tapt.py` now applies the head to a detached copy of the hidden states
+  chunk by chunk and runs one decoder backward per batch. The gradients are identical
+  (checked against the unchunked loss, max difference 7e-9). TAPT is being measured in
+  Robin's `25_gemma_tapt_holdout.ipynb`.
+
+### Final-submission plan, 2026-10-05
+
+There is no CodaBench scoring from here on. **One final submission, for Task A and Task B
+together**, made from models fine-tuned on all labelled data. Every choice is therefore
+made on the fixed holdouts:
+- Task B: 530 rows, `f85f4f049b`
+- Task A: 1,079 rows, `815110ff24`
+
+**Task B: `25_gemma_final_recipe.ipynb`,** four Gemma-4-12B seeds on all 3,532 rows.
+
+| flag | setting | source |
+|---|---|---|
+| `RDROP` | 0 | Run 24 |
+| `EPOCHS` | 3 or 4 | Run 23 |
+| `TAPT` | True only if `25_gemma_tapt_holdout` shows a gain | Robin's run |
+
+Fallback: `RECOMMENDED_b22_gemma_3ep_2seeds.zip` from Run 22 is already a complete Task B
+submission from the same recipe (two seeds).
+
+**Task A: `task_a/28_gemma_holdout_final.ipynb`.** Gemma-4-12B against the char SVM and a
+fixed 50/50 blend on the holdout, then full fits on 7,193 rows. A rule fixed in advance
+marks the recommended ZIP.
+
+Notebook-number note: `24_gemma_lora_capacity_ablation` and `25_gemma_tapt_holdout`
+(Robin) are separate from `24_gemma_muril_lessons` and `25_gemma_final_recipe`.
+
