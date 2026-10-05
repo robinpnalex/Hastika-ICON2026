@@ -50,4 +50,4 @@ python -m hastika.common.submission --task b \
 ```
 
 Roughly 25 minutes for the adaptation pass and 90 minutes for the five folds on
-a T4. `notebooks/task_b/01_rebuild_winner.ipynb` is these three commands as a notebook.
+a T4. `notebooks/task_b/01b_rebuild_winner.ipynb` is these three commands as a notebook.

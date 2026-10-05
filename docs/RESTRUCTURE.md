@@ -148,3 +148,23 @@ git diff --check
 The checks cover package paths, preprocessing behavior, organizer data presence,
 the deterministic Task B split, notebook JSON, and submission label contracts.
 Actual model training still requires a GPU smoke run before an expensive sweep.
+
+## October 2026 tidy-up
+
+Two people pushing to `task-b` produced duplicate notebook numbers and scattered
+submission folders. Fixed on 2026-10-05:
+
+| before | after |
+|---|---|
+| `notebooks/task_b/24_gemma_lora_capacity_ablation.ipynb` | `notebooks/task_b/26_gemma_lora_capacity_ablation.ipynb` (Run 26) |
+| `notebooks/task_b/25_gemma_tapt_holdout.ipynb` | `notebooks/task_b/27_gemma_tapt_holdout.ipynb` (Run 27) |
+| `notebooks/task_b/01_rebuild_winner.ipynb` | `notebooks/task_b/01b_rebuild_winner.ipynb` |
+| `notebooks/task_b/02_fullfit_single.ipynb` | `notebooks/task_b/02b_fullfit_single.ipynb` |
+| `notebookd9f2190408.ipynb` (repo root) | removed: a 99.7% copy of `notebooks/task_b/05_reinit_one_layer.ipynb` |
+| `submissions/b_tapt_5f/` | `submissions/task_b/b_tapt_5f/` |
+| `submissions/task_b_fast_svm*` | `submissions/task_b/fast_svm*/` |
+| `submissions/task_a_fast_svm*`, `submissions/task_a_embeddings_svm/` | `submissions/task_a/fast_svm/`, `submissions/task_a/embeddings_svm/` |
+
+Every reference in code, notebooks and docs was updated in the same commit. The
+conventions that prevent a repeat are in [`COLLABORATION.md`](COLLABORATION.md).
+

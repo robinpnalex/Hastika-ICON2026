@@ -193,7 +193,7 @@ def main():
                          "s_control reruns Run 9 unchanged: it supplies the "
                          "test_probs.npy the blend needs, and its CodaBench score "
                          "against Run 9's 0.6410 is a free read on run-to-run noise")
-    ap.add_argument("--reference", default="submissions/b_tapt_5f/predictions.csv",
+    ap.add_argument("--reference", default="submissions/task_b/b_tapt_5f/predictions.csv",
                     help="submission whose CodaBench score you know, for the agreement "
                          "column. Point this at Run 9's predictions.csv if you kept it")
     ap.add_argument("--blend-weight", type=float, default=0.25,
