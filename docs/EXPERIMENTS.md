@@ -76,7 +76,8 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 18 | attempted; setup failed | `18_train_validation_test.ipynb` | refit the Run 9 one-layer MuRIL + R-Drop recipe on original train plus released labelled validation, then predict the released test file | stopped before training because Kaggle could not clone GitHub; no ZIP |
 | Task B 19 | completed, 2026-10-02 | `19_oof_best_recipe.ipynb` | measure the current one-layer R-Drop recipe on five held-out folds after adding the released labels | **0.6123 macro-F1 / 0.6609 accuracy** on 3,554 rows, seed 42; last-checkpoint score `0.6120`; no ZIP by design |
 | Task B 20 | 2026-10-04, completed; main arm crashed | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM beat the Run 9 MuRIL recipe on the fixed 530-row holdout? | MuRIL **0.6151**; Sarvam-1 0.5567 (-0.058, CI [-0.104, -0.014]); 50/50 ensemble 0.6187. Gemma-4-12B screened best but crashed on a peft/torchao version check, so the main arm is untested |
-| Task B 21 | ready; not run | `21_llm_confirm_final.ipynb` | Gemma-4-12B (torchao crash fixed, length-bucketed batches, shorter prompt) on the holdout, with an automatic Qwen3-8B fallback; MuRIL holdout reused from Run 20; full fits on 3,532 rows; three test ZIPs | holdout decision rule picks the RECOMMENDED ZIP; 11 h hard stop |
+| Task B 21 | 2026-10-05, completed | `21_llm_confirm_final.ipynb` | Gemma-4-12B QLoRA vs the Run 9 MuRIL recipe on the 530-row holdout, then full fits on 3,532 rows | **Gemma 2 seeds 0.6792** vs MuRIL 0.6151, **+0.064, CI [+0.024, +0.105]**; ensemble 0.6825 (+0.003 over Gemma, inside noise) -> LLM recommended. Packaging bug left only the MuRIL ZIP; Run 22 packages the saved Gemma probabilities |
+| Task B 22 | ready; not run | `22_package_run21.ipynb` | write Run 21's LLM, MuRIL and ensemble ZIPs from its saved output, CPU only | CodaBench pending for `RECOMMENDED_b21_llm.zip` |
 
 ## Ordered next steps
 
@@ -1060,4 +1061,39 @@ token.
   length-bucketed batches (about 3.5x less padding) and a shorter prompt.
 - MuRIL's TAPT log shows `nan` epoch losses from epoch 2 to 6 (fp16 batches skipped by
   the gradient scaler). It recovered to 3.42, and the holdout score is in the usual range.
+
+### Run 21 result, 2026-10-05 -- Gemma-4-12B beats MuRIL by 6.4 points
+
+All six jobs finished in 6.1 h on T4 x2, and the torchao fix held. The Gemma-4-12B holdout
+fits took about 70 min each and peaked at 10.0 GB. Holdout is 530 rows, fingerprint
+`f85f4f049b`:
+
+| arm | macro-F1 | acc | Gender | Geo-pol | Others | Political | Religion | Violence |
+|---|---|---|---|---|---|---|---|---|
+| MuRIL, Run 9 recipe, 5 seeds | 0.6151 | 0.651 | 0.704 | 0.642 | 0.500 | 0.789 | 0.672 | 0.383 |
+| Gemma-4-12B, seed 42 | 0.6566 | 0.706 | 0.769 | 0.657 | 0.513 | 0.812 | 0.779 | 0.410 |
+| Gemma-4-12B, seed 43 | 0.6613 | 0.709 | 0.770 | 0.620 | 0.533 | 0.812 | 0.797 | 0.436 |
+| **Gemma-4-12B, 2 seeds** | **0.6792** | **0.728** | 0.793 | 0.712 | 0.566 | 0.806 | 0.788 | 0.410 |
+| 50/50 ensemble | 0.6825 | 0.730 | 0.787 | 0.701 | 0.594 | 0.821 | 0.787 | 0.405 |
+
+Paired bootstrap:
+
+| comparison | difference | 95% CI | P(better) |
+|---|---|---|---|
+| Gemma - MuRIL | +0.0641 | [+0.0239, +0.1048] | 1.00 |
+| ensemble - Gemma | +0.0033 | [-0.0186, +0.0248] | 0.62 |
+| ensemble - MuRIL | +0.0674 | [+0.0343, +0.1027] | 1.00 |
+
+- **The largest gain in the project's history on Task B, and outside noise.** Every
+  class improves except Violence, which is roughly flat. Gemma was chosen by the
+  unlabelled screen, not on this holdout, so the number is not selection-optimistic.
+- **Two seeds averaged are worth about 2 points** over either seed alone (0.657 and 0.661
+  to 0.679). More seeds are likely to help.
+- **Both seeds were still rising at the last epoch** (0.597, 0.629, 0.657 and 0.561,
+  0.630, 0.661). Four epochs is the obvious next test.
+- **The ensemble with MuRIL adds nothing measurable,** so the pre-registered rule picked
+  the LLM alone.
+- **Packaging bug.** The final cell read `test_probs.npy`, but the classifier writes
+  `test_inputs_probs.npy`, so only `b21_muril.zip` was written. Fixed in the notebook.
+  `package_b21.py` and Run 22 rebuild the ZIPs from the saved output.
 
