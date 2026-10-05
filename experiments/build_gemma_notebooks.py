@@ -11,7 +11,10 @@ Writes:
     notebooks/task_b/23_gemma_epochs_seeds_final.ipynb 4 vs 3 epochs, 4-model submission
     notebooks/task_b/24_gemma_muril_lessons.ipynb    TAPT and R-Drop on the holdout
     notebooks/task_b/25_gemma_final_recipe.ipynb     configurable final full-data fit
+    notebooks/task_b/28_gemma_prompt_lr.ipynb        definitions prompt and lr 2e-4 on the holdout
     notebooks/task_a/28_gemma_holdout_final.ipynb    Gemma on Task A, holdout + submission
+    notebooks/task_a/29-32_gemma_*.ipynb             Task A ablations: epochs, prompt, TAPT, lr
+    notebooks/task_a/33_gemma_final_recipe.ipynb     the final Task A fit
 """
 import json
 import pathlib
@@ -208,14 +211,51 @@ def tapt_job(name, texts):
 
 
 def load_probs(run_dir, csv):
-    """<input stem>_probs.npy, with the saved ids checked against the input file."""
+    """<input stem>_probs.npy, or None when it is missing, belongs to other rows (another
+    task's output found among the inputs), or is collapsed onto one class (Task A Run 28's
+    seed 43 predicted Non-Hate for every row)."""
     run_dir, csv = pathlib.Path(run_dir), pathlib.Path(csv)
     p = run_dir / f"{csv.stem}_probs.npy"
     if not p.exists():
         return None
     ids = pd.read_csv(run_dir / f"{csv.stem}_ids.csv")["id"].tolist()
-    assert ids == pd.read_csv(csv)["id"].tolist(), f"{run_dir}: ids differ from {csv.name}"
-    return np.load(p)
+    if ids != pd.read_csv(csv)["id"].tolist():
+        return None
+    probs = np.load(p)
+    share = np.bincount(probs.argmax(1), minlength=probs.shape[1]) / len(probs)
+    if share.max() > 0.9:
+        print(f"skipping {run_dir.name}: collapsed, {share.max():.0%} of rows in one class")
+        return None
+    return probs
+
+
+def run_jobs(jobs, on_done=None):
+    """run_queue with two automatic retries per job: exit code 4 (collapsed after epoch 1)
+    reruns with seed + 1000; out of GPU memory reruns at micro-batch 4 (same effective
+    batch). on_done sees each job's final outcome."""
+    import re
+    registry, retried = {j["name"]: j for j in jobs}, set()
+
+    def done(name, code):
+        job, nxt = registry.get(name), []
+        if code and job is not None and name not in retried:
+            log = open(job["log"], errors="replace").read()
+            seed = re.search(r"--seed (\d+)", job["cmd"])
+            if code == 4 and seed:
+                print(f"{name} collapsed -- rerunning with seed {int(seed.group(1)) + 1000}")
+                nxt = [{**job, "cmd": job["cmd"] + f" --seed {int(seed.group(1)) + 1000}"}]
+            elif "OutOfMemoryError" in log:
+                print(f"{name} ran out of GPU memory -- rerunning at micro-batch 4")
+                nxt = [{**job, "cmd": job["cmd"] + " --bs 4 --grad-accum 4 --eval-bs 8"}]
+            if nxt:
+                retried.add(name)
+        if not nxt and on_done is not None:
+            nxt = list(on_done(name, code) or [])
+        for j in nxt:
+            registry[j["name"]] = j
+        return nxt
+
+    return run_queue(jobs, N_GPU, raise_on_fail=False, on_done=done, stop_at=HARD_STOP)
 
 
 def write_zip(name, probs, recommended=False):
@@ -270,7 +310,7 @@ for s in (42, 43):
         print(f"seed {s}: not attached, training it")
         jobs.append(llm_job(f"{S}_full_s{s}", SPLIT / "all.csv", [TEST_CSV], s))
 if jobs:
-    print(run_queue(jobs, N_GPU, raise_on_fail=False, stop_at=HARD_STOP))
+    print(run_jobs(jobs))
     for j in jobs:
         p = load_probs(RUNS / j["name"], TEST_CSV)
         if p is not None:
@@ -313,7 +353,7 @@ print("reused from Run 21 -- holdout seeds:", list(ho3), "| full-fit seeds:", li
 
 jobs = [llm_job(f"{S}_ep4_ho_s{s}", SPLIT / "train.csv", [SPLIT / "holdout.csv"], s,
                 evalf=SPLIT / "holdout.csv", extra="--epochs 4") for s in (42, 43)]
-codes1 = run_queue(jobs, N_GPU, raise_on_fail=False, stop_at=HARD_STOP)
+codes1 = run_jobs(jobs)
 ho4 = {s: load_probs(RUNS / f"{S}_ep4_ho_s{s}", SPLIT / "holdout.csv") for s in (42, 43)}
 ho4 = {k: v for k, v in ho4.items() if v is not None}
 for s in ho4:
@@ -349,7 +389,7 @@ elif CHOICE == "4ep":
 else:                               # mix: Run 21's 3-epoch fits plus two 4-epoch fits
     plan = [full(s, True) for s in (42, 43)]
 print("queueing:", [j["name"] for j in plan])
-codes2 = run_queue(plan, N_GPU, raise_on_fail=False, stop_at=HARD_STOP)
+codes2 = run_jobs(plan)
 
 members = {}
 if CHOICE in ("3ep", "mix"):
@@ -425,7 +465,7 @@ def on_done(name, code):
     return []
 
 
-codes = run_queue(jobs, N_GPU, raise_on_fail=False, on_done=on_done, stop_at=HARD_STOP)
+codes = run_jobs(jobs, on_done)
 print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
 '''), ("code", r'''
 def arm(prefix):
@@ -470,6 +510,8 @@ notebook is a safe submission even with nothing changed.
 | `EPOCHS` | 3 | 4 | Run 23 chose `4ep` or `mix` |
 | `TAPT` | False | True | Run 24 printed `tapt: True` |
 | `RDROP` | 0.0 | 0.5 | Run 24 printed `rdrop: True` |
+| `PROMPT` | `"short"` | `"defs"` | Run 28 printed `defs: True` |
+| `LR` | 1e-4 | 2e-4 | Run 28 printed `lr2e-4: True` |
 | `SEEDS` | 42-45 | -- | four models, two per GPU round |
 
 **Time:**
@@ -489,10 +531,13 @@ text. The output is `RECOMMENDED_b25_gemma.zip`.
 ''' + SETTINGS), ("code", setup("b", "b25_outputs")), ("code", LLM_ENV), ("code", r'''
 EPOCHS = 3          # 4 if Run 23 chose 4ep or mix
 TAPT = False        # True if Run 24 printed tapt: True
-RDROP = 0.0         # 0.5 if Run 24 printed rdrop: True
+RDROP = 0.0         # 0.5 if Run 24 printed rdrop: True (it did not: inconclusive)
+PROMPT = "short"    # "defs" if Run 28 printed defs: True
+LR = 1e-4           # 2e-4 if Run 28 printed lr2e-4: True
 SEEDS = [42, 43, 44, 45]
 
-extra = f"--epochs {EPOCHS}" + (f" --rdrop {RDROP}" if RDROP else "")
+extra = (f"--epochs {EPOCHS} --prompt {PROMPT} --lr {LR}"
+         + (f" --rdrop {RDROP}" if RDROP else ""))
 full_jobs = lambda init: [llm_job(f"full_s{s}", SPLIT / "all.csv", [TEST_CSV], s,
                                   extra=extra + (f" --init-adapter {RUNS / 'tapt_all'}" if init else ""))
                           for s in SEEDS]
@@ -509,13 +554,14 @@ def on_done(name, code):
 
 
 jobs = [tapt_job("tapt_all", [SPLIT / "all.csv", EXTERNAL])] if TAPT else full_jobs(False)
-codes = run_queue(jobs, N_GPU, raise_on_fail=False, on_done=on_done, stop_at=HARD_STOP)
+codes = run_jobs(jobs, on_done)
 members = {s: load_probs(RUNS / f"full_s{s}", TEST_CSV) for s in SEEDS}
 members = {s: p for s, p in members.items() if p is not None}
 assert members, "no full fit finished -- see the logs"
 print("averaging seeds", list(members))
 write_zip("b25_gemma", np.mean(list(members.values()), 0), recommended=True)
 json.dump({"commit": head, "epochs": EPOCHS, "tapt": TAPT and state["tapt_ok"], "rdrop": RDROP,
+           "prompt": PROMPT, "lr": LR,
            "seeds": list(members), "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
 print(f"{(time.time() - T_START) / 3600:.1f} h")
 ''')]
@@ -583,6 +629,7 @@ def svm_probs(train_df, pred_df):
     return m.predict_proba(X(pred_df))
 
 
+PROMPT = "short"    # "defs" if Task B Run 28 showed the definitions prompt helps
 train = pd.read_csv(SPLIT / "train.csv")
 svm_ho = svm_probs(train, holdout)
 svm_test = svm_probs(df, test)
@@ -590,9 +637,10 @@ report(y_ho, svm_ho, "char SVM (holdout)")
 
 # holdout fits first; the full fits follow on the freed GPUs
 jobs = [llm_job(f"ho_s{s}", SPLIT / "train.csv", [SPLIT / "holdout.csv"], s,
-                evalf=SPLIT / "holdout.csv") for s in (42, 43)]
-jobs += [llm_job(f"full_s{s}", SPLIT / "all.csv", [TEST_CSV], s) for s in (42, 43)]
-codes = run_queue(jobs, N_GPU, raise_on_fail=False, stop_at=HARD_STOP)
+                evalf=SPLIT / "holdout.csv", extra=f"--prompt {PROMPT}") for s in (42, 43)]
+jobs += [llm_job(f"full_s{s}", SPLIT / "all.csv", [TEST_CSV], s, extra=f"--prompt {PROMPT}")
+         for s in (42, 43)]
+codes = run_jobs(jobs)
 print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
 '''), ("code", r'''
 ho = {s: load_probs(RUNS / f"ho_s{s}", SPLIT / "holdout.csv") for s in (42, 43)}
@@ -628,9 +676,256 @@ json.dump({"commit": head, "holdout_scores": scores, "bootstrap": boots,
           open(OUT / "result.json", "w"), indent=2)
 ''')]
 
+# ---------------------------------------------------------------------------- B28
+b28 = [("markdown", r'''
+# Task B Run 28 -- Gemma-4-12B: the annotators' definitions in the prompt, and learning rate
+
+Two untested levers that cost nothing to add to the final fit. Every arm is Gemma-4-12B
+QLoRA, 3 epochs, seeds 42 and 43, on the 530-row holdout:
+
+| arm | change | why |
+|---|---|---|
+| `base` | Run 21's recipe | the reference, 0.6753-0.6792 |
+| `defs` | `--prompt defs`: the organisers' category definitions from the HASTIKA paper, condensed into the prompt | the short prompt gives only label names. The paper defines **Others** as including hate against sports, movies and news channels and untargeted hate, and **Geo-political** as including hatred of regional languages and interstate disputes. Those are exactly the boundaries Others (0.56) and Geo-political (0.70) lose on. About twice the prompt tokens. |
+| `lr2e-4` | learning rate 2e-4 instead of 1e-4 | 2e-4 is the usual QLoRA rate, and every Gemma run so far was still improving at its last epoch |
+
+`base` reuses the no-TAPT holdout probabilities of Run 21, 24 or 27 when attached, and is
+trained here otherwise. Each arm is compared with `base` by paired bootstrap. A flag is
+printed `True` for Run 25 when P(better) >= 0.7.
+
+**Time:** about 4.5 h standalone, about 3.5 h with a base attached.
+
+''' + SETTINGS), ("code", setup("b", "b28_outputs")), ("code", LLM_ENV), ("code", r'''
+base = {}
+for s in (42, 43):
+    hits = (find_prior(f"*/runs/{S}_ho_s{s}/holdout_probs.npy")
+            or find_prior(f"*/runs/base_s{s}/holdout_probs.npy")
+            or find_prior(f"*/classifier/{S}_notapt_cls_s{s}/holdout_probs.npy"))
+    p = load_probs(hits[0].parent, SPLIT / "holdout.csv") if hits else None
+    if p is not None:
+        base[s] = p
+print("base reused for seeds:", list(base))
+
+HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv"], evalf=SPLIT / "holdout.csv")
+jobs = [llm_job(f"defs_s{s}", seed=s, extra="--prompt defs", **HO) for s in (42, 43)]
+jobs += [llm_job(f"lr2e-4_s{s}", seed=s, extra="--lr 2e-4", **HO) for s in (42, 43)]
+jobs += [llm_job(f"base_s{s}", seed=s, **HO) for s in (42, 43) if s not in base]
+codes = run_jobs(jobs)
+print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
+'''), ("code", r'''
+def arm(prefix):
+    got = {s: load_probs(RUNS / f"{prefix}_s{s}", SPLIT / "holdout.csv") for s in (42, 43)}
+    return {s: p for s, p in got.items() if p is not None}
+
+
+arms = {"base": base or arm("base"), "defs": arm("defs"), "lr2e-4": arm("lr2e-4")}
+avg, scores, boots = {}, {}, {}
+for name, seeds in arms.items():
+    for s, p in seeds.items():
+        report(y_ho, p, f"{name} seed {s}")
+    if len(seeds) == 2:
+        avg[name] = np.mean(list(seeds.values()), 0)
+        scores[name] = report(y_ho, avg[name], f"{name}, 2 seeds")
+print()
+for name in ("defs", "lr2e-4"):
+    if name in avg and "base" in avg:
+        boots[name] = boot_line(f"{name} - base", avg[name], avg["base"])
+USE = {k: v["p_better"] >= 0.7 for k, v in boots.items()}
+print("\nflags for Run 25 (P(better than base) >= 0.7):", USE)
+json.dump({"commit": head, "holdout_scores": scores, "bootstrap": boots, "use": USE,
+           "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
+''')]
+
+# ---------------------------------------------------------------------------- Task A line
+A_FACTS = """**What Task A already knows** (1,079-row holdout of train + released validation,
+`815110ff24`):
+
+| arm | macro-F1 |
+|---|---|
+| char SVM | 0.8117 |
+| SVM 0.57 + MuRIL 0.43 (the MuRIL-era best) | 0.8155 |
+| **Gemma-4-12B QLoRA, 3 epochs, seed 42 (Run 28)** | **0.8563**, +0.043 over the SVM, CI [+0.021, +0.067] |
+| Gemma + SVM, 50/50 | 0.8471, -0.007 against Gemma alone |
+
+Run 28's seed 43 collapsed: every row came out Non-Hate. The classifier now checks after
+epoch 1 and reruns a collapsed job with another seed. Seed 42's holdout curve was still
+rising at the last epoch: 0.817, 0.846, 0.856."""
+
+ABLATION_CODE = r'''
+base = {}
+for s in (42, 43):
+    for pat in (f"*/runs/base_s{s}/holdout_probs.npy", f"*/runs/ho_s{s}/holdout_probs.npy"):
+        got = [load_probs(h.parent, SPLIT / "holdout.csv") for h in find_prior(pat)]
+        got = [g for g in got if g is not None]
+        if got:
+            base[s] = got[0]
+            break
+print("base reused for seeds:", list(base))
+
+ARMS = __ARMS__
+HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv"], evalf=SPLIT / "holdout.csv")
+TAPT_DIR = RUNS / "tapt_train"
+jobs = [llm_job(f"{a}_s{s}", seed=s, extra=x, **HO) for a, x in ARMS.items() if x for s in (42, 43)]
+jobs += [llm_job(f"base_s{s}", seed=s, **HO) for s in (42, 43) if s not in base]
+USE_TAPT = __TAPT__
+if USE_TAPT:
+    jobs.insert(0, tapt_job("tapt_train", [SPLIT / "train.csv", EXTERNAL]))
+
+
+def on_done(name, code):
+    if name == "tapt_train":
+        if code == 0:
+            return [llm_job(f"tapt_s{s}", seed=s, extra=f"--init-adapter {TAPT_DIR}", **HO)
+                    for s in (42, 43)]
+        print("TAPT failed -- the tapt arm is skipped, see", LOGS / "tapt_train.log")
+    return []
+
+
+codes = run_jobs(jobs, on_done)
+print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
+'''
+
+ABLATION_REPORT = r'''
+def arm(prefix):
+    got = {s: load_probs(RUNS / f"{prefix}_s{s}", SPLIT / "holdout.csv") for s in (42, 43)}
+    return {s: p for s, p in got.items() if p is not None}
+
+
+results = {"base": base or arm("base"), **{a: arm(a) for a in ARMS}}
+avg, scores, boots = {}, {}, {}
+for name, seeds in results.items():
+    for s, p in seeds.items():
+        report(y_ho, p, f"{name} seed {s}")
+        m = RUNS / f"{name}_s{s}" / "metrics.json"
+        if m.exists():
+            print("   per epoch (diagnostic):",
+                  [round(h.get("eval_macro_f1", 0), 4) for h in json.load(open(m))["history"]])
+    if seeds:
+        avg[name] = np.mean(list(seeds.values()), 0)
+        scores[name] = report(y_ho, avg[name], f"{name}, {len(seeds)} seed(s)")
+print()
+for a in ARMS:
+    if a in avg and "base" in avg:
+        boots[a] = boot_line(f"{a} - base", avg[a], avg["base"])
+USE = {k: v["p_better"] >= 0.7 for k, v in boots.items()}
+print("\nflags for the final recipe (P(better than base) >= 0.7):", USE)
+json.dump({"commit": head, "holdout_scores": scores, "bootstrap": boots, "use": USE,
+           "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
+'''
+
+
+def ablation(run, title, why, arms, tapt=False, minutes=""):
+    """Task A holdout ablation: each arm vs a no-change base, 2 seeds, paired bootstrap.
+    The base is reused from an attached earlier output when found, else trained here."""
+    rows = "\n".join(f"| `{n}` | `{x}` | {why[n]} |" if x else f"| `{n}` | TAPT adapter | {why[n]} |"
+                     for n, x in arms.items())
+    md = (f"# Task A Run {run} -- Gemma-4-12B: {title}\n\n{A_FACTS}\n\n"
+          "**This run** trains Gemma-4-12B QLoRA, 3 epochs unless stated otherwise, seeds 42 and "
+          "43, on the 6,114 training rows. Every arm is scored on the same holdout against "
+          "`base`, which is Run 28's recipe:\n\n"
+          "| arm | change | why |\n|---|---|---|\n" + rows + "\n\n"
+          "**How each arm is judged.** Paired bootstrap against `base`. A flag is printed "
+          "`True` for the final recipe (Task A Run 33) when P(better) >= 0.7.\n\n"
+          "**The base is reused when available.** If an earlier Task A Gemma output is "
+          "attached (Run 28, or any run of this line), its healthy holdout probabilities are "
+          "reused. Otherwise the base trains here.\n\n"
+          f"**Time:** {minutes}.\n\n" + SETTINGS)
+    code = ABLATION_CODE.replace("__ARMS__", repr(arms)).replace("__TAPT__", repr(tapt))
+    return [("markdown", md), ("code", setup("a", f"a{run}_outputs")), ("code", LLM_ENV),
+            ("code", code), ("code", ABLATION_REPORT)]
+
+
+a29 = ablation(29, "four epochs vs three", {
+    "ep4": "Run 28's holdout curve was still rising at epoch 3 (0.817, 0.846, 0.856), as both "
+           "Task B seeds were"},
+    {"ep4": "--epochs 4"}, minutes="about 5.5 h standalone, about 3.2 h with Run 28 attached")
+a30 = ablation(30, "the annotators' definitions in the prompt", {
+    "defs": "the organisers' Hate / Non-hate definitions from the HASTIKA paper, in the prompt. "
+            "Task A errors sit in comments with no profanity at all, where the definition of "
+            "hate (prejudice, animosity, intolerance) carries the decision. About 2x prompt "
+            "tokens"},
+    {"defs": "--prompt defs"}, minutes="about 6 h standalone, about 3.5 h with a base attached")
+a31 = ablation(31, "task-adaptive pretraining (TAPT)", {
+    "tapt": "LoRA next-token pretraining on the 6,114 training comments plus the external "
+            "Kannada corpus, then classification from that adapter. TAPT was +2.3 on Task A "
+            "for MuRIL. Holdout and test text are never read"},
+    {"tapt": ""}, tapt=True, minutes="about 6.5 h standalone, about 4 h with a base attached")
+a32 = ablation(32, "learning rate 2e-4", {
+    "lr2e-4": "2e-4 is the usual QLoRA rate. Every Gemma run so far, on both tasks, was still "
+              "improving at its last epoch at 1e-4"},
+    {"lr2e-4": "--lr 2e-4"}, minutes="about 5 h standalone, about 2.5 h with a base attached")
+
+A33_MD = ("# Task A Run 33 -- the final Task A recipe: Gemma-4-12B, all 7,193 rows\n\n" + A_FACTS + """
+
+This run fits the final Task A models. Set the flags in the next cell from Task A Runs
+29-32. The defaults are Run 28's recipe, which is already measured at 0.8563 on the
+holdout, so the notebook is a safe final submission even with nothing changed:
+
+| flag | default | set it to | when |
+|---|---|---|---|
+| `EPOCHS` | 3 | 4 | Run 29 printed `ep4: True` |
+| `PROMPT` | `"short"` | `"defs"` | Run 30 printed `defs: True` |
+| `TAPT` | False | True | Run 31 printed `tapt: True` |
+| `LR` | 1e-4 | 2e-4 | Run 32 printed `lr2e-4: True` |
+| `SEEDS` | 42-45 | -- | four models, two per GPU round |
+
+A full Task A fit takes about 2.5 h at 3 epochs. Four seeds take about 5 h, about 6.5 h at
+4 epochs, and TAPT adds about 1.5 h. With every option on, the 11 h stop may cut the
+second round of seeds. The models that finished are still averaged and packaged.
+
+The SVM blend is left out: on the holdout it was 0.007 below Gemma alone. The output is
+`RECOMMENDED_a33_gemma.zip`, for `hastika_binary_test.csv` (806 rows).
+
+""" + SETTINGS)
+
+A33_CODE = r'''
+EPOCHS = 3          # 4 if Run 29 printed ep4: True
+PROMPT = "short"    # "defs" if Run 30 printed defs: True
+TAPT = False        # True if Run 31 printed tapt: True
+LR = 1e-4           # 2e-4 if Run 32 printed lr2e-4: True
+SEEDS = [42, 43, 44, 45]
+
+extra = f"--epochs {EPOCHS} --prompt {PROMPT} --lr {LR}"
+full_jobs = lambda init: [llm_job(f"full_s{s}", SPLIT / "all.csv", [TEST_CSV], s,
+                                  extra=extra + (f" --init-adapter {RUNS / 'tapt_all'}" if init else ""))
+                          for s in SEEDS]
+state = {"tapt_ok": False}
+
+
+def on_done(name, code):
+    if name == "tapt_all":
+        state["tapt_ok"] = code == 0
+        if code:
+            print("TAPT failed -- training without it")
+        return full_jobs(code == 0)
+    return []
+
+
+jobs = [tapt_job("tapt_all", [SPLIT / "all.csv", EXTERNAL])] if TAPT else full_jobs(False)
+codes = run_jobs(jobs, on_done)
+members = {s: load_probs(RUNS / f"full_s{s}", TEST_CSV) for s in SEEDS}
+members = {s: p for s, p in members.items() if p is not None}
+assert members, "no full fit finished -- see the logs"
+print("averaging seeds", list(members))
+write_zip("a33_gemma", np.mean(list(members.values()), 0), recommended=True)
+json.dump({"commit": head, "epochs": EPOCHS, "prompt": PROMPT, "tapt": TAPT and state["tapt_ok"],
+           "lr": LR, "seeds": list(members), "exit_codes": codes},
+          open(OUT / "result.json", "w"), indent=2)
+print(f"{(time.time() - T_START) / 3600:.1f} h")
+'''
+
+a33 = [("markdown", A33_MD), ("code", setup("a", "a33_outputs")), ("code", LLM_ENV),
+       ("code", A33_CODE)]
+
 if __name__ == "__main__":
     notebook(b22, "notebooks/task_b/22_package_run21.ipynb")
     notebook(b23, "notebooks/task_b/23_gemma_epochs_seeds_final.ipynb")
     notebook(b24, "notebooks/task_b/24_gemma_muril_lessons.ipynb")
     notebook(b25, "notebooks/task_b/25_gemma_final_recipe.ipynb")
+    notebook(b28, "notebooks/task_b/28_gemma_prompt_lr.ipynb")
     notebook(a28, "notebooks/task_a/28_gemma_holdout_final.ipynb")
+    notebook(a29, "notebooks/task_a/29_gemma_epochs.ipynb")
+    notebook(a30, "notebooks/task_a/30_gemma_definitions_prompt.ipynb")
+    notebook(a31, "notebooks/task_a/31_gemma_tapt.ipynb")
+    notebook(a32, "notebooks/task_a/32_gemma_lr.ipynb")
+    notebook(a33, "notebooks/task_a/33_gemma_final_recipe.ipynb")

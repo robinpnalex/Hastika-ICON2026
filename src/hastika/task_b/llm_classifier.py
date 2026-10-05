@@ -55,6 +55,25 @@ TASKS = {
           "Kannada-English (romanized) YouTube comment: {}\n"
           "Is this hate speech (Hate or Non-Hate)?:"),
 }
+# The organisers' own category definitions (HASTIKA paper, Kavatagi & Rachh, LRE 2025,
+# section 3), condensed. They spell out the boundaries the short prompt leaves to the
+# label names -- e.g. that Others covers hate at news channels, films and sports, and
+# that Geo-political covers hatred of regional languages. Costs ~2x prompt tokens.
+DEF_PROMPTS = {
+    "b": ("Kannada-English (romanized) hateful YouTube comment: {}\n"
+          "Categories -- Gender: hostility or prejudice towards someone for their gender (men, "
+          "women, transgender people). Political: hatred of political parties, leaders, issues "
+          "or ideologies. Religion: hatred of a religion, its beliefs, practices, priests or "
+          "caste. Geo-political: hostility over other countries or states, regional languages "
+          "or interstate disputes. Violence: threats, or incitement or calls for violent acts. "
+          "Others: hate that fits none of these, such as hate against sports, movies, news "
+          "channels, or with no particular target.\nCategory:"),
+    "a": ("Kannada-English (romanized) YouTube comment: {}\n"
+          "Hate: pejorative language, prejudice, animosity or intolerance towards individuals, "
+          "groups or organisations, e.g. for gender, religion, nationality or other "
+          "characteristics. Non-Hate: opinions, constructive criticism or information without "
+          "derogatory language.\nIs this hate speech (Hate or Non-Hate)?:"),
+}
 LABELS, LABEL_COL, PROMPT = TASKS["b"]
 LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 
@@ -158,6 +177,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
     ap.add_argument("--task", choices=["a", "b"], default="b")
+    ap.add_argument("--prompt", choices=["short", "defs"], default="short",
+                    help="defs adds the organisers' category definitions to the prompt")
     ap.add_argument("--train", required=True, help="CSV with Comment and Hate Category")
     ap.add_argument("--eval", default="", help="labelled CSV, printed per epoch, diagnostic only")
     ap.add_argument("--predict", nargs="*", default=[], help="CSVs to write probabilities for")
@@ -184,6 +205,8 @@ def main():
     ap.add_argument("--init-adapter", default="",
                     help="start from a LoRA adapter saved by Gemma TAPT "
                          "instead of a fresh one")
+    ap.add_argument("--no-collapse-check", dest="collapse_check", action="store_false",
+                    help="skip the after-epoch-1 check for a model predicting one class")
     ap.add_argument("--cache", default=os.environ.get("HF_HUB_CACHE"))
     args = ap.parse_args()
     lora_targets = [x.strip() for x in args.lora_targets.split(",") if x.strip()]
@@ -212,6 +235,8 @@ def main():
     from transformers import AutoTokenizer, get_cosine_schedule_with_warmup
 
     labels, label_col, prompt = TASKS[args.task]
+    if args.prompt == "defs":
+        prompt = DEF_PROMPTS[args.task]
     tok = AutoTokenizer.from_pretrained(args.model, token=token, cache_dir=args.cache)
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
 
@@ -310,6 +335,23 @@ def main():
                           f"{el / 60:.1f} min, eta {el / step * (steps - step) / 60:.0f} min, "
                           f"peak {torch.cuda.max_memory_allocated() / 2**30:.1f} GB", flush=True)
         rec = {"epoch": epoch + 1, "train_loss": run_loss / max(n, 1), "non_finite": bad}
+        if epoch == 0 and args.collapse_check:
+            # Task A Run 28, seed 43: the loss spiked to 1.08 in the first steps, then sat at
+            # chance (~0.70) for three epochs and every row came out Non-Hate. Catch that
+            # after one epoch on a sample of training rows, rather than at the end -- and
+            # rather than never, in a full fit with no evaluation rows. Exit code 4 tells
+            # the notebook to rerun the job with another seed.
+            sample = np.random.default_rng(0).choice(len(X), min(400, len(X)), replace=False)
+            share = np.bincount(predict(model, [X[i] for i in sample], pad_id, args.eval_bs,
+                                        dtype).argmax(1), minlength=len(labels)) / len(sample)
+            prior = counts / counts.sum()
+            top = int(share.argmax())
+            rec["train_pred_share"] = share.round(3).tolist()
+            if share[top] > 0.95 and prior[top] < 0.9:
+                print(f"COLLAPSED: after epoch 1, {share[top]:.0%} of training rows are "
+                      f"predicted '{labels[top]}' (prior {prior[top]:.0%}); exiting with code 4",
+                      flush=True)
+                sys.exit(4)
         if ev is not None:
             p = predict(model, Xev, pad_id, args.eval_bs, dtype)
             rec["eval_macro_f1"] = float(f1_score(yev, p.argmax(1), average="macro"))
