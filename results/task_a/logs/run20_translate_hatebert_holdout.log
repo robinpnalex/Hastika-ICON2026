@@ -1,0 +1,441 @@
+8.3s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.3s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.3s 3 0.00s - to python to disable frozen modules.
+8.3s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+9.0s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+9.0s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+9.0s 7 0.00s - to python to disable frozen modules.
+9.0s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+11.8s 9 repo: /kaggle/working/hastika at 2b1db66 feat(task-a): Run 20 on train + released validation with a fixed 15% holdout
+17.1s 10 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.4/10.4 MB 66.4 MB/s eta 0:00:00
+17.2s 11 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.0 MB/s eta 0:00:00
+17.2s 12 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 64.5 MB/s eta 0:00:00
+17.3s 13 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.4/566.4 kB 24.2 MB/s eta 0:00:00
+17.3s 14 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.4/10.4 MB 66.4 MB/s eta 0:00:00
+17.3s 15 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.0 MB/s eta 0:00:00
+17.3s 16 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 64.5 MB/s eta 0:00:00
+17.3s 17 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.4/566.4 kB 24.2 MB/s eta 0:00:00
+17.3s 18 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 72.3 MB/s eta 0:00:00
+17.5s 19 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 72.3 MB/s eta 0:00:00
+33.8s 20 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+33.8s 21 gradio 6.26.0 requires huggingface-hub<2.0,>=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.
+33.8s 22 diffusers 0.40.0 requires huggingface-hub<2.0,>=1.23.0, but you have huggingface-hub 0.36.2 which is incompatible.
+34.0s 23 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+34.0s 24 gradio 6.26.0 requires huggingface-hub<2.0,>=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.
+34.0s 25 diffusers 0.40.0 requires huggingface-hub<2.0,>=1.23.0, but you have huggingface-hub 0.36.2 which is incompatible.
+34.0s 26 
+34.0s 27 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+34.0s 28 gradio 6.26.0 requires huggingface-hub<2.0,>=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.
+34.0s 29 diffusers 0.40.0 requires huggingface-hub<2.0,>=1.23.0, but you have huggingface-hub 0.36.2 which is incompatible.
+34.4s 30 no HF_TOKEN secret: IndicTrans2 will be skipped, Sarvam-Translate needs none
+43.1s 31 gpus: ['Tesla T4', 'Tesla T4']
+45.4s 32 train 6114 rows, holdout 1079 rows (815110ff24), Hate 49.1% / 49.1%
+46.9s 33 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 21.3 MB/s eta 0:00:00
+47.1s 34 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 21.3 MB/s eta 0:00:00
+53.8s 35 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 55.0 MB/s eta 0:00:00
+54.0s 36 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 55.0 MB/s eta 0:00:00
+83.2s 37 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.3/47.3 kB 183.2 MB/s eta 0:00:00
+83.4s 38 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.3/47.3 kB 183.2 MB/s eta 0:00:00
+84.4s 39 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.3/45.3 kB 205.0 MB/s eta 0:00:00
+84.6s 40 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.3/45.3 kB 205.0 MB/s eta 0:00:00
+86.4s 41 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 112.4/112.4 kB 265.8 MB/s eta 0:00:00
+86.6s 42 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 112.4/112.4 kB 265.8 MB/s eta 0:00:00
+88.6s 43 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 548.4/548.4 kB 313.4 MB/s eta 0:00:00
+88.6s 44 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.8/100.8 kB 259.1 MB/s eta 0:00:00
+88.7s 45 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 92.9 MB/s eta 0:00:00
+88.7s 46 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40.3/40.3 kB 230.6 MB/s eta 0:00:00
+88.7s 47 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 53.8/53.8 kB 177.9 MB/s eta 0:00:00
+88.8s 48 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 867.8/867.8 kB 321.6 MB/s eta 0:00:00
+88.8s 49 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.5/87.5 kB 278.5 MB/s eta 0:00:00
+88.8s 50 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 548.4/548.4 kB 313.4 MB/s eta 0:00:00
+88.8s 51 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.8/100.8 kB 259.1 MB/s eta 0:00:00
+88.8s 52 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 92.9 MB/s eta 0:00:00
+88.8s 53 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40.3/40.3 kB 230.6 MB/s eta 0:00:00
+88.8s 54 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 53.8/53.8 kB 177.9 MB/s eta 0:00:00
+88.8s 55 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 867.8/867.8 kB 321.6 MB/s eta 0:00:00
+88.8s 56 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.5/87.5 kB 278.5 MB/s eta 0:00:00
+88.8s 57 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.9/62.9 kB 262.6 MB/s eta 0:00:00
+88.8s 58 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.8/123.8 kB 258.0 MB/s eta 0:00:00
+88.9s 59 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 385.6/385.6 kB 310.9 MB/s eta 0:00:00
+88.9s 60 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 129.6/129.6 kB 309.6 MB/s eta 0:00:00
+89.0s 61 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.7/7.7 MB 216.4 MB/s eta 0:00:00
+89.0s 62 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.9/62.9 kB 262.6 MB/s eta 0:00:00
+89.0s 63 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.8/123.8 kB 258.0 MB/s eta 0:00:00
+89.0s 64 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 385.6/385.6 kB 310.9 MB/s eta 0:00:00
+89.0s 65 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 129.6/129.6 kB 309.6 MB/s eta 0:00:00
+89.0s 66 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.7/7.7 MB 216.4 MB/s eta 0:00:00
+89.0s 67 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 270.6/270.6 kB 259.4 MB/s eta 0:00:00
+89.0s 68 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 121.1/121.1 kB 279.1 MB/s eta 0:00:00
+89.2s 69 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 270.6/270.6 kB 259.4 MB/s eta 0:00:00
+89.2s 70 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 121.1/121.1 kB 279.1 MB/s eta 0:00:00
+124.8s 71 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+125.0s 72 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+125.0s 73 
+125.0s 74 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+131.5s 75 'nin sule maga'          -> 'nin whore maga'
+131.5s 76 'SOOOLE magane'          -> 'son of a whore'
+131.5s 77 's00le'                  -> 'whore'
+131.5s 78 'bewarsi nan maga'       -> 'bastard nan maga'
+131.5s 79 'boli maga thoo'         -> 'boli maga shame on you'
+131.5s 80 'sure bro'               -> 'sure bro'
+131.5s 81 'sulekha is here'        -> 'sulekha is here'
+174.0s 82 + thikla           (tikla       ) -> ass              sim 0.889
+174.0s 83 + thikl            (tikl        ) -> ass              sim 0.871
+174.0s 84 + thiga            (tiga        ) -> ass              sim 0.825
+174.0s 85 + bevarsigalu      (bevarsigalu ) -> bastard          sim 0.811
+174.0s 86 + bewrsi           (bevrsi      ) -> bastard          sim 0.801
+174.0s 87 + mundege          (mundege     ) -> bitch            sim 0.912
+174.0s 88 + mundedhe         (mundede     ) -> bitch            sim 0.906
+174.0s 89 + mundae           (mundae      ) -> bitch            sim 0.905
+174.0s 90 + mundene          (mundene     ) -> bitch            sim 0.897
+174.0s 91 + mundevu          (mundevu     ) -> bitch            sim 0.887
+174.0s 92 + mundena          (mundena     ) -> bitch            sim 0.87
+174.0s 93 + munderu          (munderu     ) -> bitch            sim 0.866
+174.0s 94 + munderna         (munderna    ) -> bitch            sim 0.866
+174.0s 95 + mundeva          (mundeva     ) -> bitch            sim 0.861
+174.0s 96 + mundera          (mundera     ) -> bitch            sim 0.86
+174.0s 97 + mundenu          (mundenu     ) -> bitch            sim 0.824
+174.0s 98 + mude             (mude        ) -> bitch            sim 0.802
+174.0s 99 + bosudk           (bosudk      ) -> cunt             sim 0.911
+174.0s 100 + lowdy            (lovdy       ) -> dick             sim 0.838
+174.0s 101 + nayina           (nayina      ) -> dog              sim 0.831
+174.0s 102 + kacha            (kaca        ) -> filthy           sim 0.82
+174.0s 103 + bolemaga         (bolemaga    ) -> son of a bitch   sim 0.928
+174.0s 104 + bolimagana       (bolimagana  ) -> son of a bitch   sim 0.902
+174.0s 105 + bolimaganige     (bolimaganige) -> son of a bitch   sim 0.86
+174.0s 106 + bolimagne        (bolimagne   ) -> son of a bitch   sim 0.954
+174.0s 107 + sulemagne        (sulemagne   ) -> son of a whore   sim 0.954
+174.0s 108 + sulemaganige     (sulemaganige) -> son of a whore   sim 0.868
+174.0s 109 + sulemaganna      (sulemagana  ) -> son of a whore   sim 0.855
+174.0s 110 + suley            (suley       ) -> whore            sim 0.956
+174.0s 111 + sulemunde        (sulemunde   ) -> whore            sim 0.869
+174.0s 112 + sulege           (sulege      ) -> whore            sim 0.858
+174.0s 113 + sulemakla        (sulemakla   ) -> whore            sim 0.801
+174.0s 114 + rande            (rande       ) -> whore            sim 0.812
+174.0s 115 fastText added 33 variant skeletons; lexicon now 55
+175.3s 116 rows with a lexicon hit: 14.1% (Hate rate in them 95.0%, overall 49.1%)
+175.3s 117 
+175.3s 118 shame on you     rows   249  hate 99%  spellings  17: thu, thuu, thuuu, thoo, tho, thuuuu, thooo, thooooooo, thoooooo, thuuuuuuuuu, thuuuuu, thuuuuuu
+175.3s 119 whore            rows   225  hate 99%  spellings  36: sule, soole, sulle, sule munde, soolemunde, randi, sule makla, sulemaklu, sulemakla, soolemaklu, soolemakla, sulemunde
+175.3s 120 bitch            rows   137  hate 82%  spellings  27: munde, mundege, mundera, mundde, mundeva, mundenu, mundedhe, mundena, mundhe, mude, mundevu, munderna
+175.3s 121 son of a whore   rows    78  hate 99%  spellings  22: sulemaga, sule magane, sulemagne, soolemaga, sulemagane, sule magne, soole magane, sulle magane, soole magne, sulle magne, sulemaganna, sulleee magnee
+175.3s 122 dog              rows    72  hate 93%  spellings   8: nayi, naayi, nayigalu, nayina, nayige, naayigalu, naayige, naaayi
+175.3s 123 ass              rows    58  hate 98%  spellings   8: thika, tika, thikka, thikla, thikl, tikha, thikaa, thiga
+175.3s 124 bastard          rows    57  hate 95%  spellings  13: bevarsi, bevarsigalu, bewarsi, bewrsi, beversi, bewarsigalu, bevarsi galu, bevarsy, bevaarsi, ð bevarsi, bewrsigalu, bevarshi
+175.3s 125 filthy           rows    48  hate 96%  spellings  11: kachada, kachda, kacha, kacchada, kachadagalu, kacheda, kachadda, kaacha, kacchhdda, kacchadta, kachha
+175.3s 126 son of a bitch   rows    47  hate 98%  spellings  13: bolimaga, bolimagane, boli magane, bolimagne, bolimagana, bolimaganige, boli maganige, boli magne, boli maganeð???ð???ð, bollimagane, bolemaga, bolimaganna
+175.3s 127 dick             rows    37  hate 100%  spellings  10: lowda, tunne, thunne, lowde, lawda, lowdy, tunnege, lavda, lovdy, tunne'ge
+175.3s 128 cunt             rows    23  hate 100%  spellings  13: bosudi, bosadi, bosudk, bosadige, boshudi, bhosadimaga, bosudis, bosdi, bosadimaga, bosadk, bosude, bhosdi
+175.3s 129 fuck             rows    11  hate 100%  spellings   5: keya, keyaa, keyaaaaa, keyaaaa, keyya
+175.3s 130 eunuch           rows     3  hate 100%  spellings   1: chakka
+260.7s 131 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+260.7s 132 warnings.warn(
+260.7s 133 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `64` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+260.7s 134 warnings.warn(
+260.7s 135 
+260.7s 136 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+260.7s 137 warnings.warn(
+260.7s 138 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `64` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+260.7s 139 warnings.warn(
+1105.1s 140 
+1105.1s 141 [sarvam-translate] {'raw_survival': 0.01, 'protected_survival': 0.7, 'empty': 0.0}
+1105.1s 142 romanized : Avluu shaaa.... Saadhane maadidaale thuu btv ge ishtuuu
+1105.1s 143 raw       : Avluu shaaa.... Saadhane maadidaale thuu btv ge ishtuuu
+1105.1s 144 protected : I am furious that you are not taking the responsibility for the mistakes made by your media.
+1105.1s 145 
+1105.1s 146 romanized : soole makle gujrathalli maadiddenu porota maadi thindadda aadi chennagi neevu kone aagthaa banthu
+1105.1s 147 raw       : Soole makle gujratalli maadidenu porota maadi thindadda aadi chennagi neevu kone aagthaa banthu.
+1105.1s 148 protected : The prostitute made the Gujaratali, parotta, and thindad, and then she gave it to Chennagi.
+1105.1s 149 
+1105.1s 150 romanized : Thu ival madiddana yaru kshamisalla
+1105.1s 151 raw       : I will forgive you who are mad.
+1105.1s 152 protected : Shame on you, Ival Madiddana, for not being forgiving.
+1105.1s 153 
+1105.1s 154 romanized : Please anna nimmantha youtuber galella namma samskruthi bagge janagalige solpa ariu modisuvantha kel
+1105.1s 155 raw       : Please Anna, I request you to help me in this country and in the current situation, please please pl
+1105.1s 156 protected : Please Anna, I request you to help me in this country and in the future, to ensure that YouTube crea
+1105.1s 157 
+1105.1s 158 romanized : Ivnyaro sule maga
+1105.1s 159 raw       : The translation of the input text "Ivnyaro sule maga" from Gujarati to English is:
+1105.1s 160 
+1105.1s 161 "Ivnaro sule mag
+1105.1s 162 protected : Ivnyaro whore maga
+1105.1s 163 
+1105.1s 164 romanized : Sir namma dhesha dalli eshtu matha dharma galive yarannu bottu madi helade, bari idondu community GE
+1105.1s 165 raw       : Sir, we are not trying to promote the religion of the motherland. But, this community is also for GE
+1105.1s 166 protected : Sir, we are not able to write about the Dharma of our country. It is a great thing that this communi
+1105.1s 167 
+1105.1s 168 romanized : Bogolo nayigalu. Rcb😅
+1105.1s 169 raw       : Bogolo nayigalu. Rcb😅
+1105.1s 170 protected : Bogolo dog galu. Rcb😅
+1105.1s 171 
+1105.1s 172 romanized : Ivanu yaro mental..... Huccha hudaga agiddakke banta illa chakka agiddakke banta
+1105.1s 173 raw       : I feel a lot of anxiety when I have to give a speech or make a presentation.
+1105.1s 174 protected : I feel a lot of anxiety when I have to give a speech or make a presentation.
+1105.1s 175 
+1116.4s 176 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+1116.6s 177 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+1116.6s 178 
+1116.6s 179 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+1117.0s 180 Downloading Multilingual model for transliteration
+1117.2s 181 MB[38;2;255;0;0m  0%[39m [38;2;255;0;0m(0 of 121.0)[39m |                    | Elapsed Time: 0:00:00 ETA:  --:--:--
+1117.3s 182 MB[38;2;255;0;0m  0%[39m [38;2;255;0;0m(0 of 121.0)[39m |                    | Elapsed Time: 0:00:00 ETA:  --:--:--MB[38;2;255;54;0m  8%[39m [38;2;255;54;0m(10 of 121.0)[39m |#                  | Elapsed Time: 0:00:00 ETA:   0:00:00
+1117.3s 183 MB[38;2;255;54;0m  8%[39m [38;2;255;54;0m(10 of 121.0)[39m |#                  | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;255;80;0m  9%[39m [38;2;255;80;0m(11 of 121.0)[39m |#                  | Elapsed Time: 0:00:00 ETA:   0:00:01
+1117.4s 184 MB[38;2;255;80;0m  9%[39m [38;2;255;80;0m(11 of 121.0)[39m |#                  | Elapsed Time: 0:00:00 ETA:   0:00:01MB[38;2;255;92;0m 13%[39m [38;2;255;92;0m(16 of 121.0)[39m |##                 | Elapsed Time: 0:00:00 ETA:   0:00:01
+1117.4s 185 MB[38;2;255;92;0m 13%[39m [38;2;255;92;0m(16 of 121.0)[39m |##                 | Elapsed Time: 0:00:00 ETA:   0:00:01MB[38;2;255;108;0m 19%[39m [38;2;255;108;0m(23 of 121.0)[39m |###                | Elapsed Time: 0:00:00 ETA:   0:00:01
+1117.5s 186 MB[38;2;255;108;0m 19%[39m [38;2;255;108;0m(23 of 121.0)[39m |###                | Elapsed Time: 0:00:00 ETA:   0:00:01MB[38;2;255;124;0m 24%[39m [38;2;255;124;0m(30 of 121.0)[39m |####               | Elapsed Time: 0:00:00 ETA:   0:00:01
+1117.6s 187 MB[38;2;255;124;0m 24%[39m [38;2;255;124;0m(30 of 121.0)[39m |####               | Elapsed Time: 0:00:00 ETA:   0:00:01MB[38;2;255;138;0m 29%[39m [38;2;255;138;0m(36 of 121.0)[39m |#####              | Elapsed Time: 0:00:00 ETA:   0:00:01
+1117.7s 188 MB[38;2;255;138;0m 29%[39m [38;2;255;138;0m(36 of 121.0)[39m |#####              | Elapsed Time: 0:00:00 ETA:   0:00:01MB[38;2;255;145;0m 32%[39m [38;2;255;145;0m(39 of 121.0)[39m |######             | Elapsed Time: 0:00:00 ETA:   0:00:01
+1117.7s 189 MB[38;2;255;145;0m 32%[39m [38;2;255;145;0m(39 of 121.0)[39m |######             | Elapsed Time: 0:00:00 ETA:   0:00:01MB[38;2;255;170;0m 41%[39m [38;2;255;170;0m(50 of 121.0)[39m |#######            | Elapsed Time: 0:00:00 ETA:   0:00:00
+1117.8s 190 MB[38;2;255;170;0m 41%[39m [38;2;255;170;0m(50 of 121.0)[39m |#######            | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;255;212;0m 49%[39m [38;2;255;212;0m(60 of 121.0)[39m |#########          | Elapsed Time: 0:00:00 ETA:   0:00:00
+1117.9s 191 MB[38;2;255;212;0m 49%[39m [38;2;255;212;0m(60 of 121.0)[39m |#########          | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;255;240;0m 54%[39m [38;2;255;240;0m(66 of 121.0)[39m |##########         | Elapsed Time: 0:00:00 ETA:   0:00:00
+1117.9s 192 MB[38;2;255;240;0m 54%[39m [38;2;255;240;0m(66 of 121.0)[39m |##########         | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;250;255;0m 58%[39m [38;2;250;255;0m(71 of 121.0)[39m |###########        | Elapsed Time: 0:00:00 ETA:   0:00:00
+1118.0s 193 MB[38;2;250;255;0m 58%[39m [38;2;250;255;0m(71 of 121.0)[39m |###########        | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;243;255;0m 61%[39m [38;2;243;255;0m(74 of 121.0)[39m |###########        | Elapsed Time: 0:00:00 ETA:   0:00:00
+1118.1s 194 MB[38;2;243;255;0m 61%[39m [38;2;243;255;0m(74 of 121.0)[39m |###########        | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;232;255;0m 65%[39m [38;2;232;255;0m(79 of 121.0)[39m |############       | Elapsed Time: 0:00:00 ETA:   0:00:00
+1118.1s 195 MB[38;2;232;255;0m 65%[39m [38;2;232;255;0m(79 of 121.0)[39m |############       | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;229;255;0m 66%[39m [38;2;229;255;0m(80 of 121.0)[39m |############       | Elapsed Time: 0:00:00 ETA:   0:00:00
+1118.2s 196 MB[38;2;229;255;0m 66%[39m [38;2;229;255;0m(80 of 121.0)[39m |############       | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;209;255;0m 73%[39m [38;2;209;255;0m(89 of 121.0)[39m |#############      | Elapsed Time: 0:00:00 ETA:   0:00:00
+1118.2s 197 MB[38;2;209;255;0m 73%[39m [38;2;209;255;0m(89 of 121.0)[39m |#############      | Elapsed Time: 0:00:00 ETA:   0:00:00MB[38;2;204;255;0m 75%[39m [38;2;204;255;0m(91 of 121.0)[39m |##############     | Elapsed Time: 0:00:01 ETA:   0:00:00
+1118.3s 198 MB[38;2;204;255;0m 75%[39m [38;2;204;255;0m(91 of 121.0)[39m |##############     | Elapsed Time: 0:00:01 ETA:   0:00:00MB[38;2;185;255;0m 81%[39m [38;2;185;255;0m(99 of 121.0)[39m |###############    | Elapsed Time: 0:00:01 ETA:   0:00:00
+1118.3s 199 MB[38;2;185;255;0m 81%[39m [38;2;185;255;0m(99 of 121.0)[39m |###############    | Elapsed Time: 0:00:01 ETA:   0:00:00MB[38;2;183;255;0m 82%[39m [38;2;183;255;0m(100 of 121.0)[39m |##############    | Elapsed Time: 0:00:01 ETA:   0:00:00
+1118.4s 200 MB[38;2;183;255;0m 82%[39m [38;2;183;255;0m(100 of 121.0)[39m |##############    | Elapsed Time: 0:00:01 ETA:   0:00:00MB[38;2;178;255;0m 84%[39m [38;2;178;255;0m(102 of 121.0)[39m |###############   | Elapsed Time: 0:00:01 ETA:   0:00:00
+1118.4s 201 MB[38;2;178;255;0m 84%[39m [38;2;178;255;0m(102 of 121.0)[39m |###############   | Elapsed Time: 0:00:01 ETA:   0:00:00MB[38;2;101;255;0m 91%[39m [38;2;101;255;0m(111 of 121.0)[39m |################  | Elapsed Time: 0:00:01 ETA:   0:00:00
+1118.5s 202 MB[38;2;101;255;0m 91%[39m [38;2;101;255;0m(111 of 121.0)[39m |################  | Elapsed Time: 0:00:01 ETA:   0:00:00MB[38;2;10;255;0m 99%[39m [38;2;10;255;0m(120 of 121.0)[39m |################# | Elapsed Time: 0:00:01 ETA:   0:00:00
+1118.5s 203 MB[38;2;10;255;0m 99%[39m [38;2;10;255;0m(120 of 121.0)[39m |################# | Elapsed Time: 0:00:01 ETA:   0:00:00MB[38;2;0;255;0m100%[39m [38;2;0;255;0m(121.0 of 121.0)[39m |################| Elapsed Time: 0:00:01 Time:  0:00:01
+1118.5s 204 MB[38;2;0;255;0m100%[39m [38;2;0;255;0m(121.0 of 121.0)[39m |################| Elapsed Time: 0:00:01 Time:  0:00:01
+1118.5s 205 
+1118.5s 206 
+1118.7s 207 Succefully Downloaded to: /usr/local/lib/python3.13/dist-packages/ai4bharat/transliteration/transformer/models/en2indic/v1.0/model.zip
+1119.5s 208 Models downloaded to: /usr/local/lib/python3.13/dist-packages/ai4bharat/transliteration/transformer/models/en2indic/v1.0
+1119.5s 209 NOTE: When uninstalling this library, REMEMBER to delete the models manually
+1119.5s 210 Initializing Multilingual model for transliteration
+1119.5s 211 [indictrans2-1B] could not load, skipped: ValueError: mutable default <class 'fairseq.dataclass.configs.CommonConfig'> for field common is not allowed: use default_factory
+1119.5s 212 chosen backend: sarvam-translate {'raw_survival': 0.01, 'protected_survival': 0.7, 'empty': 0.0}
+1119.5s 213 warning: raw survival 1.0% -- the translator launders abuse on its own, so the pipeline depends on the lexicon for slurs it does not list
+1119.5s 214 gate passed, continuing
+1124.9s 215 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+1124.9s 216 warnings.warn(
+1124.9s 217 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `64` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+1124.9s 218 warnings.warn(
+1124.9s 219 
+1124.9s 220 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+1124.9s 221 warnings.warn(
+1124.9s 222 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `64` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+1124.9s 223 warnings.warn(
+10394.7s 224 wrote artifacts/translations/sarvam-translate_78f3d42a_train.csv 6114
+10394.7s 225 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+10394.7s 226 warnings.warn(
+10394.7s 227 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `64` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+10394.7s 228 warnings.warn(
+10394.7s 229 
+10394.7s 230 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+10394.7s 231 warnings.warn(
+10394.7s 232 /usr/local/lib/python3.13/dist-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `64` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+10394.7s 233 warnings.warn(
+11894.2s 234 wrote artifacts/translations/sarvam-translate_78f3d42a_holdout.csv 1079
+11894.4s 235 (6114, 3) (1079, 3)
+11894.4s 236 Janara kivige flower ???? bari sullu
+11894.4s 237 -> Janara Kivige flower ???? bari sullu
+11894.4s 238 Ee mindrimagane hogi maamsa thinnu hogi
+11894.4s 239 -> The mind will be filled with joy and the heart will be content.
+11894.4s 240 Rakesh dodda dov madta avne
+11894.4s 241 -> Rakesh dodda dov madta avne
+11894.4s 242 Paapa how she matadtale with avar tayi
+11894.4s 243 -> How she killed her uncle by eating him
+11894.4s 244 5.4 k views ge 6 k like enge guru edu
+11894.4s 245 -> 5.4 k views ge 6 k like enge guru edu
+11904.4s 246 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+11904.6s 247 [   0.0 min] start a_en_hatebert on GPU 0
+11904.6s 248 [   0.0 min] start a_rom_muril on GPU 1
+11904.7s 249 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+11904.7s 250 
+11904.7s 251 DEPRECATION: omegaconf 2.0.6 has a non-standard dependency specifier PyYAML>=5.1.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of omegaconf or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+11964.6s 252 [   1.0 min] a_en_hatebert            ===== seed 42 FULL FIT, 6114 rows, no validation =====
+11964.6s 253 [   1.0 min] a_rom_muril              ===== seed 42 FULL FIT, 6114 rows, no validation =====
+12024.6s 254 [   2.0 min] a_en_hatebert            ===== seed 42 FULL FIT, 6114 rows, no validation =====
+12024.6s 255 [   2.0 min] a_rom_muril              ===== seed 42 FULL FIT, 6114 rows, no validation =====
+12084.6s 256 [   3.0 min] a_en_hatebert            ===== seed 42 FULL FIT, 6114 rows, no validation =====
+12084.6s 257 [   3.0 min] a_rom_muril              ===== seed 42 FULL FIT, 6114 rows, no validation =====
+12144.6s 258 [   4.0 min] a_en_hatebert            ===== seed 42 FULL FIT, 6114 rows, no validation =====
+12144.6s 259 [   4.0 min] a_rom_muril              ===== seed 42 FULL FIT, 6114 rows, no validation =====
+12204.6s 260 [   5.0 min] a_en_hatebert              [s42full] ep1 done 4.2min  no val
+12204.6s 261 [   5.0 min] a_rom_muril                [s42full] ep1 done 4.5min  no val
+12264.6s 262 [   6.0 min] a_en_hatebert              [s42full] ep1 done 4.2min  no val
+12264.6s 263 [   6.0 min] a_rom_muril                [s42full] ep1 done 4.5min  no val
+12324.6s 264 [   7.0 min] a_en_hatebert              [s42full] ep1 done 4.2min  no val
+12324.6s 265 [   7.0 min] a_rom_muril                [s42full] ep1 done 4.5min  no val
+12384.6s 266 [   8.0 min] a_en_hatebert              [s42full] ep1 done 4.2min  no val
+12384.6s 267 [   8.0 min] a_rom_muril                [s42full] ep1 done 4.5min  no val
+12444.6s 268 [   9.0 min] a_en_hatebert              [s42full] ep2 done 4.2min  no val
+12444.6s 269 [   9.0 min] a_rom_muril                [s42full] ep1 done 4.5min  no val
+12504.6s 270 [  10.0 min] a_en_hatebert              [s42full] ep2 done 4.2min  no val
+12504.6s 271 [  10.0 min] a_rom_muril                [s42full] ep2 done 4.8min  no val
+12564.6s 272 [  11.0 min] a_en_hatebert              [s42full] ep2 done 4.2min  no val
+12564.6s 273 [  11.0 min] a_rom_muril                [s42full] ep2 done 4.8min  no val
+12624.6s 274 [  12.0 min] a_en_hatebert              [s42full] ep2 done 4.2min  no val
+12624.6s 275 [  12.0 min] a_rom_muril                [s42full] ep2 done 4.8min  no val
+12684.6s 276 [  13.0 min] a_en_hatebert              [s42full] ep3 done 4.1min  no val
+12684.6s 277 [  13.0 min] a_rom_muril                [s42full] ep2 done 4.8min  no val
+12744.6s 278 [  14.0 min] a_en_hatebert              [s42full] ep3 done 4.1min  no val
+12744.6s 279 [  14.0 min] a_rom_muril                [s42full] ep2 done 4.8min  no val
+12804.6s 280 [  15.0 min] a_en_hatebert              [s42full] ep3 done 4.1min  no val
+12804.6s 281 [  15.0 min] a_rom_muril                [s42full] ep3 done 4.8min  no val
+12864.6s 282 [  16.0 min] a_en_hatebert              [s42full] ep3 done 4.1min  no val
+12864.6s 283 [  16.0 min] a_rom_muril                [s42full] ep3 done 4.8min  no val
+12924.6s 284 [  17.0 min] a_en_hatebert              [s42full] ep4 done 4.2min  no val
+12924.6s 285 [  17.0 min] a_rom_muril                [s42full] ep3 done 4.8min  no val
+12984.6s 286 [  18.0 min] a_en_hatebert              [s42full] ep4 done 4.2min  no val
+12984.6s 287 [  18.0 min] a_rom_muril                [s42full] ep3 done 4.8min  no val
+13044.6s 288 [  19.0 min] a_en_hatebert              [s42full] ep4 done 4.2min  no val
+13044.6s 289 [  19.0 min] a_rom_muril                [s42full] ep3 done 4.8min  no val
+13104.6s 290 [  20.0 min] a_en_hatebert              [s42full] ep4 done 4.2min  no val
+13104.6s 291 [  20.0 min] a_rom_muril                [s42full] ep4 done 4.8min  no val
+13164.6s 292 [  21.0 min] a_en_hatebert              [s42full] ep4 done 4.2min  no val
+13164.6s 293 [  21.0 min] a_rom_muril                [s42full] ep4 done 4.8min  no val
+13224.6s 294 [  22.0 min] a_en_hatebert              [s42full] ep5 done 4.1min  no val
+13224.6s 295 [  22.0 min] a_rom_muril                [s42full] ep4 done 4.8min  no val
+13284.6s 296 [  23.0 min] a_en_hatebert              [s42full] ep5 done 4.1min  no val
+13284.6s 297 [  23.0 min] a_rom_muril                [s42full] ep4 done 4.8min  no val
+13344.7s 298 [  24.0 min] a_en_hatebert              [s42full] ep5 done 4.1min  no val
+13344.7s 299 [  24.0 min] a_rom_muril                [s42full] ep4 done 4.8min  no val
+13404.7s 300 [  25.0 min] a_en_hatebert              [s42full] ep5 done 4.1min  no val
+13404.7s 301 [  25.0 min] a_rom_muril                [s42full] ep5 done 4.8min  no val
+13464.7s 302 [  26.0 min] a_en_hatebert            ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13464.7s 303 [  26.0 min] a_rom_muril                [s42full] ep5 done 4.8min  no val
+13524.7s 304 [  27.0 min] a_en_hatebert            ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13524.7s 305 [  27.0 min] a_rom_muril                [s42full] ep5 done 4.8min  no val
+13584.7s 306 [  28.0 min] a_en_hatebert            ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13584.7s 307 [  28.0 min] a_rom_muril                [s42full] ep5 done 4.8min  no val
+13644.7s 308 [  29.0 min] a_en_hatebert            ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13644.7s 309 [  29.0 min] a_rom_muril                [s42full] ep5 done 4.8min  no val
+13704.7s 310 [  30.0 min] a_en_hatebert              [s43full] ep1 done 4.1min  no val
+13704.7s 311 [  30.0 min] a_rom_muril              ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13764.7s 312 [  31.0 min] a_en_hatebert              [s43full] ep1 done 4.1min  no val
+13764.7s 313 [  31.0 min] a_rom_muril              ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13824.7s 314 [  32.0 min] a_en_hatebert              [s43full] ep1 done 4.1min  no val
+13824.7s 315 [  32.0 min] a_rom_muril              ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13884.7s 316 [  33.0 min] a_en_hatebert              [s43full] ep1 done 4.1min  no val
+13884.7s 317 [  33.0 min] a_rom_muril              ===== seed 43 FULL FIT, 6114 rows, no validation =====
+13944.7s 318 [  34.0 min] a_en_hatebert              [s43full] ep2 done 4.1min  no val
+13944.7s 319 [  34.0 min] a_rom_muril                [s43full] ep1 done 4.8min  no val
+14004.7s 320 [  35.0 min] a_en_hatebert              [s43full] ep2 done 4.1min  no val
+14004.7s 321 [  35.0 min] a_rom_muril                [s43full] ep1 done 4.8min  no val
+14064.7s 322 [  36.0 min] a_en_hatebert              [s43full] ep2 done 4.1min  no val
+14064.7s 323 [  36.0 min] a_rom_muril                [s43full] ep1 done 4.8min  no val
+14124.7s 324 [  37.0 min] a_en_hatebert              [s43full] ep2 done 4.1min  no val
+14124.7s 325 [  37.0 min] a_rom_muril                [s43full] ep1 done 4.8min  no val
+14184.7s 326 [  38.0 min] a_en_hatebert              [s43full] ep3 done 4.1min  no val
+14184.7s 327 [  38.0 min] a_rom_muril                [s43full] ep1 done 4.8min  no val
+14244.7s 328 [  39.0 min] a_en_hatebert              [s43full] ep3 done 4.1min  no val
+14244.7s 329 [  39.0 min] a_rom_muril                [s43full] ep2 done 4.8min  no val
+14304.7s 330 [  40.0 min] a_en_hatebert              [s43full] ep3 done 4.1min  no val
+14304.7s 331 [  40.0 min] a_rom_muril                [s43full] ep2 done 4.8min  no val
+14364.9s 332 [  41.0 min] a_en_hatebert              [s43full] ep3 done 4.1min  no val
+14364.9s 333 [  41.0 min] a_rom_muril                [s43full] ep2 done 4.8min  no val
+14424.7s 334 [  42.0 min] a_en_hatebert              [s43full] ep4 done 4.1min  no val
+14424.7s 335 [  42.0 min] a_rom_muril                [s43full] ep2 done 4.8min  no val
+14484.7s 336 [  43.0 min] a_en_hatebert              [s43full] ep4 done 4.1min  no val
+14484.7s 337 [  43.0 min] a_rom_muril                [s43full] ep2 done 4.8min  no val
+14544.7s 338 [  44.0 min] a_en_hatebert              [s43full] ep4 done 4.1min  no val
+14544.7s 339 [  44.0 min] a_rom_muril                [s43full] ep3 done 4.8min  no val
+14604.7s 340 [  45.0 min] a_en_hatebert              [s43full] ep4 done 4.1min  no val
+14604.7s 341 [  45.0 min] a_rom_muril                [s43full] ep3 done 4.8min  no val
+14664.7s 342 [  46.0 min] a_en_hatebert              [s43full] ep5 done 4.1min  no val
+14664.7s 343 [  46.0 min] a_rom_muril                [s43full] ep3 done 4.8min  no val
+14724.7s 344 [  47.0 min] a_en_hatebert              [s43full] ep5 done 4.1min  no val
+14724.7s 345 [  47.0 min] a_rom_muril                [s43full] ep3 done 4.8min  no val
+14784.7s 346 [  48.0 min] a_en_hatebert              [s43full] ep5 done 4.1min  no val
+14784.7s 347 [  48.0 min] a_rom_muril                [s43full] ep3 done 4.8min  no val
+14844.7s 348 [  49.0 min] a_en_hatebert              [s43full] ep5 done 4.1min  no val
+14844.7s 349 [  49.0 min] a_rom_muril                [s43full] ep4 done 4.8min  no val
+14904.8s 350 [  50.0 min] a_en_hatebert              [s43full] ep5 done 4.1min  no val
+14904.8s 351 [  50.0 min] a_rom_muril                [s43full] ep4 done 4.8min  no val
+14964.7s 352 [  51.0 min] a_en_hatebert            ===== seed 44 FULL FIT, 6114 rows, no validation =====
+14964.7s 353 [  51.0 min] a_rom_muril                [s43full] ep4 done 4.8min  no val
+15024.8s 354 [  52.0 min] a_en_hatebert            ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15024.8s 355 [  52.0 min] a_rom_muril                [s43full] ep4 done 4.8min  no val
+15084.8s 356 [  53.0 min] a_en_hatebert            ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15084.8s 357 [  53.0 min] a_rom_muril                [s43full] ep4 done 4.8min  no val
+15144.8s 358 [  54.0 min] a_en_hatebert            ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15144.8s 359 [  54.0 min] a_rom_muril                [s43full] ep5 done 4.8min  no val
+15204.8s 360 [  55.0 min] a_en_hatebert              [s44full] ep1 done 4.2min  no val
+15204.8s 361 [  55.0 min] a_rom_muril                [s43full] ep5 done 4.8min  no val
+15264.8s 362 [  56.0 min] a_en_hatebert              [s44full] ep1 done 4.2min  no val
+15264.8s 363 [  56.0 min] a_rom_muril                [s43full] ep5 done 4.8min  no val
+15324.8s 364 [  57.0 min] a_en_hatebert              [s44full] ep1 done 4.2min  no val
+15324.8s 365 [  57.0 min] a_rom_muril                [s43full] ep5 done 4.8min  no val
+15384.8s 366 [  58.0 min] a_en_hatebert              [s44full] ep1 done 4.2min  no val
+15384.8s 367 [  58.0 min] a_rom_muril                [s43full] ep5 done 4.8min  no val
+15444.8s 368 [  59.0 min] a_en_hatebert              [s44full] ep2 done 4.1min  no val
+15444.8s 369 [  59.0 min] a_rom_muril              ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15504.8s 370 [  60.0 min] a_en_hatebert              [s44full] ep2 done 4.1min  no val
+15504.8s 371 [  60.0 min] a_rom_muril              ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15564.8s 372 [  61.0 min] a_en_hatebert              [s44full] ep2 done 4.1min  no val
+15564.8s 373 [  61.0 min] a_rom_muril              ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15624.8s 374 [  62.0 min] a_en_hatebert              [s44full] ep2 done 4.1min  no val
+15624.8s 375 [  62.0 min] a_rom_muril              ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15684.8s 376 [  63.0 min] a_en_hatebert              [s44full] ep3 done 4.2min  no val
+15684.8s 377 [  63.0 min] a_rom_muril              ===== seed 44 FULL FIT, 6114 rows, no validation =====
+15744.8s 378 [  64.0 min] a_en_hatebert              [s44full] ep3 done 4.2min  no val
+15744.8s 379 [  64.0 min] a_rom_muril                [s44full] ep1 done 4.8min  no val
+15804.8s 380 [  65.0 min] a_en_hatebert              [s44full] ep3 done 4.2min  no val
+15804.8s 381 [  65.0 min] a_rom_muril                [s44full] ep1 done 4.8min  no val
+15864.8s 382 [  66.0 min] a_en_hatebert              [s44full] ep3 done 4.2min  no val
+15864.8s 383 [  66.0 min] a_rom_muril                [s44full] ep1 done 4.8min  no val
+15924.8s 384 [  67.0 min] a_en_hatebert              [s44full] ep4 done 4.1min  no val
+15924.8s 385 [  67.0 min] a_rom_muril                [s44full] ep1 done 4.8min  no val
+15984.8s 386 [  68.0 min] a_en_hatebert              [s44full] ep4 done 4.1min  no val
+15984.8s 387 [  68.0 min] a_rom_muril                [s44full] ep2 done 4.9min  no val
+16044.8s 388 [  69.0 min] a_en_hatebert              [s44full] ep4 done 4.1min  no val
+16044.8s 389 [  69.0 min] a_rom_muril                [s44full] ep2 done 4.9min  no val
+16104.8s 390 [  70.0 min] a_en_hatebert              [s44full] ep4 done 4.1min  no val
+16104.8s 391 [  70.0 min] a_rom_muril                [s44full] ep2 done 4.9min  no val
+16164.8s 392 [  71.0 min] a_en_hatebert              [s44full] ep5 done 4.1min  no val
+16164.8s 393 [  71.0 min] a_rom_muril                [s44full] ep2 done 4.9min  no val
+16224.8s 394 [  72.0 min] a_en_hatebert              [s44full] ep5 done 4.1min  no val
+16224.8s 395 [  72.0 min] a_rom_muril                [s44full] ep2 done 4.9min  no val
+16284.8s 396 [  73.0 min] a_en_hatebert              [s44full] ep5 done 4.1min  no val
+16284.8s 397 [  73.0 min] a_rom_muril                [s44full] ep3 done 4.9min  no val
+16344.8s 398 [  74.0 min] a_en_hatebert              [s44full] ep5 done 4.1min  no val
+16344.8s 399 [  74.0 min] a_rom_muril                [s44full] ep3 done 4.9min  no val
+16404.8s 400 [  75.0 min] a_en_hatebert              [s44full] ep5 done 4.1min  no val
+16404.8s 401 [  75.0 min] a_rom_muril                [s44full] ep3 done 4.9min  no val
+16464.8s 402 [  76.0 min] done a_en_hatebert; log /kaggle/working/hastika/artifacts/logs/a_en_hatebert.log
+16464.8s 403 [  76.0 min] a_rom_muril                [s44full] ep3 done 4.9min  no val
+16524.8s 404 [  77.0 min] a_rom_muril                [s44full] ep3 done 4.9min  no val
+16584.8s 405 [  78.0 min] a_rom_muril                [s44full] ep4 done 4.8min  no val
+16644.8s 406 [  79.0 min] a_rom_muril                [s44full] ep4 done 4.8min  no val
+16704.8s 407 [  80.0 min] a_rom_muril                [s44full] ep4 done 4.8min  no val
+16764.8s 408 [  81.0 min] a_rom_muril                [s44full] ep4 done 4.8min  no val
+16824.8s 409 [  82.0 min] a_rom_muril                [s44full] ep4 done 4.8min  no val
+16884.8s 410 [  83.0 min] a_rom_muril                [s44full] ep5 done 4.8min  no val
+16944.8s 411 [  84.0 min] a_rom_muril                [s44full] ep5 done 4.8min  no val
+17004.8s 412 [  85.0 min] a_rom_muril                [s44full] ep5 done 4.8min  no val
+17064.8s 413 [  86.0 min] a_rom_muril                [s44full] ep5 done 4.8min  no val
+17124.8s 414 [  87.0 min] a_rom_muril                [s44full] ep5 done 4.8min  no val
+17184.8s 415 [  88.0 min] done a_rom_muril; log /kaggle/working/hastika/artifacts/logs/a_rom_muril.log
+17184.8s 416 exit codes: {'a_en_hatebert': 0, 'a_rom_muril': 0}
+17190.7s 417 arm                                          macro-F1    acc  Hate F1
+17190.7s 418 char SVM, romanized                            0.8117 0.8119   0.8069
+17190.7s 419 char SVM, canonicalised                        0.8146 0.8146   0.8106
+17190.7s 420 MuRIL, romanized (3 seeds)                     0.7803 0.7804   0.7775
+17190.7s 421 SVM 0.57 + MuRIL 0.43                          0.8155 0.8156   0.8135
+17190.7s 422 hateBERT, English via sarvam-translate (3 seeds)   0.7275 0.7275   0.7232
+17190.7s 423 SVM + hateBERT, 50/50                          0.7924 0.7924   0.7899
+17190.7s 424 SVM + MuRIL + hateBERT, thirds                 0.8091 0.8091   0.8071
+17190.7s 425 references, older measurements on other rows: TF-IDF floor 0.8073 OOF, TAPT MuRIL 0.8128 OOF, Run 9 blend 0.8213 combined OOF
+17190.7s 426 
+17210.1s 427 hateBERT - MuRIL           -0.0529  95% CI [-0.0780, -0.0268]  P(better) 0.00
+17229.2s 428 thirds - (SVM+MuRIL)       -0.0065  95% CI [-0.0186, +0.0056]  P(better) 0.15
+17248.3s 429 (SVM+hateBERT) - SVM       -0.0194  95% CI [-0.0362, -0.0019]  P(better) 0.02
+17267.3s 430 canonicalised SVM - SVM    +0.0028  95% CI [-0.0019, +0.0082]  P(better) 0.88
+17267.3s 431 
+17267.3s 432 hateBERT and SVM disagree on 21.0% of holdout rows; either is right on 87.5%
+17267.3s 433 ['a_en_hatebert.log', 'a_rom_muril.log', 'holdout_ids.csv', 'holdout_probs_hatebert_en.npy', 'holdout_probs_muril.npy', 'holdout_probs_svm.npy', 'holdout_probs_svm_canon.npy', 'result.json', 'sarvam-translate_78f3d42a_holdout.csv', 'sarvam-translate_78f3d42a_train.csv', 'slur_lexicon.json']
+17273.8s 434 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+17273.8s 435 cells[i][c] = re.sub('\\\\\|', '|', cell)
+17274.0s 436 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+17274.0s 437 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+17274.9s 438 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+17275.1s 439 [NbConvertApp] Writing 251538 bytes to __notebook__.ipynb
+17278.1s 440 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+17278.9s 441 [NbConvertApp] Writing 601210 bytes to __results__.html

@@ -1,0 +1,207 @@
+8.9s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.9s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.9s 3 0.00s - to python to disable frozen modules.
+8.9s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+9.6s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+9.6s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+9.6s 7 0.00s - to python to disable frozen modules.
+9.6s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+12.6s 9 repo at ae088e6 feat: standalone Gemma-4-12B notebooks applying the MuRIL lessons (Task B 22-25, Task A 28)
+15.1s 10 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 1.2 MB/s eta 0:00:00
+15.3s 11 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 1.2 MB/s eta 0:00:00
+29.1s 12 gpus: ['Tesla T4', 'Tesla T4']
+29.2s 13 task B: train 3002, holdout 530 (f85f4f049b), all 3532, test 396
+29.2s 14 attached inputs:
+29.2s 15 input/  (0 files)
+31.3s 16 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.1/43.1 MB 47.9 MB/s eta 0:00:00
+31.5s 17 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.1/43.1 MB 47.9 MB/s eta 0:00:00
+63.9s 18 LLM env: transformers 5.16.1 | peft 0.20.0
+64.1s 19 LLM env: transformers 5.16.1 | peft 0.20.0
+69.4s 20 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+69.4s 21 
+69.4s 22 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+184.4s 23 seed 42: not attached, training it
+184.4s 24 seed 43: not attached, training it
+184.4s 25 [   0.0 min] start gemma-4-12b_full_s42 on GPU 0
+184.4s 26 [   0.0 min] start gemma-4-12b_full_s43 on GPU 1
+244.4s 27 [   1.0 min] gemma-4-12b_full_s42     Loading weights:  40%|███▉      | 269/677 [00:36<00:48,  8.38it/s]
+244.4s 28 [   1.0 min] gemma-4-12b_full_s43     Loading weights:  40%|███▉      | 269/677 [00:36<00:48,  8.39it/s]
+304.4s 29 [   2.0 min] gemma-4-12b_full_s42       sched.step()
+304.4s 30 [   2.0 min] gemma-4-12b_full_s43       sched.step()
+364.4s 31 [   3.0 min] gemma-4-12b_full_s42       sched.step()
+364.4s 32 [   3.0 min] gemma-4-12b_full_s43       sched.step()
+424.4s 33 [   4.0 min] gemma-4-12b_full_s42       sched.step()
+424.4s 34 [   4.0 min] gemma-4-12b_full_s43       sched.step()
+484.4s 35 [   5.0 min] gemma-4-12b_full_s42       sched.step()
+484.4s 36 [   5.0 min] gemma-4-12b_full_s43     epoch 1 step 25/663 loss 2.0970 2.7 min, eta 68 min, peak 9.6 GB
+544.4s 37 [   6.0 min] gemma-4-12b_full_s42     epoch 1 step 25/663 loss 2.4572 3.1 min, eta 80 min, peak 10.0 GB
+544.4s 38 [   6.0 min] gemma-4-12b_full_s43     epoch 1 step 25/663 loss 2.0970 2.7 min, eta 68 min, peak 9.6 GB
+604.4s 39 [   7.0 min] gemma-4-12b_full_s42     epoch 1 step 25/663 loss 2.4572 3.1 min, eta 80 min, peak 10.0 GB
+604.4s 40 [   7.0 min] gemma-4-12b_full_s43     epoch 1 step 25/663 loss 2.0970 2.7 min, eta 68 min, peak 9.6 GB
+664.4s 41 [   8.0 min] gemma-4-12b_full_s42     epoch 1 step 25/663 loss 2.4572 3.1 min, eta 80 min, peak 10.0 GB
+664.4s 42 [   8.0 min] gemma-4-12b_full_s43     epoch 1 step 50/663 loss 1.9195 5.6 min, eta 68 min, peak 9.8 GB
+724.4s 43 [   9.0 min] gemma-4-12b_full_s42     epoch 1 step 50/663 loss 2.0209 6.4 min, eta 78 min, peak 10.0 GB
+724.4s 44 [   9.0 min] gemma-4-12b_full_s43     epoch 1 step 50/663 loss 1.9195 5.6 min, eta 68 min, peak 9.8 GB
+784.4s 45 [  10.0 min] gemma-4-12b_full_s42     epoch 1 step 50/663 loss 2.0209 6.4 min, eta 78 min, peak 10.0 GB
+784.4s 46 [  10.0 min] gemma-4-12b_full_s43     epoch 1 step 50/663 loss 1.9195 5.6 min, eta 68 min, peak 9.8 GB
+844.4s 47 [  11.0 min] gemma-4-12b_full_s42     epoch 1 step 50/663 loss 2.0209 6.4 min, eta 78 min, peak 10.0 GB
+844.4s 48 [  11.0 min] gemma-4-12b_full_s43     epoch 1 step 75/663 loss 1.7979 8.3 min, eta 65 min, peak 9.8 GB
+904.4s 49 [  12.0 min] gemma-4-12b_full_s42     epoch 1 step 75/663 loss 1.8600 9.5 min, eta 74 min, peak 10.0 GB
+904.4s 50 [  12.0 min] gemma-4-12b_full_s43     epoch 1 step 75/663 loss 1.7979 8.3 min, eta 65 min, peak 9.8 GB
+964.4s 51 [  13.0 min] gemma-4-12b_full_s42     epoch 1 step 75/663 loss 1.8600 9.5 min, eta 74 min, peak 10.0 GB
+964.4s 52 [  13.0 min] gemma-4-12b_full_s43     epoch 1 step 100/663 loss 1.7266 11.0 min, eta 62 min, peak 9.8 GB
+1024.4s 53 [  14.0 min] gemma-4-12b_full_s42     epoch 1 step 75/663 loss 1.8600 9.5 min, eta 74 min, peak 10.0 GB
+1024.4s 54 [  14.0 min] gemma-4-12b_full_s43     epoch 1 step 100/663 loss 1.7266 11.0 min, eta 62 min, peak 9.8 GB
+1084.4s 55 [  15.0 min] gemma-4-12b_full_s42     epoch 1 step 100/663 loss 1.7638 12.7 min, eta 72 min, peak 10.0 GB
+1084.4s 56 [  15.0 min] gemma-4-12b_full_s43     epoch 1 step 100/663 loss 1.7266 11.0 min, eta 62 min, peak 9.8 GB
+1144.4s 57 [  16.0 min] gemma-4-12b_full_s42     epoch 1 step 100/663 loss 1.7638 12.7 min, eta 72 min, peak 10.0 GB
+1144.4s 58 [  16.0 min] gemma-4-12b_full_s43     epoch 1 step 125/663 loss 1.6526 13.7 min, eta 59 min, peak 9.8 GB
+1204.4s 59 [  17.0 min] gemma-4-12b_full_s42     epoch 1 step 100/663 loss 1.7638 12.7 min, eta 72 min, peak 10.0 GB
+1204.4s 60 [  17.0 min] gemma-4-12b_full_s43     epoch 1 step 125/663 loss 1.6526 13.7 min, eta 59 min, peak 9.8 GB
+1264.4s 61 [  18.0 min] gemma-4-12b_full_s42     epoch 1 step 100/663 loss 1.7638 12.7 min, eta 72 min, peak 10.0 GB
+1264.4s 62 [  18.0 min] gemma-4-12b_full_s43     epoch 1 step 125/663 loss 1.6526 13.7 min, eta 59 min, peak 9.8 GB
+1324.5s 63 [  19.0 min] gemma-4-12b_full_s42     epoch 1 step 125/663 loss 1.7121 16.2 min, eta 70 min, peak 10.0 GB
+1324.5s 64 [  19.0 min] gemma-4-12b_full_s43     epoch 1 step 150/663 loss 1.6134 16.3 min, eta 56 min, peak 9.8 GB
+1384.5s 65 [  20.0 min] gemma-4-12b_full_s42     epoch 1 step 125/663 loss 1.7121 16.2 min, eta 70 min, peak 10.0 GB
+1384.5s 66 [  20.0 min] gemma-4-12b_full_s43     epoch 1 step 150/663 loss 1.6134 16.3 min, eta 56 min, peak 9.8 GB
+1444.5s 67 [  21.0 min] gemma-4-12b_full_s42     epoch 1 step 125/663 loss 1.7121 16.2 min, eta 70 min, peak 10.0 GB
+1444.5s 68 [  21.0 min] gemma-4-12b_full_s43     epoch 1 step 175/663 loss 1.5702 19.0 min, eta 53 min, peak 9.8 GB
+1504.5s 69 [  22.0 min] gemma-4-12b_full_s42     epoch 1 step 150/663 loss 1.6535 20.1 min, eta 69 min, peak 10.0 GB
+1504.5s 70 [  22.0 min] gemma-4-12b_full_s43     epoch 1 step 175/663 loss 1.5702 19.0 min, eta 53 min, peak 9.8 GB
+1564.5s 71 [  23.0 min] gemma-4-12b_full_s42     epoch 1 step 150/663 loss 1.6535 20.1 min, eta 69 min, peak 10.0 GB
+1564.5s 72 [  23.0 min] gemma-4-12b_full_s43     epoch 1 step 175/663 loss 1.5702 19.0 min, eta 53 min, peak 9.8 GB
+1624.5s 73 [  24.0 min] gemma-4-12b_full_s42     epoch 1 step 150/663 loss 1.6535 20.1 min, eta 69 min, peak 10.0 GB
+1624.5s 74 [  24.0 min] gemma-4-12b_full_s43     epoch 1 step 200/663 loss 1.5259 21.5 min, eta 50 min, peak 9.8 GB
+1684.5s 75 [  25.0 min] gemma-4-12b_full_s42     epoch 1 step 150/663 loss 1.6535 20.1 min, eta 69 min, peak 10.0 GB
+1684.5s 76 [  25.0 min] gemma-4-12b_full_s43     epoch 1 step 200/663 loss 1.5259 21.5 min, eta 50 min, peak 9.8 GB
+1744.5s 77 [  26.0 min] gemma-4-12b_full_s42     epoch 1 step 175/663 loss 1.6237 23.5 min, eta 65 min, peak 10.0 GB
+1744.5s 78 [  26.0 min] gemma-4-12b_full_s43     epoch 1 step 200/663 loss 1.5259 21.5 min, eta 50 min, peak 9.8 GB
+1804.5s 79 [  27.0 min] gemma-4-12b_full_s42     epoch 1 step 175/663 loss 1.6237 23.5 min, eta 65 min, peak 10.0 GB
+1804.5s 80 [  27.0 min] gemma-4-12b_full_s43     epoch 2 step 225/663 loss 0.9360 24.5 min, eta 48 min, peak 9.8 GB
+1864.5s 81 [  28.0 min] gemma-4-12b_full_s42     epoch 1 step 175/663 loss 1.6237 23.5 min, eta 65 min, peak 10.0 GB
+1864.5s 82 [  28.0 min] gemma-4-12b_full_s43     epoch 2 step 225/663 loss 0.9360 24.5 min, eta 48 min, peak 9.8 GB
+1924.5s 83 [  29.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 26.9 min, eta 62 min, peak 10.0 GB
+1924.5s 84 [  29.0 min] gemma-4-12b_full_s43     epoch 2 step 250/663 loss 1.0550 27.1 min, eta 45 min, peak 9.8 GB
+1984.5s 85 [  30.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 26.9 min, eta 62 min, peak 10.0 GB
+1984.5s 86 [  30.0 min] gemma-4-12b_full_s43     epoch 2 step 250/663 loss 1.0550 27.1 min, eta 45 min, peak 9.8 GB
+2044.5s 87 [  31.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 26.9 min, eta 62 min, peak 10.0 GB
+2044.5s 88 [  31.0 min] gemma-4-12b_full_s43     epoch 2 step 250/663 loss 1.0550 27.1 min, eta 45 min, peak 9.8 GB
+2104.5s 89 [  32.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 26.9 min, eta 62 min, peak 10.0 GB
+2104.5s 90 [  32.0 min] gemma-4-12b_full_s43     epoch 2 step 275/663 loss 1.0437 29.7 min, eta 42 min, peak 9.8 GB
+2164.5s 91 [  33.0 min] gemma-4-12b_full_s42     epoch 2 step 225/663 loss 0.8755 30.7 min, eta 60 min, peak 10.0 GB
+2164.5s 92 [  33.0 min] gemma-4-12b_full_s43     epoch 2 step 275/663 loss 1.0437 29.7 min, eta 42 min, peak 9.8 GB
+2224.5s 93 [  34.0 min] gemma-4-12b_full_s42     epoch 2 step 225/663 loss 0.8755 30.7 min, eta 60 min, peak 10.0 GB
+2224.5s 94 [  34.0 min] gemma-4-12b_full_s43     epoch 2 step 275/663 loss 1.0437 29.7 min, eta 42 min, peak 9.8 GB
+2284.5s 95 [  35.0 min] gemma-4-12b_full_s42     epoch 2 step 225/663 loss 0.8755 30.7 min, eta 60 min, peak 10.0 GB
+2284.5s 96 [  35.0 min] gemma-4-12b_full_s43     epoch 2 step 300/663 loss 1.0391 32.2 min, eta 39 min, peak 9.8 GB
+2344.5s 97 [  36.0 min] gemma-4-12b_full_s42     epoch 2 step 250/663 loss 1.1368 34.1 min, eta 56 min, peak 10.0 GB
+2344.5s 98 [  36.0 min] gemma-4-12b_full_s43     epoch 2 step 300/663 loss 1.0391 32.2 min, eta 39 min, peak 9.8 GB
+2404.5s 99 [  37.0 min] gemma-4-12b_full_s42     epoch 2 step 250/663 loss 1.1368 34.1 min, eta 56 min, peak 10.0 GB
+2404.5s 100 [  37.0 min] gemma-4-12b_full_s43     epoch 2 step 325/663 loss 1.0690 35.1 min, eta 37 min, peak 10.0 GB
+2464.5s 101 [  38.0 min] gemma-4-12b_full_s42     epoch 2 step 250/663 loss 1.1368 34.1 min, eta 56 min, peak 10.0 GB
+2464.5s 102 [  38.0 min] gemma-4-12b_full_s43     epoch 2 step 325/663 loss 1.0690 35.1 min, eta 37 min, peak 10.0 GB
+2524.5s 103 [  39.0 min] gemma-4-12b_full_s42     epoch 2 step 250/663 loss 1.1368 34.1 min, eta 56 min, peak 10.0 GB
+2524.5s 104 [  39.0 min] gemma-4-12b_full_s43     epoch 2 step 325/663 loss 1.0690 35.1 min, eta 37 min, peak 10.0 GB
+2584.5s 105 [  40.0 min] gemma-4-12b_full_s42     epoch 2 step 275/663 loss 1.1436 37.2 min, eta 53 min, peak 10.0 GB
+2584.5s 106 [  40.0 min] gemma-4-12b_full_s43     epoch 2 step 325/663 loss 1.0690 35.1 min, eta 37 min, peak 10.0 GB
+2644.5s 107 [  41.0 min] gemma-4-12b_full_s42     epoch 2 step 275/663 loss 1.1436 37.2 min, eta 53 min, peak 10.0 GB
+2644.5s 108 [  41.0 min] gemma-4-12b_full_s43     epoch 2 step 350/663 loss 1.0358 38.2 min, eta 34 min, peak 10.0 GB
+2704.5s 109 [  42.0 min] gemma-4-12b_full_s42     epoch 2 step 275/663 loss 1.1436 37.2 min, eta 53 min, peak 10.0 GB
+2704.5s 110 [  42.0 min] gemma-4-12b_full_s43     epoch 2 step 350/663 loss 1.0358 38.2 min, eta 34 min, peak 10.0 GB
+2764.5s 111 [  43.0 min] gemma-4-12b_full_s42     epoch 2 step 300/663 loss 1.1282 40.5 min, eta 49 min, peak 10.0 GB
+2764.5s 112 [  43.0 min] gemma-4-12b_full_s43     epoch 2 step 350/663 loss 1.0358 38.2 min, eta 34 min, peak 10.0 GB
+2824.5s 113 [  44.0 min] gemma-4-12b_full_s42     epoch 2 step 300/663 loss 1.1282 40.5 min, eta 49 min, peak 10.0 GB
+2824.5s 114 [  44.0 min] gemma-4-12b_full_s43     epoch 2 step 375/663 loss 1.0250 41.2 min, eta 32 min, peak 10.0 GB
+2884.5s 115 [  45.0 min] gemma-4-12b_full_s42     epoch 2 step 300/663 loss 1.1282 40.5 min, eta 49 min, peak 10.0 GB
+2884.5s 116 [  45.0 min] gemma-4-12b_full_s43     epoch 2 step 375/663 loss 1.0250 41.2 min, eta 32 min, peak 10.0 GB
+2944.5s 117 [  46.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1155 43.9 min, eta 46 min, peak 10.0 GB
+2944.5s 118 [  46.0 min] gemma-4-12b_full_s43     epoch 2 step 375/663 loss 1.0250 41.2 min, eta 32 min, peak 10.0 GB
+3004.5s 119 [  47.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1155 43.9 min, eta 46 min, peak 10.0 GB
+3004.5s 120 [  47.0 min] gemma-4-12b_full_s43     epoch 2 step 400/663 loss 1.0164 44.5 min, eta 29 min, peak 10.0 GB
+3064.5s 121 [  48.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1155 43.9 min, eta 46 min, peak 10.0 GB
+3064.5s 122 [  48.0 min] gemma-4-12b_full_s43     epoch 2 step 400/663 loss 1.0164 44.5 min, eta 29 min, peak 10.0 GB
+3124.6s 123 [  49.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1155 43.9 min, eta 46 min, peak 10.0 GB
+3124.6s 124 [  49.0 min] gemma-4-12b_full_s43     epoch 2 step 400/663 loss 1.0164 44.5 min, eta 29 min, peak 10.0 GB
+3184.6s 125 [  50.0 min] gemma-4-12b_full_s42     epoch 2 step 350/663 loss 1.1070 47.1 min, eta 42 min, peak 10.0 GB
+3184.6s 126 [  50.0 min] gemma-4-12b_full_s43     epoch 2 step 425/663 loss 1.0020 47.5 min, eta 27 min, peak 10.0 GB
+3244.6s 127 [  51.0 min] gemma-4-12b_full_s42     epoch 2 step 350/663 loss 1.1070 47.1 min, eta 42 min, peak 10.0 GB
+3244.6s 128 [  51.0 min] gemma-4-12b_full_s43     epoch 2 step 425/663 loss 1.0020 47.5 min, eta 27 min, peak 10.0 GB
+3304.6s 129 [  52.0 min] gemma-4-12b_full_s42     epoch 2 step 350/663 loss 1.1070 47.1 min, eta 42 min, peak 10.0 GB
+3304.6s 130 [  52.0 min] gemma-4-12b_full_s43     epoch 2 step 425/663 loss 1.0020 47.5 min, eta 27 min, peak 10.0 GB
+3364.6s 131 [  53.0 min] gemma-4-12b_full_s42     epoch 2 step 375/663 loss 1.0860 50.3 min, eta 39 min, peak 10.0 GB
+3364.6s 132 [  53.0 min] gemma-4-12b_full_s43     epoch 3 step 450/663 loss 0.7387 50.4 min, eta 24 min, peak 10.0 GB
+3424.6s 133 [  54.0 min] gemma-4-12b_full_s42     epoch 2 step 375/663 loss 1.0860 50.3 min, eta 39 min, peak 10.0 GB
+3424.6s 134 [  54.0 min] gemma-4-12b_full_s43     epoch 3 step 450/663 loss 0.7387 50.4 min, eta 24 min, peak 10.0 GB
+3484.6s 135 [  55.0 min] gemma-4-12b_full_s42     epoch 2 step 375/663 loss 1.0860 50.3 min, eta 39 min, peak 10.0 GB
+3484.6s 136 [  55.0 min] gemma-4-12b_full_s43     epoch 3 step 475/663 loss 0.7176 53.1 min, eta 21 min, peak 10.0 GB
+3544.6s 137 [  56.0 min] gemma-4-12b_full_s42     epoch 2 step 400/663 loss 1.0616 53.7 min, eta 35 min, peak 10.0 GB
+3544.6s 138 [  56.0 min] gemma-4-12b_full_s43     epoch 3 step 475/663 loss 0.7176 53.1 min, eta 21 min, peak 10.0 GB
+3604.6s 139 [  57.0 min] gemma-4-12b_full_s42     epoch 2 step 400/663 loss 1.0616 53.7 min, eta 35 min, peak 10.0 GB
+3604.6s 140 [  57.0 min] gemma-4-12b_full_s43     epoch 3 step 475/663 loss 0.7176 53.1 min, eta 21 min, peak 10.0 GB
+3664.6s 141 [  58.0 min] gemma-4-12b_full_s42     epoch 2 step 400/663 loss 1.0616 53.7 min, eta 35 min, peak 10.0 GB
+3664.6s 142 [  58.0 min] gemma-4-12b_full_s43     epoch 3 step 500/663 loss 0.7325 55.8 min, eta 18 min, peak 10.0 GB
+3724.6s 143 [  59.0 min] gemma-4-12b_full_s42     epoch 2 step 400/663 loss 1.0616 53.7 min, eta 35 min, peak 10.0 GB
+3724.6s 144 [  59.0 min] gemma-4-12b_full_s43     epoch 3 step 500/663 loss 0.7325 55.8 min, eta 18 min, peak 10.0 GB
+3784.6s 145 [  60.0 min] gemma-4-12b_full_s42     epoch 2 step 425/663 loss 1.0479 57.2 min, eta 32 min, peak 10.0 GB
+3784.6s 146 [  60.0 min] gemma-4-12b_full_s43     epoch 3 step 500/663 loss 0.7325 55.8 min, eta 18 min, peak 10.0 GB
+3844.6s 147 [  61.0 min] gemma-4-12b_full_s42     epoch 2 step 425/663 loss 1.0479 57.2 min, eta 32 min, peak 10.0 GB
+3844.6s 148 [  61.0 min] gemma-4-12b_full_s43     epoch 3 step 525/663 loss 0.6953 58.4 min, eta 15 min, peak 10.0 GB
+3904.6s 149 [  62.0 min] gemma-4-12b_full_s42     epoch 2 step 425/663 loss 1.0479 57.2 min, eta 32 min, peak 10.0 GB
+3904.6s 150 [  62.0 min] gemma-4-12b_full_s43     epoch 3 step 525/663 loss 0.6953 58.4 min, eta 15 min, peak 10.0 GB
+3964.6s 151 [  63.0 min] gemma-4-12b_full_s42     epoch 3 step 450/663 loss 0.7143 60.7 min, eta 29 min, peak 10.0 GB
+3964.6s 152 [  63.0 min] gemma-4-12b_full_s43     epoch 3 step 525/663 loss 0.6953 58.4 min, eta 15 min, peak 10.0 GB
+4024.6s 153 [  64.0 min] gemma-4-12b_full_s42     epoch 3 step 450/663 loss 0.7143 60.7 min, eta 29 min, peak 10.0 GB
+4024.6s 154 [  64.0 min] gemma-4-12b_full_s43     epoch 3 step 550/663 loss 0.6815 61.2 min, eta 13 min, peak 10.0 GB
+4084.6s 155 [  65.0 min] gemma-4-12b_full_s42     epoch 3 step 450/663 loss 0.7143 60.7 min, eta 29 min, peak 10.0 GB
+4084.6s 156 [  65.0 min] gemma-4-12b_full_s43     epoch 3 step 550/663 loss 0.6815 61.2 min, eta 13 min, peak 10.0 GB
+4144.6s 157 [  66.0 min] gemma-4-12b_full_s42     epoch 3 step 475/663 loss 0.7003 63.9 min, eta 25 min, peak 10.0 GB
+4144.6s 158 [  66.0 min] gemma-4-12b_full_s43     epoch 3 step 575/663 loss 0.6781 63.8 min, eta 10 min, peak 10.0 GB
+4204.6s 159 [  67.0 min] gemma-4-12b_full_s42     epoch 3 step 475/663 loss 0.7003 63.9 min, eta 25 min, peak 10.0 GB
+4204.6s 160 [  67.0 min] gemma-4-12b_full_s43     epoch 3 step 575/663 loss 0.6781 63.8 min, eta 10 min, peak 10.0 GB
+4264.6s 161 [  68.0 min] gemma-4-12b_full_s42     epoch 3 step 475/663 loss 0.7003 63.9 min, eta 25 min, peak 10.0 GB
+4264.6s 162 [  68.0 min] gemma-4-12b_full_s43     epoch 3 step 575/663 loss 0.6781 63.8 min, eta 10 min, peak 10.0 GB
+4324.6s 163 [  69.0 min] gemma-4-12b_full_s42     epoch 3 step 500/663 loss 0.7009 67.1 min, eta 22 min, peak 10.0 GB
+4324.6s 164 [  69.0 min] gemma-4-12b_full_s43     epoch 3 step 600/663 loss 0.6816 66.4 min, eta 7 min, peak 10.0 GB
+4384.6s 165 [  70.0 min] gemma-4-12b_full_s42     epoch 3 step 500/663 loss 0.7009 67.1 min, eta 22 min, peak 10.0 GB
+4384.6s 166 [  70.0 min] gemma-4-12b_full_s43     epoch 3 step 600/663 loss 0.6816 66.4 min, eta 7 min, peak 10.0 GB
+4444.6s 167 [  71.0 min] gemma-4-12b_full_s42     epoch 3 step 500/663 loss 0.7009 67.1 min, eta 22 min, peak 10.0 GB
+4444.6s 168 [  71.0 min] gemma-4-12b_full_s43     epoch 3 step 600/663 loss 0.6816 66.4 min, eta 7 min, peak 10.0 GB
+4504.6s 169 [  72.0 min] gemma-4-12b_full_s42     epoch 3 step 500/663 loss 0.7009 67.1 min, eta 22 min, peak 10.0 GB
+4504.6s 170 [  72.0 min] gemma-4-12b_full_s43     epoch 3 step 625/663 loss 0.6824 69.3 min, eta 4 min, peak 10.0 GB
+4564.6s 171 [  73.0 min] gemma-4-12b_full_s42     epoch 3 step 525/663 loss 0.6971 70.4 min, eta 19 min, peak 10.0 GB
+4564.6s 172 [  73.0 min] gemma-4-12b_full_s43     epoch 3 step 625/663 loss 0.6824 69.3 min, eta 4 min, peak 10.0 GB
+4624.6s 173 [  74.0 min] gemma-4-12b_full_s42     epoch 3 step 525/663 loss 0.6971 70.4 min, eta 19 min, peak 10.0 GB
+4624.6s 174 [  74.0 min] gemma-4-12b_full_s43     epoch 3 step 650/663 loss 0.6761 72.0 min, eta 1 min, peak 10.0 GB
+4684.6s 175 [  75.0 min] gemma-4-12b_full_s42     epoch 3 step 525/663 loss 0.6971 70.4 min, eta 19 min, peak 10.0 GB
+4684.6s 176 [  75.0 min] gemma-4-12b_full_s43     epoch 3 step 650/663 loss 0.6761 72.0 min, eta 1 min, peak 10.0 GB
+4744.6s 177 [  76.0 min] gemma-4-12b_full_s42     epoch 3 step 550/663 loss 0.6993 73.6 min, eta 15 min, peak 10.0 GB
+4744.6s 178 [  76.0 min] gemma-4-12b_full_s43     epoch 3 step 650/663 loss 0.6761 72.0 min, eta 1 min, peak 10.0 GB
+4804.6s 179 [  77.0 min] gemma-4-12b_full_s42     epoch 3 step 550/663 loss 0.6993 73.6 min, eta 15 min, peak 10.0 GB
+4804.6s 180 [  77.0 min] done gemma-4-12b_full_s43; log /kaggle/working/b22_outputs/logs/gemma-4-12b_full_s43.log
+4864.6s 181 [  78.0 min] gemma-4-12b_full_s42     epoch 3 step 550/663 loss 0.6993 73.6 min, eta 15 min, peak 10.0 GB
+4924.6s 182 [  79.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6974 76.9 min, eta 12 min, peak 10.0 GB
+4984.6s 183 [  80.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6974 76.9 min, eta 12 min, peak 10.0 GB
+5044.6s 184 [  81.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6974 76.9 min, eta 12 min, peak 10.0 GB
+5104.6s 185 [  82.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6974 76.9 min, eta 12 min, peak 10.0 GB
+5164.6s 186 [  83.0 min] gemma-4-12b_full_s42     epoch 3 step 600/663 loss 0.6980 80.6 min, eta 8 min, peak 10.0 GB
+5224.6s 187 [  84.0 min] gemma-4-12b_full_s42     epoch 3 step 600/663 loss 0.6980 80.6 min, eta 8 min, peak 10.0 GB
+5284.6s 188 [  85.0 min] gemma-4-12b_full_s42     epoch 3 step 600/663 loss 0.6980 80.6 min, eta 8 min, peak 10.0 GB
+5344.6s 189 [  86.0 min] gemma-4-12b_full_s42     epoch 3 step 600/663 loss 0.6980 80.6 min, eta 8 min, peak 10.0 GB
+5404.7s 190 [  87.0 min] gemma-4-12b_full_s42     epoch 3 step 625/663 loss 0.6926 84.2 min, eta 5 min, peak 10.0 GB
+5464.7s 191 [  88.0 min] gemma-4-12b_full_s42     epoch 3 step 625/663 loss 0.6926 84.2 min, eta 5 min, peak 10.0 GB
+5524.7s 192 [  89.0 min] gemma-4-12b_full_s42     epoch 3 step 625/663 loss 0.6926 84.2 min, eta 5 min, peak 10.0 GB
+5584.7s 193 [  90.0 min] gemma-4-12b_full_s42     epoch 3 step 650/663 loss 0.6935 88.0 min, eta 2 min, peak 10.0 GB
+5644.7s 194 [  91.0 min] gemma-4-12b_full_s42     epoch 3 step 650/663 loss 0.6935 88.0 min, eta 2 min, peak 10.0 GB
+5704.7s 195 [  92.0 min] gemma-4-12b_full_s42     epoch 3 step 650/663 loss 0.6935 88.0 min, eta 2 min, peak 10.0 GB
+5764.7s 196 [  93.0 min] done gemma-4-12b_full_s42; log /kaggle/working/b22_outputs/logs/gemma-4-12b_full_s42.log
+5764.7s 197 {'gemma-4-12b_full_s43': 0, 'gemma-4-12b_full_s42': 0}
+5764.7s 198 averaging: ['gemma-4-12b_full_s42', 'gemma-4-12b_full_s43']
+5764.7s 199 RECOMMENDED_b22_gemma_3ep_2seeds.zip  predicted/prior: Gende 41.2%/43.1%  Geo-p 8.8%/5.9%  Other 13.4%/14.2%  Polit 17.9%/17.7%  Relig 11.1%/12.1%  Viole 7.6%/7.0%
+5769.8s 200 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+5769.8s 201 cells[i][c] = re.sub('\\\\\|', '|', cell)
+5770.2s 202 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+5770.2s 203 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+5772.0s 204 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+5772.1s 205 [NbConvertApp] Writing 71100 bytes to __notebook__.ipynb
+5774.9s 206 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+5775.9s 207 [NbConvertApp] Writing 375652 bytes to __results__.html

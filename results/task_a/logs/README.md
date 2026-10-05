@@ -13,3 +13,4 @@ depending on the original upload filenames.
 | `run22_run9_oof_evaluation.log` | Task A Run 22: focused five-fold OOF evaluation of the Run 9 ensemble | completed; Run 9 locked ensemble 0.8213 macro-F1 and 0.8215 accuracy on 7,193 deduplicated rows |
 | `run23_oof_compare_run11_run9.log` | Task A Run 23: five-fold OOF comparison of Run 11 and Run 9 on the combined labelled corpus | completed; Run 11 locked ensemble 0.8204 macro-F1, Run 9 locked ensemble 0.8213 macro-F1 |
 | `run20_translate_to_english_failed_ai4bharat.log` | Task A Run 20 translation setup, previous attempt | failed before training because current pip rejected IndicXlit's legacy Fairseq metadata; the notebook was subsequently patched to pin pip 24.0; no model or ZIP from this attempt |
+| `run20_translate_hatebert_holdout.log` | Task A Run 20: Sarvam-Translate -> hateBERT on the 1,079-row holdout | hateBERT 0.7275 vs MuRIL 0.7803 and SVM+MuRIL 0.8155; translation line closed |

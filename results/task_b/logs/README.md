@@ -11,6 +11,9 @@ These are the captured Kaggle logs for the completed Task B experiments:
 | `run12_context_tags_full.log` | Run 12: all five context-tagged full-data fits completed; packaging stopped on an incorrect post-training R-Drop log assertion |
 | `run17_muril_large_oof_oom.log` | Run 17: MuRIL-large five-fold OOF evaluation | TAPT completed, but classifier fold 1 stopped with CUDA out-of-memory; no OOF score |
 | `run18_train_validation_test_failed_clone.log` | Run 18: train-plus-validation final fit for released Task B test data | stopped before training because Kaggle could not clone the GitHub repository; no ZIP was produced |
+| `run20_llm_screen_holdout.log` | Run 20: LLM screen + MuRIL baseline on the 530-row holdout | MuRIL 0.6151; Sarvam-1 0.5567; Gemma-4-12B screened best but its fine-tune crashed on peft/torchao |
+| `run21_gemma12b_holdout_full.log` | Run 21: Gemma-4-12B QLoRA holdout + full fits | Gemma 2 seeds 0.6792 vs MuRIL 0.6151 (+0.064, CI [+0.024, +0.105]); packaging cell missed the LLM files |
+| `run22_gemma_3ep_2seeds_full.log` | Run 22: standalone Gemma-4-12B full fits, 3 epochs, seeds 42/43, on all 3,532 rows | both fits completed (77 and 93 min); `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written |
 
 The logs are retained as raw captured output. The corresponding experiment descriptions
 and results are recorded in `docs/EXPERIMENTS.md`.

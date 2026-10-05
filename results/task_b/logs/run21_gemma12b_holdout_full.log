@@ -1,0 +1,730 @@
+7.4s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+7.4s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+7.4s 3 0.00s - to python to disable frozen modules.
+7.4s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+8.0s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.0s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.0s 7 0.00s - to python to disable frozen modules.
+8.0s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+10.4s 9 repo at 92939e4 fix(task-b): Run 21 retargeted at Gemma-4-12B after Run 20's peft/torchao crash
+12.6s 10 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.2 MB/s eta 0:00:00
+12.8s 11 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.2 MB/s eta 0:00:00
+15.0s 12 no HF_TOKEN secret: gated models (Gemma) will be skipped, the rest still run
+23.0s 13 gpus: ['Tesla T4', 'Tesla T4']
+23.0s 14 free disk on /tmp: 1070 GB
+24.8s 15 dedupe task B combined: 3554 -> 3532 rows (16 duplicate, 6 in label-conflict groups)
+24.8s 16 train 3002, holdout 530 (f85f4f049b), test 396
+27.0s 17 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.1/43.1 MB 30.6 MB/s eta 0:00:00
+27.2s 18 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.1/43.1 MB 30.6 MB/s eta 0:00:00
+55.0s 19 LLM env: torch 2.11.0+cu128 | transformers 5.16.1 | peft 0.20.0 | bnb 0.50.2
+55.2s 20 LLM env: torch 2.11.0+cu128 | transformers 5.16.1 | peft 0.20.0 | bnb 0.50.2
+59.1s 21 Run 20 output NOT attached: the MuRIL holdout run will be repeated (+2.7 h)
+59.6s 22 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+59.6s 23 
+59.6s 24 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+164.4s 25 downloaded google/gemma-4-12B; 1047 GB free
+174.4s 26 [   0.0 min] start gemma-4-12b_ho_s42 on GPU 0
+174.4s 27 [   0.0 min] start b21_muril_full on GPU 1
+234.4s 28 [   1.0 min] gemma-4-12b_ho_s42       Loading weights:  37%|███▋      | 250/677 [00:41<00:50,  8.39it/s]
+234.4s 29 [   1.0 min] b21_muril_full           effective batch 4 x 4 = 16, 424 optimizer steps/epoch
+294.4s 30 [   2.0 min] gemma-4-12b_ho_s42       loaded in 1.7 min; 7.4 GB on GPU
+294.4s 31 [   2.0 min] b21_muril_full           effective batch 4 x 4 = 16, 424 optimizer steps/epoch
+354.4s 32 [   3.0 min] gemma-4-12b_ho_s42         sched.step()
+354.4s 33 [   3.0 min] b21_muril_full           effective batch 4 x 4 = 16, 424 optimizer steps/epoch
+414.4s 34 [   4.0 min] gemma-4-12b_ho_s42         sched.step()
+414.4s 35 [   4.0 min] b21_muril_full           effective batch 4 x 4 = 16, 424 optimizer steps/epoch
+474.4s 36 [   5.0 min] gemma-4-12b_ho_s42       epoch 1 step 25/564 loss 2.3384 2.4 min, eta 52 min, peak 9.1 GB
+474.4s 37 [   5.0 min] b21_muril_full           effective batch 4 x 4 = 16, 424 optimizer steps/epoch
+534.4s 38 [   6.0 min] gemma-4-12b_ho_s42       epoch 1 step 25/564 loss 2.3384 2.4 min, eta 52 min, peak 9.1 GB
+534.4s 39 [   6.0 min] b21_muril_full           effective batch 4 x 4 = 16, 424 optimizer steps/epoch
+594.5s 40 [   7.0 min] gemma-4-12b_ho_s42       epoch 1 step 25/564 loss 2.3384 2.4 min, eta 52 min, peak 9.1 GB
+594.5s 41 [   7.0 min] b21_muril_full             epoch 1/8 train loss 5.3115
+654.5s 42 [   8.0 min] gemma-4-12b_ho_s42       epoch 1 step 50/564 loss 1.9768 5.4 min, eta 55 min, peak 9.8 GB
+654.5s 43 [   8.0 min] b21_muril_full             epoch 1/8 train loss 5.3115
+714.5s 44 [   9.0 min] gemma-4-12b_ho_s42       epoch 1 step 50/564 loss 1.9768 5.4 min, eta 55 min, peak 9.8 GB
+714.5s 45 [   9.0 min] b21_muril_full             epoch 1/8 train loss 5.3115
+774.5s 46 [  10.0 min] gemma-4-12b_ho_s42       epoch 1 step 50/564 loss 1.9768 5.4 min, eta 55 min, peak 9.8 GB
+774.5s 47 [  10.0 min] b21_muril_full             epoch 1/8 train loss 5.3115
+834.5s 48 [  11.0 min] gemma-4-12b_ho_s42       epoch 1 step 75/564 loss 1.8651 8.7 min, eta 57 min, peak 9.9 GB
+834.5s 49 [  11.0 min] b21_muril_full             epoch 1/8 train loss 5.3115
+894.5s 50 [  12.0 min] gemma-4-12b_ho_s42       epoch 1 step 75/564 loss 1.8651 8.7 min, eta 57 min, peak 9.9 GB
+894.5s 51 [  12.0 min] b21_muril_full             epoch 1/8 train loss 5.3115
+954.5s 52 [  13.0 min] gemma-4-12b_ho_s42       epoch 1 step 75/564 loss 1.8651 8.7 min, eta 57 min, peak 9.9 GB
+954.5s 53 [  13.0 min] b21_muril_full             epoch 2/8 train loss 4.5050
+1014.5s 54 [  14.0 min] gemma-4-12b_ho_s42       epoch 1 step 100/564 loss 1.7555 12.0 min, eta 56 min, peak 9.9 GB
+1014.5s 55 [  14.0 min] b21_muril_full             epoch 2/8 train loss 4.5050
+1074.5s 56 [  15.0 min] gemma-4-12b_ho_s42       epoch 1 step 100/564 loss 1.7555 12.0 min, eta 56 min, peak 9.9 GB
+1074.5s 57 [  15.0 min] b21_muril_full             epoch 2/8 train loss 4.5050
+1134.5s 58 [  16.0 min] gemma-4-12b_ho_s42       epoch 1 step 100/564 loss 1.7555 12.0 min, eta 56 min, peak 9.9 GB
+1134.5s 59 [  16.0 min] b21_muril_full             epoch 2/8 train loss 4.5050
+1194.5s 60 [  17.0 min] gemma-4-12b_ho_s42       epoch 1 step 100/564 loss 1.7555 12.0 min, eta 56 min, peak 9.9 GB
+1194.5s 61 [  17.0 min] b21_muril_full             epoch 2/8 train loss 4.5050
+1254.5s 62 [  18.0 min] gemma-4-12b_ho_s42       epoch 1 step 125/564 loss 1.7091 15.2 min, eta 54 min, peak 9.9 GB
+1254.5s 63 [  18.0 min] b21_muril_full             epoch 2/8 train loss 4.5050
+1314.5s 64 [  19.0 min] gemma-4-12b_ho_s42       epoch 1 step 125/564 loss 1.7091 15.2 min, eta 54 min, peak 9.9 GB
+1314.5s 65 [  19.0 min] b21_muril_full             epoch 3/8 train loss nan
+1374.5s 66 [  20.0 min] gemma-4-12b_ho_s42       epoch 1 step 125/564 loss 1.7091 15.2 min, eta 54 min, peak 9.9 GB
+1374.5s 67 [  20.0 min] b21_muril_full             epoch 3/8 train loss nan
+1434.5s 68 [  21.0 min] gemma-4-12b_ho_s42       epoch 1 step 150/564 loss 1.6700 18.5 min, eta 51 min, peak 9.9 GB
+1434.5s 69 [  21.0 min] b21_muril_full             epoch 3/8 train loss nan
+1494.5s 70 [  22.0 min] gemma-4-12b_ho_s42       epoch 1 step 150/564 loss 1.6700 18.5 min, eta 51 min, peak 9.9 GB
+1494.5s 71 [  22.0 min] b21_muril_full             epoch 3/8 train loss nan
+1554.5s 72 [  23.0 min] gemma-4-12b_ho_s42       epoch 1 step 150/564 loss 1.6700 18.5 min, eta 51 min, peak 9.9 GB
+1554.5s 73 [  23.0 min] b21_muril_full             epoch 3/8 train loss nan
+1614.5s 74 [  24.0 min] gemma-4-12b_ho_s42       epoch 1 step 175/564 loss 1.6097 21.6 min, eta 48 min, peak 9.9 GB
+1614.5s 75 [  24.0 min] b21_muril_full             epoch 3/8 train loss nan
+1674.5s 76 [  25.0 min] gemma-4-12b_ho_s42       epoch 1 step 175/564 loss 1.6097 21.6 min, eta 48 min, peak 9.9 GB
+1674.5s 77 [  25.0 min] b21_muril_full             epoch 4/8 train loss nan
+1734.5s 78 [  26.0 min] gemma-4-12b_ho_s42       epoch 1 step 175/564 loss 1.6097 21.6 min, eta 48 min, peak 9.9 GB
+1734.5s 79 [  26.0 min] b21_muril_full             epoch 4/8 train loss nan
+1794.5s 80 [  27.0 min] gemma-4-12b_ho_s42       == epoch 1: eval macro-F1 0.5972 (diagnostic only, not used for selection)
+1794.5s 81 [  27.0 min] b21_muril_full             epoch 4/8 train loss nan
+1854.5s 82 [  28.0 min] gemma-4-12b_ho_s42       epoch 2 step 200/564 loss 1.1403 25.5 min, eta 46 min, peak 9.9 GB
+1854.5s 83 [  28.0 min] b21_muril_full             epoch 4/8 train loss nan
+1914.5s 84 [  29.0 min] gemma-4-12b_ho_s42       epoch 2 step 200/564 loss 1.1403 25.5 min, eta 46 min, peak 9.9 GB
+1914.5s 85 [  29.0 min] b21_muril_full             epoch 4/8 train loss nan
+1974.5s 86 [  30.0 min] gemma-4-12b_ho_s42       epoch 2 step 200/564 loss 1.1403 25.5 min, eta 46 min, peak 9.9 GB
+1974.5s 87 [  30.0 min] b21_muril_full             epoch 4/8 train loss nan
+2034.5s 88 [  31.0 min] gemma-4-12b_ho_s42       epoch 2 step 225/564 loss 1.1017 28.2 min, eta 42 min, peak 9.9 GB
+2034.5s 89 [  31.0 min] b21_muril_full             epoch 4/8 train loss nan
+2094.5s 90 [  32.0 min] gemma-4-12b_ho_s42       epoch 2 step 225/564 loss 1.1017 28.2 min, eta 42 min, peak 9.9 GB
+2094.5s 91 [  32.0 min] b21_muril_full             epoch 5/8 train loss nan
+2154.5s 92 [  33.0 min] gemma-4-12b_ho_s42       epoch 2 step 250/564 loss 1.1109 30.9 min, eta 39 min, peak 9.9 GB
+2154.5s 93 [  33.0 min] b21_muril_full             epoch 5/8 train loss nan
+2214.5s 94 [  34.0 min] gemma-4-12b_ho_s42       epoch 2 step 250/564 loss 1.1109 30.9 min, eta 39 min, peak 9.9 GB
+2214.5s 95 [  34.0 min] b21_muril_full             epoch 5/8 train loss nan
+2274.5s 96 [  35.0 min] gemma-4-12b_ho_s42       epoch 2 step 250/564 loss 1.1109 30.9 min, eta 39 min, peak 9.9 GB
+2274.5s 97 [  35.0 min] b21_muril_full             epoch 5/8 train loss nan
+2334.5s 98 [  36.0 min] gemma-4-12b_ho_s42       epoch 2 step 275/564 loss 1.1057 33.5 min, eta 35 min, peak 9.9 GB
+2334.5s 99 [  36.0 min] b21_muril_full             epoch 5/8 train loss nan
+2394.5s 100 [  37.0 min] gemma-4-12b_ho_s42       epoch 2 step 275/564 loss 1.1057 33.5 min, eta 35 min, peak 9.9 GB
+2394.5s 101 [  37.0 min] b21_muril_full             epoch 5/8 train loss nan
+2454.5s 102 [  38.0 min] gemma-4-12b_ho_s42       epoch 2 step 275/564 loss 1.1057 33.5 min, eta 35 min, peak 9.9 GB
+2454.5s 103 [  38.0 min] b21_muril_full             epoch 6/8 train loss 3.5397
+2514.6s 104 [  39.0 min] gemma-4-12b_ho_s42       epoch 2 step 300/564 loss 1.0923 36.6 min, eta 32 min, peak 9.9 GB
+2514.6s 105 [  39.0 min] b21_muril_full             epoch 6/8 train loss 3.5397
+2574.6s 106 [  40.0 min] gemma-4-12b_ho_s42       epoch 2 step 300/564 loss 1.0923 36.6 min, eta 32 min, peak 9.9 GB
+2574.6s 107 [  40.0 min] b21_muril_full             epoch 6/8 train loss 3.5397
+2634.6s 108 [  41.0 min] gemma-4-12b_ho_s42       epoch 2 step 300/564 loss 1.0923 36.6 min, eta 32 min, peak 9.9 GB
+2634.6s 109 [  41.0 min] b21_muril_full             epoch 6/8 train loss 3.5397
+2694.6s 110 [  42.0 min] gemma-4-12b_ho_s42       epoch 2 step 325/564 loss 1.0743 39.5 min, eta 29 min, peak 9.9 GB
+2694.6s 111 [  42.0 min] b21_muril_full             epoch 6/8 train loss 3.5397
+2754.6s 112 [  43.0 min] gemma-4-12b_ho_s42       epoch 2 step 325/564 loss 1.0743 39.5 min, eta 29 min, peak 9.9 GB
+2754.6s 113 [  43.0 min] b21_muril_full             epoch 6/8 train loss 3.5397
+2814.6s 114 [  44.0 min] gemma-4-12b_ho_s42       epoch 2 step 325/564 loss 1.0743 39.5 min, eta 29 min, peak 9.9 GB
+2814.6s 115 [  44.0 min] b21_muril_full             epoch 7/8 train loss nan
+2874.6s 116 [  45.0 min] gemma-4-12b_ho_s42       epoch 2 step 350/564 loss 1.0612 42.7 min, eta 26 min, peak 9.9 GB
+2874.6s 117 [  45.0 min] b21_muril_full             epoch 7/8 train loss nan
+2934.6s 118 [  46.0 min] gemma-4-12b_ho_s42       epoch 2 step 350/564 loss 1.0612 42.7 min, eta 26 min, peak 9.9 GB
+2934.6s 119 [  46.0 min] b21_muril_full             epoch 7/8 train loss nan
+2994.6s 120 [  47.0 min] gemma-4-12b_ho_s42       epoch 2 step 350/564 loss 1.0612 42.7 min, eta 26 min, peak 9.9 GB
+2994.6s 121 [  47.0 min] b21_muril_full             epoch 7/8 train loss nan
+3054.6s 122 [  48.0 min] gemma-4-12b_ho_s42       epoch 2 step 375/564 loss 1.0398 45.5 min, eta 23 min, peak 9.9 GB
+3054.6s 123 [  48.0 min] b21_muril_full             epoch 7/8 train loss nan
+3114.6s 124 [  49.0 min] gemma-4-12b_ho_s42       == epoch 2: eval macro-F1 0.6290 (diagnostic only, not used for selection)
+3114.6s 125 [  49.0 min] b21_muril_full             epoch 7/8 train loss nan
+3174.6s 126 [  50.0 min] gemma-4-12b_ho_s42       == epoch 2: eval macro-F1 0.6290 (diagnostic only, not used for selection)
+3174.6s 127 [  50.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+3234.6s 128 [  51.0 min] gemma-4-12b_ho_s42       == epoch 2: eval macro-F1 0.6290 (diagnostic only, not used for selection)
+3234.6s 129 [  51.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+3294.6s 130 [  52.0 min] gemma-4-12b_ho_s42       epoch 3 step 400/564 loss 0.7300 49.4 min, eta 20 min, peak 9.9 GB
+3294.6s 131 [  52.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+3354.6s 132 [  53.0 min] gemma-4-12b_ho_s42       epoch 3 step 400/564 loss 0.7300 49.4 min, eta 20 min, peak 9.9 GB
+3354.6s 133 [  53.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+3414.6s 134 [  54.0 min] gemma-4-12b_ho_s42       epoch 3 step 400/564 loss 0.7300 49.4 min, eta 20 min, peak 9.9 GB
+3414.6s 135 [  54.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+3474.6s 136 [  55.0 min] gemma-4-12b_ho_s42       epoch 3 step 425/564 loss 0.6996 52.3 min, eta 17 min, peak 10.0 GB
+3474.6s 137 [  55.0 min] b21_muril_full             [s42full] ep1 done 4.5min  no val
+3534.6s 138 [  56.0 min] gemma-4-12b_ho_s42       epoch 3 step 425/564 loss 0.6996 52.3 min, eta 17 min, peak 10.0 GB
+3534.6s 139 [  56.0 min] b21_muril_full             [s42full] ep1 done 4.5min  no val
+3594.6s 140 [  57.0 min] gemma-4-12b_ho_s42       epoch 3 step 425/564 loss 0.6996 52.3 min, eta 17 min, peak 10.0 GB
+3594.6s 141 [  57.0 min] b21_muril_full             [s42full] ep1 done 4.5min  no val
+3654.6s 142 [  58.0 min] gemma-4-12b_ho_s42       epoch 3 step 450/564 loss 0.7014 55.1 min, eta 14 min, peak 10.0 GB
+3654.6s 143 [  58.0 min] b21_muril_full             [s42full] ep1 done 4.5min  no val
+3714.6s 144 [  59.0 min] gemma-4-12b_ho_s42       epoch 3 step 450/564 loss 0.7014 55.1 min, eta 14 min, peak 10.0 GB
+3714.6s 145 [  59.0 min] b21_muril_full             [s42full] ep2 done 4.5min  no val
+3774.6s 146 [  60.0 min] gemma-4-12b_ho_s42       epoch 3 step 475/564 loss 0.6764 58.0 min, eta 11 min, peak 10.0 GB
+3774.6s 147 [  60.0 min] b21_muril_full             [s42full] ep2 done 4.5min  no val
+3834.6s 148 [  61.0 min] gemma-4-12b_ho_s42       epoch 3 step 475/564 loss 0.6764 58.0 min, eta 11 min, peak 10.0 GB
+3834.6s 149 [  61.0 min] b21_muril_full             [s42full] ep2 done 4.5min  no val
+3894.6s 150 [  62.0 min] gemma-4-12b_ho_s42       epoch 3 step 475/564 loss 0.6764 58.0 min, eta 11 min, peak 10.0 GB
+3894.6s 151 [  62.0 min] b21_muril_full             [s42full] ep2 done 4.5min  no val
+3954.6s 152 [  63.0 min] gemma-4-12b_ho_s42       epoch 3 step 500/564 loss 0.6680 60.7 min, eta 8 min, peak 10.0 GB
+3954.6s 153 [  63.0 min] b21_muril_full             [s42full] ep2 done 4.5min  no val
+4014.6s 154 [  64.0 min] gemma-4-12b_ho_s42       epoch 3 step 500/564 loss 0.6680 60.7 min, eta 8 min, peak 10.0 GB
+4014.6s 155 [  64.0 min] b21_muril_full             [s42full] ep3 done 4.5min  no val
+4074.6s 156 [  65.0 min] gemma-4-12b_ho_s42       epoch 3 step 500/564 loss 0.6680 60.7 min, eta 8 min, peak 10.0 GB
+4074.6s 157 [  65.0 min] b21_muril_full             [s42full] ep3 done 4.5min  no val
+4134.6s 158 [  66.0 min] gemma-4-12b_ho_s42       epoch 3 step 525/564 loss 0.6708 63.8 min, eta 5 min, peak 10.0 GB
+4134.6s 159 [  66.0 min] b21_muril_full             [s42full] ep3 done 4.5min  no val
+4194.6s 160 [  67.0 min] gemma-4-12b_ho_s42       epoch 3 step 525/564 loss 0.6708 63.8 min, eta 5 min, peak 10.0 GB
+4194.6s 161 [  67.0 min] b21_muril_full             [s42full] ep3 done 4.5min  no val
+4254.6s 162 [  68.0 min] gemma-4-12b_ho_s42       epoch 3 step 525/564 loss 0.6708 63.8 min, eta 5 min, peak 10.0 GB
+4254.6s 163 [  68.0 min] b21_muril_full             [s42full] ep4 done 4.5min  no val
+4314.6s 164 [  69.0 min] gemma-4-12b_ho_s42       epoch 3 step 550/564 loss 0.6769 66.6 min, eta 2 min, peak 10.0 GB
+4314.6s 165 [  69.0 min] b21_muril_full             [s42full] ep4 done 4.5min  no val
+4374.7s 166 [  70.0 min] gemma-4-12b_ho_s42       epoch 3 step 550/564 loss 0.6769 66.6 min, eta 2 min, peak 10.0 GB
+4374.7s 167 [  70.0 min] b21_muril_full             [s42full] ep4 done 4.5min  no val
+4434.7s 168 [  71.0 min] gemma-4-12b_ho_s42       epoch 3 step 550/564 loss 0.6769 66.6 min, eta 2 min, peak 10.0 GB
+4434.7s 169 [  71.0 min] b21_muril_full             [s42full] ep4 done 4.5min  no val
+4494.7s 170 [  72.0 min] gemma-4-12b_ho_s42       == epoch 3: eval macro-F1 0.6566 (diagnostic only, not used for selection)
+4494.7s 171 [  72.0 min] b21_muril_full             [s42full] ep4 done 4.5min  no val
+4554.7s 172 [  73.0 min] done gemma-4-12b_ho_s42; log /kaggle/working/b21_outputs/logs/gemma-4-12b_ho_s42.log
+4554.7s 173 [  73.0 min] queued gemma-4-12b_full_s42
+4554.7s 174 [  73.0 min] queued gemma-4-12b_ho_s43
+4554.7s 175 [  73.0 min] queued gemma-4-12b_full_s43
+4554.7s 176 [  73.0 min] b21_muril_full             [s42full] ep5 done 4.5min  no val
+4554.7s 177 [  73.0 min] start b21_muril_ho on GPU 0
+4614.7s 178 [  74.0 min] b21_muril_full             [s42full] ep5 done 4.5min  no val
+4614.7s 179 [  74.0 min] b21_muril_ho             effective batch 4 x 4 = 16, 391 optimizer steps/epoch
+4674.7s 180 [  75.0 min] b21_muril_full             [s42full] ep5 done 4.5min  no val
+4674.7s 181 [  75.0 min] b21_muril_ho             effective batch 4 x 4 = 16, 391 optimizer steps/epoch
+4734.7s 182 [  76.0 min] b21_muril_full             [s42full] ep5 done 4.5min  no val
+4734.7s 183 [  76.0 min] b21_muril_ho             effective batch 4 x 4 = 16, 391 optimizer steps/epoch
+4794.7s 184 [  77.0 min] b21_muril_full             [s42full] ep5 done 4.5min  no val
+4794.7s 185 [  77.0 min] b21_muril_ho             effective batch 4 x 4 = 16, 391 optimizer steps/epoch
+4854.7s 186 [  78.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+4854.7s 187 [  78.0 min] b21_muril_ho             effective batch 4 x 4 = 16, 391 optimizer steps/epoch
+4914.7s 188 [  79.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+4914.7s 189 [  79.0 min] b21_muril_ho               epoch 1/8 train loss 5.3822
+4974.7s 190 [  80.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+4974.7s 191 [  80.0 min] b21_muril_ho               epoch 1/8 train loss 5.3822
+5034.7s 192 [  81.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+5034.7s 193 [  81.0 min] b21_muril_ho               epoch 1/8 train loss 5.3822
+5094.7s 194 [  82.0 min] b21_muril_full             [s43full] ep1 done 4.6min  no val
+5094.7s 195 [  82.0 min] b21_muril_ho               epoch 1/8 train loss 5.3822
+5154.7s 196 [  83.0 min] b21_muril_full             [s43full] ep1 done 4.6min  no val
+5154.7s 197 [  83.0 min] b21_muril_ho               epoch 1/8 train loss 5.3822
+5214.7s 198 [  84.0 min] b21_muril_full             [s43full] ep1 done 4.6min  no val
+5214.7s 199 [  84.0 min] b21_muril_ho               epoch 2/8 train loss nan
+5274.7s 200 [  85.0 min] b21_muril_full             [s43full] ep1 done 4.6min  no val
+5274.7s 201 [  85.0 min] b21_muril_ho               epoch 2/8 train loss nan
+5334.7s 202 [  86.0 min] b21_muril_full             [s43full] ep1 done 4.6min  no val
+5334.7s 203 [  86.0 min] b21_muril_ho               epoch 2/8 train loss nan
+5394.7s 204 [  87.0 min] b21_muril_full             [s43full] ep2 done 4.5min  no val
+5394.7s 205 [  87.0 min] b21_muril_ho               epoch 2/8 train loss nan
+5454.7s 206 [  88.0 min] b21_muril_full             [s43full] ep2 done 4.5min  no val
+5454.7s 207 [  88.0 min] b21_muril_ho               epoch 2/8 train loss nan
+5514.7s 208 [  89.0 min] b21_muril_full             [s43full] ep2 done 4.5min  no val
+5514.7s 209 [  89.0 min] b21_muril_ho               epoch 2/8 train loss nan
+5574.7s 210 [  90.0 min] b21_muril_full             [s43full] ep2 done 4.5min  no val
+5574.7s 211 [  90.0 min] b21_muril_ho               epoch 3/8 train loss nan
+5634.7s 212 [  91.0 min] b21_muril_full             [s43full] ep3 done 4.5min  no val
+5634.7s 213 [  91.0 min] b21_muril_ho               epoch 3/8 train loss nan
+5694.7s 214 [  92.0 min] b21_muril_full             [s43full] ep3 done 4.5min  no val
+5694.7s 215 [  92.0 min] b21_muril_ho               epoch 3/8 train loss nan
+5754.7s 216 [  93.0 min] b21_muril_full             [s43full] ep3 done 4.5min  no val
+5754.7s 217 [  93.0 min] b21_muril_ho               epoch 3/8 train loss nan
+5814.7s 218 [  94.0 min] b21_muril_full             [s43full] ep3 done 4.5min  no val
+5814.7s 219 [  94.0 min] b21_muril_ho               epoch 3/8 train loss nan
+5874.7s 220 [  95.0 min] b21_muril_full             [s43full] ep3 done 4.5min  no val
+5874.7s 221 [  95.0 min] b21_muril_ho               epoch 4/8 train loss nan
+5934.7s 222 [  96.0 min] b21_muril_full             [s43full] ep4 done 4.5min  no val
+5934.7s 223 [  96.0 min] b21_muril_ho               epoch 4/8 train loss nan
+5994.7s 224 [  97.0 min] b21_muril_full             [s43full] ep4 done 4.5min  no val
+5994.7s 225 [  97.0 min] b21_muril_ho               epoch 4/8 train loss nan
+6054.7s 226 [  98.0 min] b21_muril_full             [s43full] ep4 done 4.5min  no val
+6054.7s 227 [  98.0 min] b21_muril_ho               epoch 4/8 train loss nan
+6114.7s 228 [  99.0 min] b21_muril_full             [s43full] ep4 done 4.5min  no val
+6114.7s 229 [  99.0 min] b21_muril_ho               epoch 4/8 train loss nan
+6174.7s 230 [ 100.0 min] b21_muril_full             [s43full] ep5 done 4.5min  no val
+6174.7s 231 [ 100.0 min] b21_muril_ho               epoch 4/8 train loss nan
+6234.7s 232 [ 101.0 min] b21_muril_full             [s43full] ep5 done 4.5min  no val
+6234.7s 233 [ 101.0 min] b21_muril_ho               epoch 5/8 train loss nan
+6294.7s 234 [ 102.0 min] b21_muril_full             [s43full] ep5 done 4.5min  no val
+6294.7s 235 [ 102.0 min] b21_muril_ho               epoch 5/8 train loss nan
+6354.7s 236 [ 103.0 min] b21_muril_full             [s43full] ep5 done 4.5min  no val
+6354.7s 237 [ 103.0 min] b21_muril_ho               epoch 5/8 train loss nan
+6414.8s 238 [ 104.0 min] b21_muril_full             [s43full] ep5 done 4.5min  no val
+6414.8s 239 [ 104.0 min] b21_muril_ho               epoch 5/8 train loss nan
+6474.7s 240 [ 105.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+6474.7s 241 [ 105.0 min] b21_muril_ho               epoch 5/8 train loss nan
+6534.8s 242 [ 106.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+6534.8s 243 [ 106.0 min] b21_muril_ho               epoch 6/8 train loss nan
+6594.8s 244 [ 107.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+6594.8s 245 [ 107.0 min] b21_muril_ho               epoch 6/8 train loss nan
+6654.8s 246 [ 108.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+6654.8s 247 [ 108.0 min] b21_muril_ho               epoch 6/8 train loss nan
+6714.8s 248 [ 109.0 min] b21_muril_full             [s44full] ep1 done 4.5min  no val
+6714.8s 249 [ 109.0 min] b21_muril_ho               epoch 6/8 train loss nan
+6774.8s 250 [ 110.0 min] b21_muril_full             [s44full] ep1 done 4.5min  no val
+6774.8s 251 [ 110.0 min] b21_muril_ho               epoch 6/8 train loss nan
+6834.8s 252 [ 111.0 min] b21_muril_full             [s44full] ep1 done 4.5min  no val
+6834.8s 253 [ 111.0 min] b21_muril_ho               epoch 6/8 train loss nan
+6894.8s 254 [ 112.0 min] b21_muril_full             [s44full] ep1 done 4.5min  no val
+6894.8s 255 [ 112.0 min] b21_muril_ho               epoch 7/8 train loss 3.4227
+6954.8s 256 [ 113.0 min] b21_muril_full             [s44full] ep1 done 4.5min  no val
+6954.8s 257 [ 113.0 min] b21_muril_ho               epoch 7/8 train loss 3.4227
+7014.8s 258 [ 114.0 min] b21_muril_full             [s44full] ep2 done 4.5min  no val
+7014.8s 259 [ 114.0 min] b21_muril_ho               epoch 7/8 train loss 3.4227
+7074.8s 260 [ 115.0 min] b21_muril_full             [s44full] ep2 done 4.5min  no val
+7074.8s 261 [ 115.0 min] b21_muril_ho               epoch 7/8 train loss 3.4227
+7134.8s 262 [ 116.0 min] b21_muril_full             [s44full] ep2 done 4.5min  no val
+7134.8s 263 [ 116.0 min] b21_muril_ho               epoch 7/8 train loss 3.4227
+7194.8s 264 [ 117.0 min] b21_muril_full             [s44full] ep2 done 4.5min  no val
+7194.8s 265 [ 117.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+7254.8s 266 [ 118.0 min] b21_muril_full             [s44full] ep3 done 4.5min  no val
+7254.8s 267 [ 118.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+7314.8s 268 [ 119.0 min] b21_muril_full             [s44full] ep3 done 4.5min  no val
+7314.8s 269 [ 119.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+7374.8s 270 [ 120.0 min] b21_muril_full             [s44full] ep3 done 4.5min  no val
+7374.8s 271 [ 120.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+7434.8s 272 [ 121.0 min] b21_muril_full             [s44full] ep3 done 4.5min  no val
+7434.8s 273 [ 121.0 min] b21_muril_ho               [s42full] ep1 done 3.8min  no val
+7494.8s 274 [ 122.0 min] b21_muril_full             [s44full] ep3 done 4.5min  no val
+7494.8s 275 [ 122.0 min] b21_muril_ho               [s42full] ep1 done 3.8min  no val
+7554.8s 276 [ 123.0 min] b21_muril_full             [s44full] ep4 done 4.5min  no val
+7554.8s 277 [ 123.0 min] b21_muril_ho               [s42full] ep1 done 3.8min  no val
+7614.8s 278 [ 124.0 min] b21_muril_full             [s44full] ep4 done 4.5min  no val
+7614.8s 279 [ 124.0 min] b21_muril_ho               [s42full] ep1 done 3.8min  no val
+7674.8s 280 [ 125.0 min] b21_muril_full             [s44full] ep4 done 4.5min  no val
+7674.8s 281 [ 125.0 min] b21_muril_ho               [s42full] ep2 done 3.8min  no val
+7734.8s 282 [ 126.0 min] b21_muril_full             [s44full] ep4 done 4.5min  no val
+7734.8s 283 [ 126.0 min] b21_muril_ho               [s42full] ep2 done 3.8min  no val
+7794.8s 284 [ 127.0 min] b21_muril_full             [s44full] ep5 done 4.5min  no val
+7794.8s 285 [ 127.0 min] b21_muril_ho               [s42full] ep2 done 3.8min  no val
+7854.8s 286 [ 128.0 min] b21_muril_full             [s44full] ep5 done 4.5min  no val
+7854.8s 287 [ 128.0 min] b21_muril_ho               [s42full] ep2 done 3.8min  no val
+7914.8s 288 [ 129.0 min] b21_muril_full             [s44full] ep5 done 4.5min  no val
+7914.8s 289 [ 129.0 min] b21_muril_ho               [s42full] ep3 done 3.7min  no val
+7974.8s 290 [ 130.0 min] b21_muril_full             [s44full] ep5 done 4.5min  no val
+7974.8s 291 [ 130.0 min] b21_muril_ho               [s42full] ep3 done 3.7min  no val
+8034.8s 292 [ 131.0 min] b21_muril_full             [s44full] ep5 done 4.5min  no val
+8034.8s 293 [ 131.0 min] b21_muril_ho               [s42full] ep3 done 3.7min  no val
+8094.8s 294 [ 132.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8094.8s 295 [ 132.0 min] b21_muril_ho               [s42full] ep4 done 3.8min  no val
+8154.8s 296 [ 133.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8154.8s 297 [ 133.0 min] b21_muril_ho               [s42full] ep4 done 3.8min  no val
+8214.8s 298 [ 134.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8214.8s 299 [ 134.0 min] b21_muril_ho               [s42full] ep4 done 3.8min  no val
+8274.8s 300 [ 135.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8274.8s 301 [ 135.0 min] b21_muril_ho               [s42full] ep4 done 3.8min  no val
+8334.8s 302 [ 136.0 min] b21_muril_full             [s45full] ep1 done 4.5min  no val
+8334.8s 303 [ 136.0 min] b21_muril_ho               [s42full] ep5 done 3.8min  no val
+8394.8s 304 [ 137.0 min] b21_muril_full             [s45full] ep1 done 4.5min  no val
+8394.8s 305 [ 137.0 min] b21_muril_ho               [s42full] ep5 done 3.8min  no val
+8454.8s 306 [ 138.0 min] b21_muril_full             [s45full] ep1 done 4.5min  no val
+8454.8s 307 [ 138.0 min] b21_muril_ho               [s42full] ep5 done 3.8min  no val
+8515.0s 308 [ 139.0 min] b21_muril_full             [s45full] ep1 done 4.5min  no val
+8515.0s 309 [ 139.0 min] b21_muril_ho               [s42full] ep5 done 3.8min  no val
+8574.8s 310 [ 140.0 min] b21_muril_full             [s45full] ep1 done 4.5min  no val
+8574.8s 311 [ 140.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8634.9s 312 [ 141.0 min] b21_muril_full             [s45full] ep2 done 4.6min  no val
+8634.9s 313 [ 141.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8694.9s 314 [ 142.0 min] b21_muril_full             [s45full] ep2 done 4.6min  no val
+8694.9s 315 [ 142.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8754.9s 316 [ 143.0 min] b21_muril_full             [s45full] ep2 done 4.6min  no val
+8754.9s 317 [ 143.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+8814.9s 318 [ 144.0 min] b21_muril_full             [s45full] ep2 done 4.6min  no val
+8814.9s 319 [ 144.0 min] b21_muril_ho               [s43full] ep1 done 3.7min  no val
+8874.9s 320 [ 145.0 min] b21_muril_full             [s45full] ep3 done 4.6min  no val
+8874.9s 321 [ 145.0 min] b21_muril_ho               [s43full] ep1 done 3.7min  no val
+8934.9s 322 [ 146.0 min] b21_muril_full             [s45full] ep3 done 4.6min  no val
+8934.9s 323 [ 146.0 min] b21_muril_ho               [s43full] ep1 done 3.7min  no val
+8994.9s 324 [ 147.0 min] b21_muril_full             [s45full] ep3 done 4.6min  no val
+8994.9s 325 [ 147.0 min] b21_muril_ho               [s43full] ep2 done 3.7min  no val
+9054.9s 326 [ 148.0 min] b21_muril_full             [s45full] ep3 done 4.6min  no val
+9054.9s 327 [ 148.0 min] b21_muril_ho               [s43full] ep2 done 3.7min  no val
+9114.9s 328 [ 149.0 min] b21_muril_full             [s45full] ep3 done 4.6min  no val
+9114.9s 329 [ 149.0 min] b21_muril_ho               [s43full] ep2 done 3.7min  no val
+9174.9s 330 [ 150.0 min] b21_muril_full             [s45full] ep4 done 4.5min  no val
+9174.9s 331 [ 150.0 min] b21_muril_ho               [s43full] ep2 done 3.7min  no val
+9234.9s 332 [ 151.0 min] b21_muril_full             [s45full] ep4 done 4.5min  no val
+9234.9s 333 [ 151.0 min] b21_muril_ho               [s43full] ep3 done 3.8min  no val
+9294.9s 334 [ 152.0 min] b21_muril_full             [s45full] ep4 done 4.5min  no val
+9294.9s 335 [ 152.0 min] b21_muril_ho               [s43full] ep3 done 3.8min  no val
+9354.9s 336 [ 153.0 min] b21_muril_full             [s45full] ep4 done 4.5min  no val
+9354.9s 337 [ 153.0 min] b21_muril_ho               [s43full] ep3 done 3.8min  no val
+9414.9s 338 [ 154.0 min] b21_muril_full             [s45full] ep5 done 4.5min  no val
+9414.9s 339 [ 154.0 min] b21_muril_ho               [s43full] ep3 done 3.8min  no val
+9474.9s 340 [ 155.0 min] b21_muril_full             [s45full] ep5 done 4.5min  no val
+9474.9s 341 [ 155.0 min] b21_muril_ho               [s43full] ep4 done 3.7min  no val
+9534.9s 342 [ 156.0 min] b21_muril_full             [s45full] ep5 done 4.5min  no val
+9534.9s 343 [ 156.0 min] b21_muril_ho               [s43full] ep4 done 3.7min  no val
+9594.9s 344 [ 157.0 min] b21_muril_full             [s45full] ep5 done 4.5min  no val
+9594.9s 345 [ 157.0 min] b21_muril_ho               [s43full] ep4 done 3.7min  no val
+9654.9s 346 [ 158.0 min] b21_muril_full             [s45full] ep5 done 4.5min  no val
+9654.9s 347 [ 158.0 min] b21_muril_ho               [s43full] ep4 done 3.7min  no val
+9714.9s 348 [ 159.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+9714.9s 349 [ 159.0 min] b21_muril_ho               [s43full] ep5 done 3.8min  no val
+9774.9s 350 [ 160.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+9774.9s 351 [ 160.0 min] b21_muril_ho               [s43full] ep5 done 3.8min  no val
+9834.9s 352 [ 161.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+9834.9s 353 [ 161.0 min] b21_muril_ho               [s43full] ep5 done 3.8min  no val
+9894.9s 354 [ 162.0 min] b21_muril_full           - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+9894.9s 355 [ 162.0 min] b21_muril_ho               [s43full] ep5 done 3.8min  no val
+9954.9s 356 [ 163.0 min] b21_muril_full             [s46full] ep1 done 4.5min  no val
+9954.9s 357 [ 163.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+10014.9s 358 [ 164.0 min] b21_muril_full             [s46full] ep1 done 4.5min  no val
+10014.9s 359 [ 164.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+10074.9s 360 [ 165.0 min] b21_muril_full             [s46full] ep1 done 4.5min  no val
+10074.9s 361 [ 165.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+10134.9s 362 [ 166.0 min] b21_muril_full             [s46full] ep1 done 4.5min  no val
+10134.9s 363 [ 166.0 min] b21_muril_ho               [s44full] ep1 done 3.8min  no val
+10194.9s 364 [ 167.0 min] b21_muril_full             [s46full] ep1 done 4.5min  no val
+10194.9s 365 [ 167.0 min] b21_muril_ho               [s44full] ep1 done 3.8min  no val
+10254.9s 366 [ 168.0 min] b21_muril_full             [s46full] ep2 done 4.5min  no val
+10254.9s 367 [ 168.0 min] b21_muril_ho               [s44full] ep1 done 3.8min  no val
+10314.9s 368 [ 169.0 min] b21_muril_full             [s46full] ep2 done 4.5min  no val
+10314.9s 369 [ 169.0 min] b21_muril_ho               [s44full] ep1 done 3.8min  no val
+10374.9s 370 [ 170.0 min] b21_muril_full             [s46full] ep2 done 4.5min  no val
+10374.9s 371 [ 170.0 min] b21_muril_ho               [s44full] ep2 done 3.7min  no val
+10435.0s 372 [ 171.0 min] b21_muril_full             [s46full] ep2 done 4.5min  no val
+10435.0s 373 [ 171.0 min] b21_muril_ho               [s44full] ep2 done 3.7min  no val
+10495.0s 374 [ 172.0 min] b21_muril_full             [s46full] ep3 done 4.5min  no val
+10495.0s 375 [ 172.0 min] b21_muril_ho               [s44full] ep2 done 3.7min  no val
+10554.9s 376 [ 173.0 min] b21_muril_full             [s46full] ep3 done 4.5min  no val
+10554.9s 377 [ 173.0 min] b21_muril_ho               [s44full] ep2 done 3.7min  no val
+10614.9s 378 [ 174.0 min] b21_muril_full             [s46full] ep3 done 4.5min  no val
+10614.9s 379 [ 174.0 min] b21_muril_ho               [s44full] ep3 done 3.8min  no val
+10675.0s 380 [ 175.0 min] b21_muril_full             [s46full] ep3 done 4.5min  no val
+10675.0s 381 [ 175.0 min] b21_muril_ho               [s44full] ep3 done 3.8min  no val
+10735.0s 382 [ 176.0 min] b21_muril_full             [s46full] ep3 done 4.5min  no val
+10735.0s 383 [ 176.0 min] b21_muril_ho               [s44full] ep3 done 3.8min  no val
+10795.0s 384 [ 177.0 min] b21_muril_full             [s46full] ep4 done 4.5min  no val
+10795.0s 385 [ 177.0 min] b21_muril_ho               [s44full] ep3 done 3.8min  no val
+10855.0s 386 [ 178.0 min] b21_muril_full             [s46full] ep4 done 4.5min  no val
+10855.0s 387 [ 178.0 min] b21_muril_ho               [s44full] ep4 done 3.8min  no val
+10915.0s 388 [ 179.0 min] b21_muril_full             [s46full] ep4 done 4.5min  no val
+10915.0s 389 [ 179.0 min] b21_muril_ho               [s44full] ep4 done 3.8min  no val
+10975.0s 390 [ 180.0 min] b21_muril_full             [s46full] ep4 done 4.5min  no val
+10975.0s 391 [ 180.0 min] b21_muril_ho               [s44full] ep4 done 3.8min  no val
+11035.0s 392 [ 181.0 min] b21_muril_full             [s46full] ep4 done 4.5min  no val
+11035.0s 393 [ 181.0 min] b21_muril_ho               [s44full] ep5 done 3.7min  no val
+11095.0s 394 [ 182.0 min] b21_muril_full             [s46full] ep5 done 4.5min  no val
+11095.0s 395 [ 182.0 min] b21_muril_ho               [s44full] ep5 done 3.7min  no val
+11155.0s 396 [ 183.0 min] b21_muril_full             [s46full] ep5 done 4.5min  no val
+11155.0s 397 [ 183.0 min] b21_muril_ho               [s44full] ep5 done 3.7min  no val
+11215.0s 398 [ 184.0 min] b21_muril_full             [s46full] ep5 done 4.5min  no val
+11215.0s 399 [ 184.0 min] b21_muril_ho               [s44full] ep5 done 3.7min  no val
+11275.0s 400 [ 185.0 min] b21_muril_full             [s46full] ep5 done 4.5min  no val
+11275.0s 401 [ 185.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+11335.0s 402 [ 186.0 min] done b21_muril_full; log /kaggle/working/b21_outputs/logs/b21_muril_full.log
+11335.0s 403 [ 186.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+11335.0s 404 [ 186.0 min] start gemma-4-12b_full_s42 on GPU 1
+11395.0s 405 [ 187.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+11395.0s 406 [ 187.0 min] gemma-4-12b_full_s42     Loading weights:  38%|███▊      | 257/677 [00:45<01:48,  3.86it/s]
+11455.0s 407 [ 188.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+11455.0s 408 [ 188.0 min] gemma-4-12b_full_s42     loaded in 1.7 min; 7.4 GB on GPU
+11515.0s 409 [ 189.0 min] b21_muril_ho               [s45full] ep1 done 3.8min  no val
+11515.0s 410 [ 189.0 min] gemma-4-12b_full_s42       sched.step()
+11575.0s 411 [ 190.0 min] b21_muril_ho               [s45full] ep1 done 3.8min  no val
+11575.0s 412 [ 190.0 min] gemma-4-12b_full_s42       sched.step()
+11635.0s 413 [ 191.0 min] b21_muril_ho               [s45full] ep1 done 3.8min  no val
+11635.0s 414 [ 191.0 min] gemma-4-12b_full_s42     epoch 1 step 25/663 loss 2.4572 2.9 min, eta 74 min, peak 10.0 GB
+11695.0s 415 [ 192.0 min] b21_muril_ho               [s45full] ep1 done 3.8min  no val
+11695.0s 416 [ 192.0 min] gemma-4-12b_full_s42     epoch 1 step 25/663 loss 2.4572 2.9 min, eta 74 min, peak 10.0 GB
+11755.0s 417 [ 193.0 min] b21_muril_ho               [s45full] ep2 done 3.8min  no val
+11755.0s 418 [ 193.0 min] gemma-4-12b_full_s42     epoch 1 step 25/663 loss 2.4572 2.9 min, eta 74 min, peak 10.0 GB
+11815.0s 419 [ 194.0 min] b21_muril_ho               [s45full] ep2 done 3.8min  no val
+11815.0s 420 [ 194.0 min] gemma-4-12b_full_s42     epoch 1 step 50/663 loss 2.0209 6.0 min, eta 74 min, peak 10.0 GB
+11875.0s 421 [ 195.0 min] b21_muril_ho               [s45full] ep2 done 3.8min  no val
+11875.0s 422 [ 195.0 min] gemma-4-12b_full_s42     epoch 1 step 50/663 loss 2.0209 6.0 min, eta 74 min, peak 10.0 GB
+11935.0s 423 [ 196.0 min] b21_muril_ho               [s45full] ep2 done 3.8min  no val
+11935.0s 424 [ 196.0 min] gemma-4-12b_full_s42     epoch 1 step 50/663 loss 2.0209 6.0 min, eta 74 min, peak 10.0 GB
+11995.0s 425 [ 197.0 min] b21_muril_ho               [s45full] ep3 done 3.8min  no val
+11995.0s 426 [ 197.0 min] gemma-4-12b_full_s42     epoch 1 step 75/663 loss 1.8600 8.9 min, eta 70 min, peak 10.0 GB
+12055.0s 427 [ 198.0 min] b21_muril_ho               [s45full] ep3 done 3.8min  no val
+12055.0s 428 [ 198.0 min] gemma-4-12b_full_s42     epoch 1 step 75/663 loss 1.8600 8.9 min, eta 70 min, peak 10.0 GB
+12115.0s 429 [ 199.0 min] b21_muril_ho               [s45full] ep3 done 3.8min  no val
+12115.0s 430 [ 199.0 min] gemma-4-12b_full_s42     epoch 1 step 75/663 loss 1.8600 8.9 min, eta 70 min, peak 10.0 GB
+12175.0s 431 [ 200.0 min] b21_muril_ho               [s45full] ep3 done 3.8min  no val
+12175.0s 432 [ 200.0 min] gemma-4-12b_full_s42     epoch 1 step 75/663 loss 1.8600 8.9 min, eta 70 min, peak 10.0 GB
+12235.0s 433 [ 201.0 min] b21_muril_ho               [s45full] ep4 done 3.8min  no val
+12235.0s 434 [ 201.0 min] gemma-4-12b_full_s42     epoch 1 step 100/663 loss 1.7638 12.1 min, eta 68 min, peak 10.0 GB
+12295.0s 435 [ 202.0 min] b21_muril_ho               [s45full] ep4 done 3.8min  no val
+12295.0s 436 [ 202.0 min] gemma-4-12b_full_s42     epoch 1 step 100/663 loss 1.7638 12.1 min, eta 68 min, peak 10.0 GB
+12355.0s 437 [ 203.0 min] b21_muril_ho               [s45full] ep4 done 3.8min  no val
+12355.0s 438 [ 203.0 min] gemma-4-12b_full_s42     epoch 1 step 100/663 loss 1.7638 12.1 min, eta 68 min, peak 10.0 GB
+12415.0s 439 [ 204.0 min] b21_muril_ho               [s45full] ep5 done 3.8min  no val
+12415.0s 440 [ 204.0 min] gemma-4-12b_full_s42     epoch 1 step 125/663 loss 1.7121 15.4 min, eta 66 min, peak 10.0 GB
+12475.0s 441 [ 205.0 min] b21_muril_ho               [s45full] ep5 done 3.8min  no val
+12475.0s 442 [ 205.0 min] gemma-4-12b_full_s42     epoch 1 step 125/663 loss 1.7121 15.4 min, eta 66 min, peak 10.0 GB
+12535.0s 443 [ 206.0 min] b21_muril_ho               [s45full] ep5 done 3.8min  no val
+12535.0s 444 [ 206.0 min] gemma-4-12b_full_s42     epoch 1 step 125/663 loss 1.7121 15.4 min, eta 66 min, peak 10.0 GB
+12595.1s 445 [ 207.0 min] b21_muril_ho               [s45full] ep5 done 3.8min  no val
+12595.1s 446 [ 207.0 min] gemma-4-12b_full_s42     epoch 1 step 125/663 loss 1.7121 15.4 min, eta 66 min, peak 10.0 GB
+12655.0s 447 [ 208.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+12655.0s 448 [ 208.0 min] gemma-4-12b_full_s42     epoch 1 step 150/663 loss 1.6535 19.1 min, eta 65 min, peak 10.0 GB
+12715.0s 449 [ 209.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+12715.0s 450 [ 209.0 min] gemma-4-12b_full_s42     epoch 1 step 150/663 loss 1.6535 19.1 min, eta 65 min, peak 10.0 GB
+12775.1s 451 [ 210.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+12775.1s 452 [ 210.0 min] gemma-4-12b_full_s42     epoch 1 step 150/663 loss 1.6535 19.1 min, eta 65 min, peak 10.0 GB
+12835.1s 453 [ 211.0 min] b21_muril_ho             - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+12835.1s 454 [ 211.0 min] gemma-4-12b_full_s42     epoch 1 step 175/663 loss 1.6237 22.4 min, eta 63 min, peak 10.0 GB
+12895.1s 455 [ 212.0 min] b21_muril_ho               [s46full] ep1 done 3.8min  no val
+12895.1s 456 [ 212.0 min] gemma-4-12b_full_s42     epoch 1 step 175/663 loss 1.6237 22.4 min, eta 63 min, peak 10.0 GB
+12955.1s 457 [ 213.0 min] b21_muril_ho               [s46full] ep1 done 3.8min  no val
+12955.1s 458 [ 213.0 min] gemma-4-12b_full_s42     epoch 1 step 175/663 loss 1.6237 22.4 min, eta 63 min, peak 10.0 GB
+13015.1s 459 [ 214.0 min] b21_muril_ho               [s46full] ep1 done 3.8min  no val
+13015.1s 460 [ 214.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 25.7 min, eta 59 min, peak 10.0 GB
+13075.1s 461 [ 215.0 min] b21_muril_ho               [s46full] ep1 done 3.8min  no val
+13075.1s 462 [ 215.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 25.7 min, eta 59 min, peak 10.0 GB
+13135.1s 463 [ 216.0 min] b21_muril_ho               [s46full] ep2 done 3.8min  no val
+13135.1s 464 [ 216.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 25.7 min, eta 59 min, peak 10.0 GB
+13195.1s 465 [ 217.0 min] b21_muril_ho               [s46full] ep2 done 3.8min  no val
+13195.1s 466 [ 217.0 min] gemma-4-12b_full_s42     epoch 1 step 200/663 loss 1.5772 25.7 min, eta 59 min, peak 10.0 GB
+13255.1s 467 [ 218.0 min] b21_muril_ho               [s46full] ep2 done 3.8min  no val
+13255.1s 468 [ 218.0 min] gemma-4-12b_full_s42     epoch 2 step 225/663 loss 0.8755 29.4 min, eta 57 min, peak 10.0 GB
+13315.1s 469 [ 219.0 min] b21_muril_ho               [s46full] ep2 done 3.8min  no val
+13315.1s 470 [ 219.0 min] gemma-4-12b_full_s42     epoch 2 step 225/663 loss 0.8755 29.4 min, eta 57 min, peak 10.0 GB
+13375.1s 471 [ 220.0 min] b21_muril_ho               [s46full] ep3 done 3.8min  no val
+13375.1s 472 [ 220.0 min] gemma-4-12b_full_s42     epoch 2 step 225/663 loss 0.8755 29.4 min, eta 57 min, peak 10.0 GB
+13435.1s 473 [ 221.0 min] b21_muril_ho               [s46full] ep3 done 3.8min  no val
+13435.1s 474 [ 221.0 min] gemma-4-12b_full_s42     epoch 2 step 250/663 loss 1.1380 32.6 min, eta 54 min, peak 10.0 GB
+13495.1s 475 [ 222.0 min] b21_muril_ho               [s46full] ep3 done 3.8min  no val
+13495.1s 476 [ 222.0 min] gemma-4-12b_full_s42     epoch 2 step 250/663 loss 1.1380 32.6 min, eta 54 min, peak 10.0 GB
+13555.1s 477 [ 223.0 min] b21_muril_ho               [s46full] ep4 done 3.8min  no val
+13555.1s 478 [ 223.0 min] gemma-4-12b_full_s42     epoch 2 step 250/663 loss 1.1380 32.6 min, eta 54 min, peak 10.0 GB
+13615.1s 479 [ 224.0 min] b21_muril_ho               [s46full] ep4 done 3.8min  no val
+13615.1s 480 [ 224.0 min] gemma-4-12b_full_s42     epoch 2 step 275/663 loss 1.1426 35.6 min, eta 50 min, peak 10.0 GB
+13675.1s 481 [ 225.0 min] b21_muril_ho               [s46full] ep4 done 3.8min  no val
+13675.1s 482 [ 225.0 min] gemma-4-12b_full_s42     epoch 2 step 275/663 loss 1.1426 35.6 min, eta 50 min, peak 10.0 GB
+13735.1s 483 [ 226.0 min] b21_muril_ho               [s46full] ep4 done 3.8min  no val
+13735.1s 484 [ 226.0 min] gemma-4-12b_full_s42     epoch 2 step 275/663 loss 1.1426 35.6 min, eta 50 min, peak 10.0 GB
+13795.1s 485 [ 227.0 min] b21_muril_ho               [s46full] ep5 done 3.8min  no val
+13795.1s 486 [ 227.0 min] gemma-4-12b_full_s42     epoch 2 step 300/663 loss 1.1242 38.8 min, eta 47 min, peak 10.0 GB
+13855.1s 487 [ 228.0 min] b21_muril_ho               [s46full] ep5 done 3.8min  no val
+13855.1s 488 [ 228.0 min] gemma-4-12b_full_s42     epoch 2 step 300/663 loss 1.1242 38.8 min, eta 47 min, peak 10.0 GB
+13915.1s 489 [ 229.0 min] b21_muril_ho               [s46full] ep5 done 3.8min  no val
+13915.1s 490 [ 229.0 min] gemma-4-12b_full_s42     epoch 2 step 300/663 loss 1.1242 38.8 min, eta 47 min, peak 10.0 GB
+13975.1s 491 [ 230.0 min] b21_muril_ho               [s46full] ep5 done 3.8min  no val
+13975.1s 492 [ 230.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1142 42.1 min, eta 44 min, peak 10.0 GB
+14035.1s 493 [ 231.0 min] done b21_muril_ho; log /kaggle/working/b21_outputs/logs/b21_muril_ho.log
+14035.1s 494 [ 231.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1142 42.1 min, eta 44 min, peak 10.0 GB
+14035.1s 495 [ 231.0 min] start gemma-4-12b_ho_s43 on GPU 0
+14095.1s 496 [ 232.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1142 42.1 min, eta 44 min, peak 10.0 GB
+14095.1s 497 [ 232.0 min] gemma-4-12b_ho_s43       Loading weights:  56%|█████▌    | 377/677 [00:44<00:20, 14.55it/s]
+14155.1s 498 [ 233.0 min] gemma-4-12b_full_s42     epoch 2 step 325/663 loss 1.1142 42.1 min, eta 44 min, peak 10.0 GB
+14155.1s 499 [ 233.0 min] gemma-4-12b_ho_s43         sched.step()
+14215.1s 500 [ 234.0 min] gemma-4-12b_full_s42     epoch 2 step 350/663 loss 1.1024 45.2 min, eta 40 min, peak 10.0 GB
+14215.1s 501 [ 234.0 min] gemma-4-12b_ho_s43         sched.step()
+14275.1s 502 [ 235.0 min] gemma-4-12b_full_s42     epoch 2 step 350/663 loss 1.1024 45.2 min, eta 40 min, peak 10.0 GB
+14275.1s 503 [ 235.0 min] gemma-4-12b_ho_s43         sched.step()
+14335.1s 504 [ 236.0 min] gemma-4-12b_full_s42     epoch 2 step 350/663 loss 1.1024 45.2 min, eta 40 min, peak 10.0 GB
+14335.1s 505 [ 236.0 min] gemma-4-12b_ho_s43       epoch 1 step 25/564 loss 2.1054 2.5 min, eta 54 min, peak 9.7 GB
+14395.1s 506 [ 237.0 min] gemma-4-12b_full_s42     epoch 2 step 375/663 loss 1.0765 48.2 min, eta 37 min, peak 10.0 GB
+14395.1s 507 [ 237.0 min] gemma-4-12b_ho_s43       epoch 1 step 25/564 loss 2.1054 2.5 min, eta 54 min, peak 9.7 GB
+14455.1s 508 [ 238.0 min] gemma-4-12b_full_s42     epoch 2 step 375/663 loss 1.0765 48.2 min, eta 37 min, peak 10.0 GB
+14455.1s 509 [ 238.0 min] gemma-4-12b_ho_s43       epoch 1 step 50/564 loss 1.9562 5.2 min, eta 54 min, peak 9.7 GB
+14515.1s 510 [ 239.0 min] gemma-4-12b_full_s42     epoch 2 step 375/663 loss 1.0765 48.2 min, eta 37 min, peak 10.0 GB
+14515.1s 511 [ 239.0 min] gemma-4-12b_ho_s43       epoch 1 step 50/564 loss 1.9562 5.2 min, eta 54 min, peak 9.7 GB
+14575.1s 512 [ 240.0 min] gemma-4-12b_full_s42     epoch 2 step 400/663 loss 1.0555 51.5 min, eta 34 min, peak 10.0 GB
+14575.1s 513 [ 240.0 min] gemma-4-12b_ho_s43       epoch 1 step 50/564 loss 1.9562 5.2 min, eta 54 min, peak 9.7 GB
+14635.1s 514 [ 241.0 min] gemma-4-12b_full_s42     epoch 2 step 400/663 loss 1.0555 51.5 min, eta 34 min, peak 10.0 GB
+14635.1s 515 [ 241.0 min] gemma-4-12b_ho_s43       epoch 1 step 75/564 loss 1.8343 8.1 min, eta 53 min, peak 9.7 GB
+14695.2s 516 [ 242.0 min] gemma-4-12b_full_s42     epoch 2 step 400/663 loss 1.0555 51.5 min, eta 34 min, peak 10.0 GB
+14695.2s 517 [ 242.0 min] gemma-4-12b_ho_s43       epoch 1 step 75/564 loss 1.8343 8.1 min, eta 53 min, peak 9.7 GB
+14755.2s 518 [ 243.0 min] gemma-4-12b_full_s42     epoch 2 step 425/663 loss 1.0441 54.9 min, eta 31 min, peak 10.0 GB
+14755.2s 519 [ 243.0 min] gemma-4-12b_ho_s43       epoch 1 step 75/564 loss 1.8343 8.1 min, eta 53 min, peak 9.7 GB
+14815.2s 520 [ 244.0 min] gemma-4-12b_full_s42     epoch 2 step 425/663 loss 1.0441 54.9 min, eta 31 min, peak 10.0 GB
+14815.2s 521 [ 244.0 min] gemma-4-12b_ho_s43       epoch 1 step 100/564 loss 1.7427 10.9 min, eta 51 min, peak 9.8 GB
+14875.2s 522 [ 245.0 min] gemma-4-12b_full_s42     epoch 2 step 425/663 loss 1.0441 54.9 min, eta 31 min, peak 10.0 GB
+14875.2s 523 [ 245.0 min] gemma-4-12b_ho_s43       epoch 1 step 100/564 loss 1.7427 10.9 min, eta 51 min, peak 9.8 GB
+14935.2s 524 [ 246.0 min] gemma-4-12b_full_s42     epoch 2 step 425/663 loss 1.0441 54.9 min, eta 31 min, peak 10.0 GB
+14935.2s 525 [ 246.0 min] gemma-4-12b_ho_s43       epoch 1 step 100/564 loss 1.7427 10.9 min, eta 51 min, peak 9.8 GB
+14995.2s 526 [ 247.0 min] gemma-4-12b_full_s42     epoch 3 step 450/663 loss 0.7349 58.2 min, eta 28 min, peak 10.0 GB
+14995.2s 527 [ 247.0 min] gemma-4-12b_ho_s43       epoch 1 step 125/564 loss 1.6596 14.0 min, eta 49 min, peak 9.9 GB
+15055.2s 528 [ 248.0 min] gemma-4-12b_full_s42     epoch 3 step 450/663 loss 0.7349 58.2 min, eta 28 min, peak 10.0 GB
+15055.2s 529 [ 248.0 min] gemma-4-12b_ho_s43       epoch 1 step 125/564 loss 1.6596 14.0 min, eta 49 min, peak 9.9 GB
+15115.2s 530 [ 249.0 min] gemma-4-12b_full_s42     epoch 3 step 450/663 loss 0.7349 58.2 min, eta 28 min, peak 10.0 GB
+15115.2s 531 [ 249.0 min] gemma-4-12b_ho_s43       epoch 1 step 125/564 loss 1.6596 14.0 min, eta 49 min, peak 9.9 GB
+15175.2s 532 [ 250.0 min] gemma-4-12b_full_s42     epoch 3 step 475/663 loss 0.7063 61.3 min, eta 24 min, peak 10.0 GB
+15175.2s 533 [ 250.0 min] gemma-4-12b_ho_s43       epoch 1 step 150/564 loss 1.6249 16.8 min, eta 46 min, peak 9.9 GB
+15235.2s 534 [ 251.0 min] gemma-4-12b_full_s42     epoch 3 step 475/663 loss 0.7063 61.3 min, eta 24 min, peak 10.0 GB
+15235.2s 535 [ 251.0 min] gemma-4-12b_ho_s43       epoch 1 step 150/564 loss 1.6249 16.8 min, eta 46 min, peak 9.9 GB
+15295.2s 536 [ 252.0 min] gemma-4-12b_full_s42     epoch 3 step 475/663 loss 0.7063 61.3 min, eta 24 min, peak 10.0 GB
+15295.2s 537 [ 252.0 min] gemma-4-12b_ho_s43       epoch 1 step 150/564 loss 1.6249 16.8 min, eta 46 min, peak 9.9 GB
+15355.2s 538 [ 253.0 min] gemma-4-12b_full_s42     epoch 3 step 500/663 loss 0.6996 64.3 min, eta 21 min, peak 10.0 GB
+15355.2s 539 [ 253.0 min] gemma-4-12b_ho_s43       epoch 1 step 175/564 loss 1.5817 20.0 min, eta 44 min, peak 10.0 GB
+15415.2s 540 [ 254.0 min] gemma-4-12b_full_s42     epoch 3 step 500/663 loss 0.6996 64.3 min, eta 21 min, peak 10.0 GB
+15415.2s 541 [ 254.0 min] gemma-4-12b_ho_s43       epoch 1 step 175/564 loss 1.5817 20.0 min, eta 44 min, peak 10.0 GB
+15475.2s 542 [ 255.0 min] gemma-4-12b_full_s42     epoch 3 step 500/663 loss 0.6996 64.3 min, eta 21 min, peak 10.0 GB
+15475.2s 543 [ 255.0 min] gemma-4-12b_ho_s43       epoch 1 step 175/564 loss 1.5817 20.0 min, eta 44 min, peak 10.0 GB
+15535.2s 544 [ 256.0 min] gemma-4-12b_full_s42     epoch 3 step 525/663 loss 0.6900 67.5 min, eta 18 min, peak 10.0 GB
+15535.2s 545 [ 256.0 min] gemma-4-12b_ho_s43       == epoch 1: eval macro-F1 0.5612 (diagnostic only, not used for selection)
+15595.2s 546 [ 257.0 min] gemma-4-12b_full_s42     epoch 3 step 525/663 loss 0.6900 67.5 min, eta 18 min, peak 10.0 GB
+15595.2s 547 [ 257.0 min] gemma-4-12b_ho_s43       epoch 2 step 200/564 loss 1.2472 23.9 min, eta 43 min, peak 10.0 GB
+15655.2s 548 [ 258.0 min] gemma-4-12b_full_s42     epoch 3 step 525/663 loss 0.6900 67.5 min, eta 18 min, peak 10.0 GB
+15655.2s 549 [ 258.0 min] gemma-4-12b_ho_s43       epoch 2 step 200/564 loss 1.2472 23.9 min, eta 43 min, peak 10.0 GB
+15715.2s 550 [ 259.0 min] gemma-4-12b_full_s42     epoch 3 step 550/663 loss 0.6915 70.6 min, eta 14 min, peak 10.0 GB
+15715.2s 551 [ 259.0 min] gemma-4-12b_ho_s43       epoch 2 step 200/564 loss 1.2472 23.9 min, eta 43 min, peak 10.0 GB
+15775.2s 552 [ 260.0 min] gemma-4-12b_full_s42     epoch 3 step 550/663 loss 0.6915 70.6 min, eta 14 min, peak 10.0 GB
+15775.2s 553 [ 260.0 min] gemma-4-12b_ho_s43       epoch 2 step 225/564 loss 1.1368 26.6 min, eta 40 min, peak 10.0 GB
+15835.2s 554 [ 261.0 min] gemma-4-12b_full_s42     epoch 3 step 550/663 loss 0.6915 70.6 min, eta 14 min, peak 10.0 GB
+15835.2s 555 [ 261.0 min] gemma-4-12b_ho_s43       epoch 2 step 225/564 loss 1.1368 26.6 min, eta 40 min, peak 10.0 GB
+15895.2s 556 [ 262.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6929 73.8 min, eta 11 min, peak 10.0 GB
+15895.2s 557 [ 262.0 min] gemma-4-12b_ho_s43       epoch 2 step 225/564 loss 1.1368 26.6 min, eta 40 min, peak 10.0 GB
+15955.2s 558 [ 263.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6929 73.8 min, eta 11 min, peak 10.0 GB
+15955.2s 559 [ 263.0 min] gemma-4-12b_ho_s43       epoch 2 step 250/564 loss 1.1567 29.5 min, eta 37 min, peak 10.0 GB
+16015.2s 560 [ 264.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6929 73.8 min, eta 11 min, peak 10.0 GB
+16015.2s 561 [ 264.0 min] gemma-4-12b_ho_s43       epoch 2 step 250/564 loss 1.1567 29.5 min, eta 37 min, peak 10.0 GB
+16075.2s 562 [ 265.0 min] gemma-4-12b_full_s42     epoch 3 step 575/663 loss 0.6929 73.8 min, eta 11 min, peak 10.0 GB
+16075.2s 563 [ 265.0 min] gemma-4-12b_ho_s43       epoch 2 step 275/564 loss 1.1231 32.3 min, eta 34 min, peak 10.0 GB
+16135.2s 564 [ 266.0 min] gemma-4-12b_full_s42     epoch 3 step 600/663 loss 0.6976 77.3 min, eta 8 min, peak 10.0 GB
+16135.2s 565 [ 266.0 min] gemma-4-12b_ho_s43       epoch 2 step 275/564 loss 1.1231 32.3 min, eta 34 min, peak 10.0 GB
+16195.2s 566 [ 267.0 min] gemma-4-12b_full_s42     epoch 3 step 600/663 loss 0.6976 77.3 min, eta 8 min, peak 10.0 GB
+16195.2s 567 [ 267.0 min] gemma-4-12b_ho_s43       epoch 2 step 275/564 loss 1.1231 32.3 min, eta 34 min, peak 10.0 GB
+16255.2s 568 [ 268.0 min] gemma-4-12b_full_s42     epoch 3 step 600/663 loss 0.6976 77.3 min, eta 8 min, peak 10.0 GB
+16255.2s 569 [ 268.0 min] gemma-4-12b_ho_s43       epoch 2 step 300/564 loss 1.1112 35.2 min, eta 31 min, peak 10.0 GB
+16315.2s 570 [ 269.0 min] gemma-4-12b_full_s42     epoch 3 step 625/663 loss 0.6915 80.8 min, eta 5 min, peak 10.0 GB
+16315.2s 571 [ 269.0 min] gemma-4-12b_ho_s43       epoch 2 step 300/564 loss 1.1112 35.2 min, eta 31 min, peak 10.0 GB
+16375.2s 572 [ 270.0 min] gemma-4-12b_full_s42     epoch 3 step 625/663 loss 0.6915 80.8 min, eta 5 min, peak 10.0 GB
+16375.2s 573 [ 270.0 min] gemma-4-12b_ho_s43       epoch 2 step 300/564 loss 1.1112 35.2 min, eta 31 min, peak 10.0 GB
+16435.2s 574 [ 271.0 min] gemma-4-12b_full_s42     epoch 3 step 625/663 loss 0.6915 80.8 min, eta 5 min, peak 10.0 GB
+16435.2s 575 [ 271.0 min] gemma-4-12b_ho_s43       epoch 2 step 300/564 loss 1.1112 35.2 min, eta 31 min, peak 10.0 GB
+16495.3s 576 [ 272.0 min] gemma-4-12b_full_s42     epoch 3 step 625/663 loss 0.6915 80.8 min, eta 5 min, peak 10.0 GB
+16495.3s 577 [ 272.0 min] gemma-4-12b_ho_s43       epoch 2 step 325/564 loss 1.1255 38.5 min, eta 28 min, peak 10.0 GB
+16555.3s 578 [ 273.0 min] gemma-4-12b_full_s42     epoch 3 step 650/663 loss 0.6869 84.5 min, eta 2 min, peak 10.0 GB
+16555.3s 579 [ 273.0 min] gemma-4-12b_ho_s43       epoch 2 step 325/564 loss 1.1255 38.5 min, eta 28 min, peak 10.0 GB
+16615.3s 580 [ 274.0 min] gemma-4-12b_full_s42     epoch 3 step 650/663 loss 0.6869 84.5 min, eta 2 min, peak 10.0 GB
+16615.3s 581 [ 274.0 min] gemma-4-12b_ho_s43       epoch 2 step 325/564 loss 1.1255 38.5 min, eta 28 min, peak 10.0 GB
+16675.3s 582 [ 275.0 min] gemma-4-12b_full_s42     epoch 3 step 650/663 loss 0.6869 84.5 min, eta 2 min, peak 10.0 GB
+16675.3s 583 [ 275.0 min] gemma-4-12b_ho_s43       epoch 2 step 350/564 loss 1.0983 41.5 min, eta 25 min, peak 10.0 GB
+16735.2s 584 [ 276.0 min] done gemma-4-12b_full_s42; log /kaggle/working/b21_outputs/logs/gemma-4-12b_full_s42.log
+16735.2s 585 [ 276.0 min] gemma-4-12b_ho_s43       epoch 2 step 350/564 loss 1.0983 41.5 min, eta 25 min, peak 10.0 GB
+16735.2s 586 [ 276.0 min] start gemma-4-12b_full_s43 on GPU 1
+16795.3s 587 [ 277.0 min] gemma-4-12b_ho_s43       epoch 2 step 350/564 loss 1.0983 41.5 min, eta 25 min, peak 10.0 GB
+16795.3s 588 [ 277.0 min] gemma-4-12b_full_s43     Loading weights:  44%|████▍     | 299/677 [00:40<00:31, 12.12it/s]
+16855.3s 589 [ 278.0 min] gemma-4-12b_ho_s43       epoch 2 step 375/564 loss 1.0899 44.7 min, eta 23 min, peak 10.0 GB
+16855.3s 590 [ 278.0 min] gemma-4-12b_full_s43       sched.step()
+16915.3s 591 [ 279.0 min] gemma-4-12b_ho_s43       == epoch 2: eval macro-F1 0.6298 (diagnostic only, not used for selection)
+16915.3s 592 [ 279.0 min] gemma-4-12b_full_s43       sched.step()
+16975.3s 593 [ 280.0 min] gemma-4-12b_ho_s43       == epoch 2: eval macro-F1 0.6298 (diagnostic only, not used for selection)
+16975.3s 594 [ 280.0 min] gemma-4-12b_full_s43       sched.step()
+17035.3s 595 [ 281.0 min] gemma-4-12b_ho_s43       == epoch 2: eval macro-F1 0.6298 (diagnostic only, not used for selection)
+17035.3s 596 [ 281.0 min] gemma-4-12b_full_s43     epoch 1 step 25/663 loss 2.0970 2.9 min, eta 74 min, peak 9.6 GB
+17095.3s 597 [ 282.0 min] gemma-4-12b_ho_s43       == epoch 2: eval macro-F1 0.6298 (diagnostic only, not used for selection)
+17095.3s 598 [ 282.0 min] gemma-4-12b_full_s43     epoch 1 step 25/663 loss 2.0970 2.9 min, eta 74 min, peak 9.6 GB
+17155.3s 599 [ 283.0 min] gemma-4-12b_ho_s43       epoch 3 step 400/564 loss 0.8526 49.5 min, eta 20 min, peak 10.0 GB
+17155.3s 600 [ 283.0 min] gemma-4-12b_full_s43     epoch 1 step 25/663 loss 2.0970 2.9 min, eta 74 min, peak 9.6 GB
+17215.3s 601 [ 284.0 min] gemma-4-12b_ho_s43       epoch 3 step 400/564 loss 0.8526 49.5 min, eta 20 min, peak 10.0 GB
+17215.3s 602 [ 284.0 min] gemma-4-12b_full_s43     epoch 1 step 50/663 loss 1.9195 6.3 min, eta 77 min, peak 9.8 GB
+17275.3s 603 [ 285.0 min] gemma-4-12b_ho_s43       epoch 3 step 400/564 loss 0.8526 49.5 min, eta 20 min, peak 10.0 GB
+17275.3s 604 [ 285.0 min] gemma-4-12b_full_s43     epoch 1 step 50/663 loss 1.9195 6.3 min, eta 77 min, peak 9.8 GB
+17335.3s 605 [ 286.0 min] gemma-4-12b_ho_s43       epoch 3 step 425/564 loss 0.7806 52.6 min, eta 17 min, peak 10.0 GB
+17335.3s 606 [ 286.0 min] gemma-4-12b_full_s43     epoch 1 step 50/663 loss 1.9195 6.3 min, eta 77 min, peak 9.8 GB
+17395.3s 607 [ 287.0 min] gemma-4-12b_ho_s43       epoch 3 step 425/564 loss 0.7806 52.6 min, eta 17 min, peak 10.0 GB
+17395.3s 608 [ 287.0 min] gemma-4-12b_full_s43     epoch 1 step 50/663 loss 1.9195 6.3 min, eta 77 min, peak 9.8 GB
+17455.3s 609 [ 288.0 min] gemma-4-12b_ho_s43       epoch 3 step 425/564 loss 0.7806 52.6 min, eta 17 min, peak 10.0 GB
+17455.3s 610 [ 288.0 min] gemma-4-12b_full_s43     epoch 1 step 75/663 loss 1.7979 9.4 min, eta 74 min, peak 9.8 GB
+17515.3s 611 [ 289.0 min] gemma-4-12b_ho_s43       epoch 3 step 450/564 loss 0.7616 56.0 min, eta 14 min, peak 10.0 GB
+17515.3s 612 [ 289.0 min] gemma-4-12b_full_s43     epoch 1 step 75/663 loss 1.7979 9.4 min, eta 74 min, peak 9.8 GB
+17575.3s 613 [ 290.0 min] gemma-4-12b_ho_s43       epoch 3 step 450/564 loss 0.7616 56.0 min, eta 14 min, peak 10.0 GB
+17575.3s 614 [ 290.0 min] gemma-4-12b_full_s43     epoch 1 step 75/663 loss 1.7979 9.4 min, eta 74 min, peak 9.8 GB
+17635.3s 615 [ 291.0 min] gemma-4-12b_ho_s43       epoch 3 step 450/564 loss 0.7616 56.0 min, eta 14 min, peak 10.0 GB
+17635.3s 616 [ 291.0 min] gemma-4-12b_full_s43     epoch 1 step 100/663 loss 1.7266 12.6 min, eta 71 min, peak 9.8 GB
+17695.3s 617 [ 292.0 min] gemma-4-12b_ho_s43       epoch 3 step 475/564 loss 0.7355 59.1 min, eta 11 min, peak 10.0 GB
+17695.3s 618 [ 292.0 min] gemma-4-12b_full_s43     epoch 1 step 100/663 loss 1.7266 12.6 min, eta 71 min, peak 9.8 GB
+17755.3s 619 [ 293.0 min] gemma-4-12b_ho_s43       epoch 3 step 475/564 loss 0.7355 59.1 min, eta 11 min, peak 10.0 GB
+17755.3s 620 [ 293.0 min] gemma-4-12b_full_s43     epoch 1 step 100/663 loss 1.7266 12.6 min, eta 71 min, peak 9.8 GB
+17815.3s 621 [ 294.0 min] gemma-4-12b_ho_s43       epoch 3 step 475/564 loss 0.7355 59.1 min, eta 11 min, peak 10.0 GB
+17815.3s 622 [ 294.0 min] gemma-4-12b_full_s43     epoch 1 step 125/663 loss 1.6526 15.6 min, eta 67 min, peak 9.8 GB
+17875.3s 623 [ 295.0 min] gemma-4-12b_ho_s43       epoch 3 step 500/564 loss 0.7313 61.9 min, eta 8 min, peak 10.0 GB
+17875.3s 624 [ 295.0 min] gemma-4-12b_full_s43     epoch 1 step 125/663 loss 1.6526 15.6 min, eta 67 min, peak 9.8 GB
+17935.3s 625 [ 296.0 min] gemma-4-12b_ho_s43       epoch 3 step 500/564 loss 0.7313 61.9 min, eta 8 min, peak 10.0 GB
+17935.3s 626 [ 296.0 min] gemma-4-12b_full_s43     epoch 1 step 125/663 loss 1.6526 15.6 min, eta 67 min, peak 9.8 GB
+17995.3s 627 [ 297.0 min] gemma-4-12b_ho_s43       epoch 3 step 500/564 loss 0.7313 61.9 min, eta 8 min, peak 10.0 GB
+17995.3s 628 [ 297.0 min] gemma-4-12b_full_s43     epoch 1 step 150/663 loss 1.6134 18.7 min, eta 64 min, peak 9.8 GB
+18055.4s 629 [ 298.0 min] gemma-4-12b_ho_s43       epoch 3 step 525/564 loss 0.7270 65.0 min, eta 5 min, peak 10.0 GB
+18055.4s 630 [ 298.0 min] gemma-4-12b_full_s43     epoch 1 step 150/663 loss 1.6134 18.7 min, eta 64 min, peak 9.8 GB
+18115.4s 631 [ 299.0 min] gemma-4-12b_ho_s43       epoch 3 step 525/564 loss 0.7270 65.0 min, eta 5 min, peak 10.0 GB
+18115.4s 632 [ 299.0 min] gemma-4-12b_full_s43     epoch 1 step 150/663 loss 1.6134 18.7 min, eta 64 min, peak 9.8 GB
+18175.4s 633 [ 300.0 min] gemma-4-12b_ho_s43       epoch 3 step 525/564 loss 0.7270 65.0 min, eta 5 min, peak 10.0 GB
+18175.4s 634 [ 300.0 min] gemma-4-12b_full_s43     epoch 1 step 175/663 loss 1.5702 21.8 min, eta 61 min, peak 9.8 GB
+18235.4s 635 [ 301.0 min] gemma-4-12b_ho_s43       epoch 3 step 550/564 loss 0.7247 68.2 min, eta 2 min, peak 10.0 GB
+18235.4s 636 [ 301.0 min] gemma-4-12b_full_s43     epoch 1 step 175/663 loss 1.5702 21.8 min, eta 61 min, peak 9.8 GB
+18295.4s 637 [ 302.0 min] gemma-4-12b_ho_s43       epoch 3 step 550/564 loss 0.7247 68.2 min, eta 2 min, peak 10.0 GB
+18295.4s 638 [ 302.0 min] gemma-4-12b_full_s43     epoch 1 step 175/663 loss 1.5702 21.8 min, eta 61 min, peak 9.8 GB
+18355.4s 639 [ 303.0 min] gemma-4-12b_ho_s43       epoch 3 step 550/564 loss 0.7247 68.2 min, eta 2 min, peak 10.0 GB
+18355.4s 640 [ 303.0 min] gemma-4-12b_full_s43     epoch 1 step 200/663 loss 1.5259 24.7 min, eta 57 min, peak 9.8 GB
+18415.4s 641 [ 304.0 min] gemma-4-12b_ho_s43       == epoch 3: eval macro-F1 0.6613 (diagnostic only, not used for selection)
+18415.4s 642 [ 304.0 min] gemma-4-12b_full_s43     epoch 1 step 200/663 loss 1.5259 24.7 min, eta 57 min, peak 9.8 GB
+18475.4s 643 [ 305.0 min] done gemma-4-12b_ho_s43; log /kaggle/working/b21_outputs/logs/gemma-4-12b_ho_s43.log
+18475.4s 644 [ 305.0 min] gemma-4-12b_full_s43     epoch 1 step 200/663 loss 1.5259 24.7 min, eta 57 min, peak 9.8 GB
+18535.4s 645 [ 306.0 min] gemma-4-12b_full_s43     epoch 2 step 225/663 loss 0.9360 28.2 min, eta 55 min, peak 9.8 GB
+18595.4s 646 [ 307.0 min] gemma-4-12b_full_s43     epoch 2 step 225/663 loss 0.9360 28.2 min, eta 55 min, peak 9.8 GB
+18655.4s 647 [ 308.0 min] gemma-4-12b_full_s43     epoch 2 step 225/663 loss 0.9360 28.2 min, eta 55 min, peak 9.8 GB
+18715.4s 648 [ 309.0 min] gemma-4-12b_full_s43     epoch 2 step 250/663 loss 1.0550 31.2 min, eta 52 min, peak 9.8 GB
+18775.4s 649 [ 310.0 min] gemma-4-12b_full_s43     epoch 2 step 250/663 loss 1.0550 31.2 min, eta 52 min, peak 9.8 GB
+18835.4s 650 [ 311.0 min] gemma-4-12b_full_s43     epoch 2 step 250/663 loss 1.0550 31.2 min, eta 52 min, peak 9.8 GB
+18895.4s 651 [ 312.0 min] gemma-4-12b_full_s43     epoch 2 step 275/663 loss 1.0437 34.3 min, eta 48 min, peak 9.8 GB
+18955.4s 652 [ 313.0 min] gemma-4-12b_full_s43     epoch 2 step 275/663 loss 1.0437 34.3 min, eta 48 min, peak 9.8 GB
+19015.4s 653 [ 314.0 min] gemma-4-12b_full_s43     epoch 2 step 275/663 loss 1.0437 34.3 min, eta 48 min, peak 9.8 GB
+19075.4s 654 [ 315.0 min] gemma-4-12b_full_s43     epoch 2 step 300/663 loss 1.0391 37.2 min, eta 45 min, peak 9.8 GB
+19135.4s 655 [ 316.0 min] gemma-4-12b_full_s43     epoch 2 step 300/663 loss 1.0391 37.2 min, eta 45 min, peak 9.8 GB
+19195.4s 656 [ 317.0 min] gemma-4-12b_full_s43     epoch 2 step 300/663 loss 1.0391 37.2 min, eta 45 min, peak 9.8 GB
+19255.4s 657 [ 318.0 min] gemma-4-12b_full_s43     epoch 2 step 300/663 loss 1.0391 37.2 min, eta 45 min, peak 9.8 GB
+19315.4s 658 [ 319.0 min] gemma-4-12b_full_s43     epoch 2 step 325/663 loss 1.0690 40.5 min, eta 42 min, peak 10.0 GB
+19375.4s 659 [ 320.0 min] gemma-4-12b_full_s43     epoch 2 step 325/663 loss 1.0690 40.5 min, eta 42 min, peak 10.0 GB
+19435.4s 660 [ 321.0 min] gemma-4-12b_full_s43     epoch 2 step 325/663 loss 1.0690 40.5 min, eta 42 min, peak 10.0 GB
+19495.4s 661 [ 322.0 min] gemma-4-12b_full_s43     epoch 2 step 350/663 loss 1.0358 44.1 min, eta 39 min, peak 10.0 GB
+19555.4s 662 [ 323.0 min] gemma-4-12b_full_s43     epoch 2 step 350/663 loss 1.0358 44.1 min, eta 39 min, peak 10.0 GB
+19615.4s 663 [ 324.0 min] gemma-4-12b_full_s43     epoch 2 step 350/663 loss 1.0358 44.1 min, eta 39 min, peak 10.0 GB
+19675.4s 664 [ 325.0 min] gemma-4-12b_full_s43     epoch 2 step 350/663 loss 1.0358 44.1 min, eta 39 min, peak 10.0 GB
+19735.4s 665 [ 326.0 min] gemma-4-12b_full_s43     epoch 2 step 375/663 loss 1.0250 47.6 min, eta 37 min, peak 10.0 GB
+19795.4s 666 [ 327.0 min] gemma-4-12b_full_s43     epoch 2 step 375/663 loss 1.0250 47.6 min, eta 37 min, peak 10.0 GB
+19855.4s 667 [ 328.0 min] gemma-4-12b_full_s43     epoch 2 step 375/663 loss 1.0250 47.6 min, eta 37 min, peak 10.0 GB
+19915.4s 668 [ 329.0 min] gemma-4-12b_full_s43     epoch 2 step 375/663 loss 1.0250 47.6 min, eta 37 min, peak 10.0 GB
+19975.4s 669 [ 330.0 min] gemma-4-12b_full_s43     epoch 2 step 400/663 loss 1.0164 51.4 min, eta 34 min, peak 10.0 GB
+20035.4s 670 [ 331.0 min] gemma-4-12b_full_s43     epoch 2 step 400/663 loss 1.0164 51.4 min, eta 34 min, peak 10.0 GB
+20095.4s 671 [ 332.0 min] gemma-4-12b_full_s43     epoch 2 step 400/663 loss 1.0164 51.4 min, eta 34 min, peak 10.0 GB
+20155.4s 672 [ 333.0 min] gemma-4-12b_full_s43     epoch 2 step 425/663 loss 1.0020 54.9 min, eta 31 min, peak 10.0 GB
+20215.4s 673 [ 334.0 min] gemma-4-12b_full_s43     epoch 2 step 425/663 loss 1.0020 54.9 min, eta 31 min, peak 10.0 GB
+20275.4s 674 [ 335.0 min] gemma-4-12b_full_s43     epoch 2 step 425/663 loss 1.0020 54.9 min, eta 31 min, peak 10.0 GB
+20335.4s 675 [ 336.0 min] gemma-4-12b_full_s43     epoch 3 step 450/663 loss 0.7385 58.3 min, eta 28 min, peak 10.0 GB
+20395.4s 676 [ 337.0 min] gemma-4-12b_full_s43     epoch 3 step 450/663 loss 0.7385 58.3 min, eta 28 min, peak 10.0 GB
+20455.4s 677 [ 338.0 min] gemma-4-12b_full_s43     epoch 3 step 450/663 loss 0.7385 58.3 min, eta 28 min, peak 10.0 GB
+20515.4s 678 [ 339.0 min] gemma-4-12b_full_s43     epoch 3 step 475/663 loss 0.7175 61.4 min, eta 24 min, peak 10.0 GB
+20575.4s 679 [ 340.0 min] gemma-4-12b_full_s43     epoch 3 step 475/663 loss 0.7175 61.4 min, eta 24 min, peak 10.0 GB
+20635.4s 680 [ 341.0 min] gemma-4-12b_full_s43     epoch 3 step 475/663 loss 0.7175 61.4 min, eta 24 min, peak 10.0 GB
+20695.4s 681 [ 342.0 min] gemma-4-12b_full_s43     epoch 3 step 475/663 loss 0.7175 61.4 min, eta 24 min, peak 10.0 GB
+20755.4s 682 [ 343.0 min] gemma-4-12b_full_s43     epoch 3 step 500/663 loss 0.7324 64.5 min, eta 21 min, peak 10.0 GB
+20815.4s 683 [ 344.0 min] gemma-4-12b_full_s43     epoch 3 step 500/663 loss 0.7324 64.5 min, eta 21 min, peak 10.0 GB
+20875.4s 684 [ 345.0 min] gemma-4-12b_full_s43     epoch 3 step 500/663 loss 0.7324 64.5 min, eta 21 min, peak 10.0 GB
+20935.4s 685 [ 346.0 min] gemma-4-12b_full_s43     epoch 3 step 525/663 loss 0.6954 67.6 min, eta 18 min, peak 10.0 GB
+20995.4s 686 [ 347.0 min] gemma-4-12b_full_s43     epoch 3 step 525/663 loss 0.6954 67.6 min, eta 18 min, peak 10.0 GB
+21055.4s 687 [ 348.0 min] gemma-4-12b_full_s43     epoch 3 step 525/663 loss 0.6954 67.6 min, eta 18 min, peak 10.0 GB
+21115.4s 688 [ 349.0 min] gemma-4-12b_full_s43     epoch 3 step 550/663 loss 0.6816 70.8 min, eta 15 min, peak 10.0 GB
+21175.4s 689 [ 350.0 min] gemma-4-12b_full_s43     epoch 3 step 550/663 loss 0.6816 70.8 min, eta 15 min, peak 10.0 GB
+21235.4s 690 [ 351.0 min] gemma-4-12b_full_s43     epoch 3 step 550/663 loss 0.6816 70.8 min, eta 15 min, peak 10.0 GB
+21295.4s 691 [ 352.0 min] gemma-4-12b_full_s43     epoch 3 step 575/663 loss 0.6781 73.8 min, eta 11 min, peak 10.0 GB
+21355.4s 692 [ 353.0 min] gemma-4-12b_full_s43     epoch 3 step 575/663 loss 0.6781 73.8 min, eta 11 min, peak 10.0 GB
+21415.4s 693 [ 354.0 min] gemma-4-12b_full_s43     epoch 3 step 575/663 loss 0.6781 73.8 min, eta 11 min, peak 10.0 GB
+21475.4s 694 [ 355.0 min] gemma-4-12b_full_s43     epoch 3 step 600/663 loss 0.6817 76.9 min, eta 8 min, peak 10.0 GB
+21535.4s 695 [ 356.0 min] gemma-4-12b_full_s43     epoch 3 step 600/663 loss 0.6817 76.9 min, eta 8 min, peak 10.0 GB
+21595.4s 696 [ 357.0 min] gemma-4-12b_full_s43     epoch 3 step 600/663 loss 0.6817 76.9 min, eta 8 min, peak 10.0 GB
+21655.4s 697 [ 358.0 min] gemma-4-12b_full_s43     epoch 3 step 625/663 loss 0.6824 80.2 min, eta 5 min, peak 10.0 GB
+21715.4s 698 [ 359.0 min] gemma-4-12b_full_s43     epoch 3 step 625/663 loss 0.6824 80.2 min, eta 5 min, peak 10.0 GB
+21775.4s 699 [ 360.0 min] gemma-4-12b_full_s43     epoch 3 step 625/663 loss 0.6824 80.2 min, eta 5 min, peak 10.0 GB
+21835.4s 700 [ 361.0 min] gemma-4-12b_full_s43     epoch 3 step 650/663 loss 0.6762 83.4 min, eta 2 min, peak 10.0 GB
+21895.4s 701 [ 362.0 min] gemma-4-12b_full_s43     epoch 3 step 650/663 loss 0.6762 83.4 min, eta 2 min, peak 10.0 GB
+21955.4s 702 [ 363.0 min] gemma-4-12b_full_s43     epoch 3 step 650/663 loss 0.6762 83.4 min, eta 2 min, peak 10.0 GB
+22015.4s 703 [ 364.0 min] done gemma-4-12b_full_s43; log /kaggle/working/b21_outputs/logs/gemma-4-12b_full_s43.log
+22015.4s 704 
+22015.4s 705 exit codes: {'gemma-4-12b_ho_s42': 0, 'b21_muril_full': 0, 'b21_muril_ho': 0, 'gemma-4-12b_full_s42': 0, 'gemma-4-12b_ho_s43': 0, 'gemma-4-12b_full_s43': 0} | LLM used: google/gemma-4-12B | 6.1 h elapsed
+22015.6s 706 MuRIL (Run 9 recipe)         macro-F1 0.6151  acc 0.6509  | Gende 0.704  Geo-p 0.642  Other 0.500  Polit 0.789  Relig 0.672  Viole 0.383
+22015.6s 707 gemma-4-12b seed 42          macro-F1 0.6566  acc 0.7057  | Gende 0.769  Geo-p 0.657  Other 0.513  Polit 0.812  Relig 0.779  Viole 0.410
+22015.6s 708 per-epoch holdout (diagnostic): [0.5972, 0.629, 0.6566]
+22015.6s 709 gemma-4-12b seed 43          macro-F1 0.6613  acc 0.7094  | Gende 0.770  Geo-p 0.620  Other 0.533  Polit 0.812  Relig 0.797  Viole 0.436
+22015.6s 710 per-epoch holdout (diagnostic): [0.5612, 0.6298, 0.6613]
+22015.6s 711 gemma-4-12b, 2 seed(s)       macro-F1 0.6792  acc 0.7283  | Gende 0.793  Geo-p 0.712  Other 0.566  Polit 0.806  Relig 0.788  Viole 0.410
+22015.6s 712 ensemble 50/50               macro-F1 0.6825  acc 0.7302  | Gende 0.787  Geo-p 0.701  Other 0.594  Polit 0.821  Relig 0.787  Viole 0.405
+22062.0s 713 LLM - MuRIL       +0.0641  CI [+0.0239, +0.1048]  P(better) 1.00
+22062.0s 714 ensemble - LLM    +0.0033  CI [-0.0186, +0.0248]  P(better) 0.62
+22062.0s 715 ensemble - MuRIL  +0.0674  CI [+0.0343, +0.1027]  P(better) 1.00
+22062.0s 716 
+22062.0s 717 recommended submission: llm
+22062.1s 718 b21_muril.zip  (5 seeds)
+22062.1s 719 Gende 40.9%/43.1%  Geo-p 10.1%/5.9%  Other 13.4%/14.2%  Polit 15.9%/17.7%  Relig 10.6%/12.1%  Viole 9.1%/7.0%
+22062.1s 720 WARNING: the recommended arm 'llm' has no full fit -- check the logs
+22062.1s 721 
+22062.1s 722 ['b21_muril.zip']
+22066.1s 723 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+22066.1s 724 cells[i][c] = re.sub('\\\\\|', '|', cell)
+22066.4s 725 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+22066.4s 726 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+22067.4s 727 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+22067.5s 728 [NbConvertApp] Writing 138425 bytes to __notebook__.ipynb
+22070.0s 729 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+22070.8s 730 [NbConvertApp] Writing 456301 bytes to __results__.html
