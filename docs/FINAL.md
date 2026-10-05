@@ -1,0 +1,78 @@
+# The final submission
+
+There is no more CodaBench scoring. **One submission is made for Task A and Task B
+together**, from models fine-tuned on all labelled rows: train plus the released labelled
+validation. Every choice behind it is made on the fixed 15% holdouts:
+
+| task | labelled rows | holdout | fingerprint |
+|---|---|---|---|
+| A | 7,193 | 1,079 | `815110ff24` |
+| B | 3,532 | 530 | `f85f4f049b` |
+
+No cross-task label derivation, and no test text in training, TAPT or screening.
+
+All notebooks below run standalone on Kaggle: **GPU T4 x2, Internet on, nothing to
+attach, no token.** Each clones the latest `task-b` and stops at 11 h, so it always saves
+its outputs.
+
+## Where things stand (2026-10-05)
+
+| | Task B | Task A |
+|---|---|---|
+| model | Gemma-4-12B, 4-bit QLoRA, last-token classification head | Gemma-4-12B, same recipe |
+| holdout evidence | **0.6792 / 0.6753** two-seed macro-F1 (Runs 21, 24) vs MuRIL **0.6151**: +0.064, CI [+0.024, +0.105] | **0.8563** (Run 28, seed 42) vs char SVM 0.8117: +0.043, CI [+0.021, +0.067]; the MuRIL-era best was 0.8155; the Gemma + SVM blend is 0.007 *worse* |
+| fallback already built | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22) | `RECOMMENDED_a28_gemma.zip` (Run 28, two healthy full fits) |
+
+## Open questions, each answered on the holdout before the final fit
+
+| question | notebook | owner | status | sets |
+|---|---|---|---|---|
+| 4 epochs or 3? | `task_b/23_gemma_epochs_seeds_final` | Aaryan | ready | `EPOCHS` |
+| R-Drop? | `task_b/24_gemma_muril_lessons` | Aaryan | **done**: inconclusive, -0.002 [-0.027, +0.023] | `RDROP = 0` |
+| LoRA rank and attention-only vs attention + MLP? | `task_b/26_gemma_lora_capacity_ablation` | Robin | ready | `--r`, `--lora-targets` |
+| TAPT (LoRA next-token pretraining)? | `task_b/27_gemma_tapt_holdout` | Robin | ready; memory fixed | `TAPT` |
+| definitions prompt, learning rate 2e-4? | `task_b/28_gemma_prompt_lr` | Aaryan | ready | `PROMPT`, `LR` |
+| Gemma on Task A, alone or blended with the SVM? | `task_a/28_gemma_holdout_final` | Aaryan | **done**: Gemma alone, 0.8563 | Task A model |
+| Task A: 4 epochs or 3? | `task_a/29_gemma_epochs` | Aaryan | ready | `EPOCHS` |
+| Task A: definitions prompt? | `task_a/30_gemma_definitions_prompt` | Aaryan | ready | `PROMPT` |
+| Task A: TAPT? | `task_a/31_gemma_tapt` | Aaryan | ready | `TAPT` |
+| Task A: lr 2e-4? | `task_a/32_gemma_lr` | Aaryan | ready | `LR` |
+
+These are independent and can run in parallel on separate accounts.
+
+**Collapse guard.** Gemma occasionally collapses onto one class: Task A Run 28's seed 43
+predicted Non-Hate for every row. After epoch 1 the classifier checks a sample of training
+rows, and exits with code 4 if one class takes more than 95% of them. Every notebook
+reruns such a job once with seed + 1000, and skips collapsed probabilities when reusing
+earlier outputs.
+
+## The final run
+
+1. **Task B.** Open `task_b/25_gemma_final_recipe` and set the flags in its third code
+   cell from the results above:
+
+   | flag | default | change it when |
+   |---|---|---|
+   | `EPOCHS` | 3 | Run 23 chose `4ep` or `mix`: use 4 |
+   | `TAPT` | False | Run 27's TAPT - no TAPT interval is clearly above 0 |
+   | `RDROP` | 0.0 | stays 0 |
+   | `PROMPT` | `"short"` | Run 28 printed `defs: True` |
+   | `LR` | 1e-4 | Run 28 printed `lr2e-4: True` |
+
+   Four seeds are trained on all 3,532 rows. It writes `RECOMMENDED_b25_gemma.zip`.
+2. **Task A.** Open `task_a/33_gemma_final_recipe` and set `EPOCHS`, `PROMPT`, `TAPT` and
+   `LR` from Task A Runs 29-32. Each flag is printed `True` when the arm beats the base
+   with P(better) >= 0.7. Four seeds are trained on all 7,193 rows. It writes
+   `RECOMMENDED_a33_gemma.zip`. Its defaults are Run 28's recipe, so it is safe to run
+   unchanged.
+3. **Store both** under `submissions/task_a/final/` and `submissions/task_b/final/`, each
+   with the ZIP, its `predictions.csv` and a README naming the notebook, the commit and
+   the holdout evidence. Record them in `docs/EXPERIMENTS.md`.
+
+Every final ZIP holds one bare `predictions.csv` with header `id,label`, one row per id of
+the released test file:
+
+| task | test file | rows |
+|---|---|---|
+| A | `hastika_binary_test.csv` | 806 |
+| B | `hastika_multiclass_test.csv` | 396 |

@@ -387,3 +387,31 @@ every blend weight, every decision threshold and every decode rule becomes secon
 instead of hours of GPU, and can be checked honestly with a nested estimate before a
 submission slot is spent. It is the highest-leverage hour available, and it is the one
 thing the no-holdout constraint should make an exception for.
+
+## The Gemma era, from 2026-10-04
+
+The rule "representation-level changes win" held again, and by the largest margin yet.
+Replacing MuRIL with a 4-bit QLoRA Gemma-4-12B moved both tasks: Task B +6.4 and Task A
++4.3 on the fixed holdouts. MuRIL-era lessons were re-tested on the new encoder and not
+assumed to carry over:
+
+| idea | result on Gemma | where |
+|---|---|---|
+| Gemma-4-12B instead of MuRIL | **measured: Task B +0.064, Task A +0.043**, both CIs above 0 | Task B 21, Task A 28 |
+| screen LLMs by bits per character | Gemma-4-12B 3.01 best; it then won after fine-tuning | Task B 20 |
+| Sarvam-1 (2B) | 0.5567 on Task B, -0.058 vs MuRIL | Task B 20 |
+| R-Drop 0.5 | inconclusive: -0.002 [-0.027, +0.023], 2x cost; better per seed, not after averaging | Task B 24 |
+| blend Gemma with the char SVM (Task A) | -0.007; the SVM is now redundant | Task A 28 |
+| blend Gemma with MuRIL (Task B) | +0.003, noise | Task B 21 |
+| translate to English, then hateBERT | dead: -5.3; the translator laundered 99% of slurs | Task A 20 |
+| more epochs (3 -> 4) | queued: every Gemma curve still rising at epoch 3 | Task B 23, Task A 29 |
+| TAPT as LoRA next-token pretraining | queued; first attempt ran out of memory (logits), fixed | Task B 27, Task A 31 |
+| the organisers' category definitions in the prompt | queued; targets the Others / Geo-political boundaries | Task B 28, Task A 30 |
+| learning rate 2e-4 | queued | Task B 28, Task A 32 |
+| LoRA rank and target modules | queued | Task B 26 |
+| layer re-initialisation, demojization | do not apply: MuRIL-specific fixes | -- |
+| larger Gemma (26B MoE, 31B) | does not fit a 15 GB T4 even in 4-bit | -- |
+
+**Hazard:** a seed can collapse onto one class (Task A 28, seed 43). It is now detected
+after epoch 1 and rerun automatically.
+

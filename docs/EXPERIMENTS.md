@@ -9,25 +9,26 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 * **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
   `Political`, `Religion`, and `Violence`.
 
-## Current status — 2026-10-03
+## Current status — 2026-10-05
+
+There is no more CodaBench scoring. **One final submission is made for both tasks**,
+decided on the fixed 15% holdouts. The runbook is [`FINAL.md`](FINAL.md), and the rules for
+two people working in parallel are in [`COLLABORATION.md`](COLLABORATION.md).
 
 | item | current state |
 |---|---|
-| Best Task A result | Run 11 at **`0.8188`** macro-F1 / `0.8189` accuracy on validation A; Run 9 is next at `0.8187` / `0.8189` |
-| Best Task A component | TAPT MuRIL alone, `0.8128` five-fold OOF, against the `0.8073` TF-IDF floor |
-| Latest combined-corpus Task A OOF result | Run 9 locked ensemble `0.8213` macro-F1 / `0.8215` accuracy on 7,193 deduplicated rows; local OOF only |
-| Best Task B local result | Run 6 at **`0.614`** averaged five-fold OOF macro-F1; Run 19 scored `0.6123` on a larger transductive corpus with one seed |
-| Best recorded Task B CodaBench result | `b_reinit1_rdrop_full`, **`0.6410`** — confirmed Run 9 |
-| Current Task B candidate | `b_reinit1_rdrop_full`, R-Drop plus one-layer reinitialization |
-| Next Task B step | Keep Run 9 as the confirmed candidate; Run 19 is complete and does not justify replacing it |
-| Current Task A work | Runs 22 and 23 completed the combined-corpus OOF comparison; Runs 24--26 are prepared; Run 10 is rejected |
-| Next Task A step | Run 24, 25 and 26 are prepared as evaluation-only OOF diagnostics before any new full-data submission |
-| Current branch | `task-b` |
-| Official validation size | 395 rows with hidden labels; score via CodaBench |
+| Task B model | **Gemma-4-12B, 4-bit QLoRA**, last-token head: **0.6792 / 0.6753** two-seed holdout macro-F1 (Runs 21, 24) vs **0.6151** for the best MuRIL recipe (+0.064, CI [+0.024, +0.105]) |
+| Task A model | **Gemma-4-12B**, same recipe: **0.8563** on the 1,079-row holdout (Run 28, seed 42) vs the char SVM's 0.8117 (+0.043, CI [+0.021, +0.067]) and SVM + MuRIL's 0.8155 |
+| Measured and rejected on Gemma | Task B R-Drop (inconclusive, -0.002, CI [-0.027, +0.023], 2x cost); Task A Gemma + SVM blend (-0.007); translation to English (Task A Run 20, -5.3) |
+| Being measured | Task B: epochs (23), LoRA capacity (26, Robin), TAPT (27, Robin), definitions prompt and lr (28). Task A: epochs (29), definitions prompt (30), TAPT (31), lr (32) |
+| Final fits | Task B Run 25 and Task A Run 33: four seeds on all labelled rows, flags set from the runs above |
+| Fallback ZIPs already built | Task B `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22); Task A `RECOMMENDED_a28_gemma.zip` (Run 28) |
+| Known hazard | Gemma can collapse onto one class (Task A Run 28, seed 43). The classifier exits with code 4 after epoch 1 and the notebooks rerun the job with another seed |
+| Holdouts | Task B 530 rows `f85f4f049b`; Task A 1,079 rows `815110ff24` |
+| Branch | `task-b` |
 
-Run 9 is now the strongest confirmed Task B submission: the one-layer full-data R-Drop fit
-scored `0.6410` on CodaBench, improving on Run 8's `0.6299`. Runs 6 and 7 support the
-one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
+MuRIL-era CodaBench results (Task B best 0.6410, Task A best 0.8188) are kept below as a
+record.
 
 ## Experiment roadmap
 
@@ -56,7 +57,12 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 25 | ready; not run | `25_char_svm_third_member_oof.ipynb` | test character-only TF-IDF as a third member beside word+char SVM and MuRIL | three-way five-fold OOF and nested blend pending; no ZIP by design |
 | Task A 26 | ready; not run | `26_transductive_derivable_labels_oof.ipynb` | add only the 365 certain cross-task-derived labels to each training fold | matched control, original-train OOF, and derived/non-derived released-validation diagnostics pending; no ZIP by design |
 | Task A 27 | ready; not run | `27_run25_validation_and_test.ipynb` | fit the fixed Run 25 0.60/0.33/0.07 blend on original training data for an honest released-validation score, then refit on train plus validation for released-test predictions | validation score and `test_predictions.csv` pending; no ZIP by design |
-| Task A 28 | ready; standalone | `28_gemma_holdout_final.ipynb` | Gemma-4-12B QLoRA on Task A: 2 seeds on the 1,079-row holdout vs the char SVM and a fixed 50/50 blend, then full fits on 7,193 rows and three test ZIPs | holdout bootstraps; RECOMMENDED ZIP by a pre-set rule |
+| Task A 28 | 2026-10-05, completed | `28_gemma_holdout_final.ipynb` | Gemma-4-12B QLoRA on Task A: holdout vs char SVM and a 50/50 blend, then full fits and three ZIPs | seed 42 **0.8563** vs SVM 0.8117 (+0.043, CI [+0.021, +0.067]); blend -0.007 vs Gemma; seed 43 **collapsed** (all Non-Hate); both full fits healthy -> `RECOMMENDED_a28_gemma.zip` |
+| Task A 29 | ready; standalone | `29_gemma_epochs.ipynb` | 4 epochs vs 3 on the holdout | holdout bootstrap vs base; flag for Run 33 (~5.5 h) |
+| Task A 30 | ready; standalone | `30_gemma_definitions_prompt.ipynb` | the organisers' Hate/Non-hate definitions in the prompt | holdout bootstrap vs base; flag for Run 33 (~6 h) |
+| Task A 31 | ready; standalone | `31_gemma_tapt.ipynb` | TAPT: LoRA next-token pretraining on training text + external corpus, then classification | holdout bootstrap vs base; flag for Run 33 (~6.5 h) |
+| Task A 32 | ready; standalone | `32_gemma_lr.ipynb` | learning rate 2e-4 vs 1e-4 | holdout bootstrap vs base; flag for Run 33 (~5 h) |
+| Task A 33 | ready; standalone | `33_gemma_final_recipe.ipynb` | **final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | `RECOMMENDED_a33_gemma.zip` (~5-8.5 h) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -80,6 +86,11 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 21 | 2026-10-05, completed | `21_llm_confirm_final.ipynb` | Gemma-4-12B QLoRA vs the Run 9 MuRIL recipe on the 530-row holdout, then full fits on 3,532 rows | **Gemma 2 seeds 0.6792** vs MuRIL 0.6151, **+0.064, CI [+0.024, +0.105]**; ensemble 0.6825 (+0.003 over Gemma, inside noise) -> LLM recommended. Packaging bug left only the MuRIL ZIP; Run 22 packages the saved Gemma probabilities |
 | Task B 22 | 2026-10-05, completed | `22_package_run21.ipynb` | Run 21's 2-seed Gemma-4-12B submission, standalone (nothing attached, so both full fits retrained) | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written; predicted shares match the prior (Violence 7.6% vs 7.0%, Geo 8.8% vs 5.9%); final-submission candidate (3 epochs, 2 seeds) |
 | Task B 23 | ready; standalone | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout (vs Run 21's recorded 0.6792, or paired when attached), then four full-data models of the winner | `RECOMMENDED_b23_gemma.zip`, CodaBench pending |
+| Task B 24 | 2026-10-05, completed; TAPT arm failed | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma-4-12B, 2 seeds each on the 530-row holdout | base **0.6753** (reproduces Run 21's 0.6792); **R-Drop 0.6734, -0.002, CI [-0.027, +0.023]: inconclusive, left off (2x cost)**; TAPT OOM in the 262k-vocabulary logits, unmeasured (fixed since) |
+| Task B 25 | ready; standalone | `25_gemma_final_recipe.ipynb` | final Gemma recipe on all 3,532 rows, four seeds; `EPOCHS`/`TAPT`/`RDROP` flags set from Runs 23-24 (defaults: Run 21's recipe) | `RECOMMENDED_b25_gemma.zip`, CodaBench pending |
+| Task B 26 | ready (Robin) | `26_gemma_lora_capacity_ablation.ipynb` | LoRA rank 8/16/32 x attention-only vs attention + MLP, 2 seeds each, on the holdout | sets `--r` / `--lora-targets` for Run 25 |
+| Task B 27 | ready (Robin); standalone since 2026-10-05 | `27_gemma_tapt_holdout.ipynb` | TAPT then classification vs no TAPT on the holdout | sets `TAPT` for Run 25 |
+| Task B 28 | ready; standalone | `28_gemma_prompt_lr.ipynb` | the organisers' category definitions in the prompt; lr 2e-4 | sets `PROMPT` / `LR` for Run 25 |
 
 ## Ordered next steps
 
@@ -256,7 +267,7 @@ extractor with **no fine-tuning at all**: meanmax-pooled embeddings feed an
 official validation inputs.
 
 The artifact is preserved at
-[`submissions/task_a_embeddings_svm/`](../submissions/task_a_embeddings_svm/) and was
+[`submissions/task_a/embeddings_svm/`](../submissions/task_a/embeddings_svm/) and was
 validated on 2026-09-19: 806 rows, ids matching `binary_validation_inputs.csv` exactly, no
 duplicates, `id,label` header, allowed labels only, and a flat ZIP containing one bare
 `predictions.csv`.
@@ -638,8 +649,6 @@ is a Task A row labelled Hate. So a Task B row whose id appears in **no** releas
 file can only be a Task A **test** row:
 
 | Task B file | ids | in Task A train | in Task A validation | in neither |
-| Task B 24 | 2026-10-05, completed; TAPT arm failed | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma-4-12B, 2 seeds each on the 530-row holdout | base **0.6753** (reproduces Run 21's 0.6792); **R-Drop 0.6734, -0.002, CI [-0.027, +0.023] -> rejected**; TAPT OOM in the 262k-vocabulary logits, unmeasured (fixed since) |
-| Task B 25 | ready; standalone | `25_gemma_final_recipe.ipynb` | final Gemma recipe on all 3,532 rows, four seeds; `EPOCHS`/`TAPT`/`RDROP` flags set from Runs 23-24 (defaults: Run 21's recipe) | `RECOMMENDED_b25_gemma.zip`, CodaBench pending |
 |---|---|---|---|---|
 | `multiclass_train` | 3,159 | 2,515 | 324 | **320** |
 | `multiclass_validation_inputs` | 395 | 319 | 32 | **44** |
@@ -1193,9 +1202,13 @@ against the 0.6410 MuRIL best; record its CodaBench score here. Log:
 | base (Run 21's recipe, retrained) | 0.6566 | 0.6631 | **0.6753** | 0.794 | 0.701 | 0.556 | 0.802 | 0.773 | 0.425 |
 | R-Drop 0.5 | 0.6690 | 0.6900 | 0.6734 | 0.773 | 0.676 | 0.557 | 0.829 | 0.791 | 0.415 |
 
-- **R-Drop:** -0.0019, 95% CI [-0.0271, +0.0228], P(better) 0.44, at twice the step cost.
-  Rejected for Gemma. Its 0.6900 on seed 43 is the best single seed so far, but the two
-  seeds average below base, which is seed noise and not an effect.
+- **R-Drop is inconclusive:** -0.0019, 95% CI [-0.0271, +0.0228], P(better) 0.44, at
+  twice the step cost. Per seed it is ahead: 0.669 and 0.690, against 0.657 and 0.663 for
+  base. Averaged, it is not: averaging two base models gained +1.5, averaging two R-Drop
+  models lost 0.6. One plausible reason is that R-Drop makes models agree more, which
+  leaves averaging less to gain. On 530 rows, a few rare-class comments decide either
+  reading. It is left off for the final fit because a gain is not shown and it doubles the
+  cost.
 - **The base reproduces Run 21:** seed 42 is identical (0.6566), seed 43 differs by
   0.002, and the 2-seed average is 0.6753 against 0.6792. The Gemma result is stable
   across sessions.
@@ -1206,7 +1219,7 @@ against the 0.6410 MuRIL best; record its CodaBench score here. Log:
   4 x 160. `llm_tapt.py` now applies the head to a detached copy of the hidden states
   chunk by chunk and runs one decoder backward per batch. The gradients are identical
   (checked against the unchunked loss, max difference 7e-9). TAPT is being measured in
-  Robin's `25_gemma_tapt_holdout.ipynb`.
+  Robin's `27_gemma_tapt_holdout.ipynb`.
 
 ### Final-submission plan, 2026-10-05
 
@@ -1222,7 +1235,7 @@ made on the fixed holdouts:
 |---|---|---|
 | `RDROP` | 0 | Run 24 |
 | `EPOCHS` | 3 or 4 | Run 23 |
-| `TAPT` | True only if `25_gemma_tapt_holdout` shows a gain | Robin's run |
+| `TAPT` | True only if `27_gemma_tapt_holdout` shows a gain | Robin's run |
 
 Fallback: `RECOMMENDED_b22_gemma_3ep_2seeds.zip` from Run 22 is already a complete Task B
 submission from the same recipe (two seeds).
@@ -1231,6 +1244,45 @@ submission from the same recipe (two seeds).
 fixed 50/50 blend on the holdout, then full fits on 7,193 rows. A rule fixed in advance
 marks the recommended ZIP.
 
-Notebook-number note: `24_gemma_lora_capacity_ablation` and `25_gemma_tapt_holdout`
-(Robin) are separate from `24_gemma_muril_lessons` and `25_gemma_final_recipe`.
+Notebook numbering was fixed on 2026-10-05. Robin's capacity ablation is **Run 26**
+(`26_gemma_lora_capacity_ablation`) and his TAPT holdout is **Run 27**
+(`27_gemma_tapt_holdout`). They used to share the numbers 24 and 25 with
+`24_gemma_muril_lessons` and `25_gemma_final_recipe`.
+
+### Task A Run 28 result, 2026-10-05 -- Gemma-4-12B lifts Task A by 4 points
+
+Gemma-4-12B QLoRA, 3 epochs, seeds 42 and 43, trained on 6,114 rows and scored on the
+1,079-row holdout (`815110ff24`). Both seeds were then fitted on all 7,193 rows. 5.2 h on
+T4 x2.
+
+| arm | macro-F1 | Non-Hate F1 | Hate F1 |
+|---|---|---|---|
+| char SVM | 0.8117 | 0.817 | 0.807 |
+| SVM 0.57 + MuRIL 0.43 (Run 20) | 0.8155 | | |
+| **Gemma seed 42** | **0.8563** | 0.856 | 0.857 |
+| Gemma seed 43 | 0.3372 | 0.674 | 0.000 |
+| Gemma, both seeds averaged | 0.8545 | 0.854 | 0.854 |
+| Gemma + SVM, 50/50 | 0.8471 | 0.848 | 0.846 |
+
+| paired bootstrap | difference | 95% CI | P(better) |
+|---|---|---|---|
+| Gemma - SVM | +0.0428 | [+0.0205, +0.0668] | 1.00 |
+| blend - Gemma | -0.0074 | [-0.0226, +0.0078] | 0.16 |
+| blend - SVM | +0.0353 | [+0.0187, +0.0531] | 1.00 |
+
+- **Gemma is the largest Task A gain in the project:** +4.3 over the char SVM and +4.1
+  over the MuRIL-era best blend. Seed 42's curve was still rising at the last epoch
+  (0.817, 0.846, 0.856).
+- **The SVM no longer helps.** Blending it in costs 0.7 points. On Task A the char SVM
+  was the strongest component of every MuRIL-era submission, and against Gemma it is
+  redundant.
+- **Seed 43 collapsed.** Its first logged loss was 1.08, after which it sat at chance
+  (about 0.70) for three epochs and predicted Non-Hate for every row. Both full-data fits
+  trained normally (final loss 0.25 and 0.27), so `RECOMMENDED_a28_gemma.zip` averages two
+  healthy models. The classifier now catches this after epoch 1: a training-row sample
+  predicted more than 95% one class exits with code 4. `run_jobs` in every Gemma notebook
+  then reruns the job with seed + 1000. Reused probabilities that are collapsed are
+  skipped.
+- **Next:** Runs 29-32 test epochs, the definitions prompt, TAPT and learning rate on
+  Task A. Run 33 is the final fit.
 
