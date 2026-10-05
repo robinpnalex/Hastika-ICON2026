@@ -48,7 +48,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task A 17 | 2026-09-20, ready; not run | `17_final_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 3 seeds, transductive, 0.4 SVM blend | CodaBench pending |
 | Task A 18 | 2026-09-20, ready; not run | `18_rdrop_short.ipynb` | paired 80-minute holdout test of R-Drop 0.5 vs control on Task A | bootstrapped interval pending |
 | Task A 19 | 2026-09-20, ready; not run | `19_optimized_submission.ipynb` | full-corpus TAPT, 10 epochs, 2 reinit layers, 5 seeds, R-Drop 0.5, transductive, 0.25 SVM blend | CodaBench pending |
-| Task A 20 | 2026-10-05, revised; rerun pending | `20_translate_to_english.ipynb` | translate to English, then hateBERT; now on train + released validation (7,193 rows) with a fixed 15% holdout of 1,079 rows (`815110ff24`), compared on the same rows with char SVM, MuRIL and fixed-weight blends | second attempt loaded no translator: indic-translate gated, IndicTrans2 broken under transformers 5. Now Sarvam-Translate (ungated) + IndicTrans2 1B (with `HF_TOKEN`) on transformers 4.51.3; slur-lexicon false positives (`kannada`->filthy, `gowda`->dick, `gandhi`->whore) removed |
+| Task A 20 | 2026-10-05, completed; **negative** | `20_translate_to_english.ipynb` | translate to English (Sarvam-Translate), then hateBERT; 1,079-row holdout of train + released validation | hateBERT **0.7275** vs MuRIL 0.7803 (-0.053, CI [-0.078, -0.027]); adding it hurts every blend; canonicalised char SVM +0.003 (CI spans 0). Translation line closed |
 | Task A 21 | attempted; setup failed | `21_train_validation_test.ipynb` | refit the Run 11 one-layer MuRIL + TF-IDF blend on original train plus released labelled validation, then predict the released test file | stopped before training because the released validation CSV was missing from the stale Kaggle clone; no ZIP |
 | Task A 22 | completed | `22_run9_oof_evaluation.ipynb` | measure the second-best Run 9 demojized MuRIL + TF-IDF ensemble on the combined labelled corpus with five-fold OOF predictions | **0.8213 macro-F1 / 0.8215 accuracy** on 7,193 deduplicated rows; no ZIP by design |
 | Task A 23 | completed | `23_oof_compare_run11_run9.ipynb` | measure Run 11 and Run 9 on the same five-fold OOF split after adding the released labels | Run 11: **0.8204 / 0.8204**; Run 9: **0.8213 / 0.8215** macro-F1/accuracy; no ZIP by design |
@@ -1097,4 +1097,42 @@ Paired bootstrap:
 - **Packaging bug.** The final cell read `test_probs.npy`, but the classifier writes
   `test_inputs_probs.npy`, so only `b21_muril.zip` was written. Fixed in the notebook.
   `package_b21.py` and Run 22 rebuild the ZIPs from the saved output.
+
+### Task A Run 20 result, 2026-10-05 -- translation loses, and the line is closed
+
+The run trained on 6,114 rows and scored on the fixed 1,079-row holdout (`815110ff24`).
+IndicTrans2 could not load: fairseq's dataclasses are rejected by Kaggle's Python 3.13. So
+the only translator was **Sarvam-Translate**. Translating 7,193 rows took about 3 h on a T4.
+
+| arm | macro-F1 | Hate F1 |
+|---|---|---|
+| char SVM, romanized | 0.8117 | 0.8069 |
+| char SVM, canonicalised slur spellings | 0.8146 | 0.8106 |
+| MuRIL, romanized, 3 seeds | 0.7803 | 0.7775 |
+| SVM 0.57 + MuRIL 0.43 | **0.8155** | 0.8135 |
+| hateBERT on Sarvam-Translate English, 3 seeds | 0.7275 | 0.7232 |
+| SVM + hateBERT, 50/50 | 0.7924 | 0.7899 |
+| SVM + MuRIL + hateBERT, thirds | 0.8091 | 0.8071 |
+
+| paired bootstrap | difference | 95% CI | P(better) |
+|---|---|---|---|
+| hateBERT - MuRIL | -0.0529 | [-0.0780, -0.0268] | 0.00 |
+| thirds - (SVM + MuRIL) | -0.0065 | [-0.0186, +0.0056] | 0.15 |
+| (SVM + hateBERT) - SVM | -0.0194 | [-0.0362, -0.0019] | 0.02 |
+| canonicalised SVM - SVM | +0.0028 | [-0.0019, +0.0082] | 0.88 |
+
+- **The translator launders the abuse.** Raw slur survival was **1%**. Most outputs were
+  either the romanized text echoed back unchanged, or a fluent sentence unrelated to the
+  comment. One example: "Huccha hudaga ... chakka agiddakke banta" became "I feel a lot of
+  anxiety when I have to give a speech". Another: "Paapa how she matadtale with avar tayi"
+  became "How she killed her uncle by eating him". The injected glosses survived (70%)
+  only because they were already English.
+- **hateBERT on that text is 5.3 points below MuRIL,** and it drags down every blend it
+  joins. The two models disagree on 21% of rows, but hateBERT is the one that is wrong
+  there, which is the Run 10 pattern again.
+- **The spelling canonicaliser is a small, unconfirmed positive** for the char SVM. It is
+  worth folding into a future SVM run, not worth a submission of its own.
+- **Conclusion:** translating romanized Kanglish with current open translators destroys
+  the signal Task A depends on. The representation lever that worked on Task B, a QLoRA
+  multilingual LLM reading the romanized text directly, is the one to try on Task A.
 
