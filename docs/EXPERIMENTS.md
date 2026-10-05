@@ -17,12 +17,12 @@ two people working in parallel are in [`COLLABORATION.md`](COLLABORATION.md).
 
 | item | current state |
 |---|---|
-| Task B model | **Gemma-4-12B, 4-bit QLoRA**, last-token head: **0.6792 / 0.6753** two-seed holdout macro-F1 (Runs 21, 24) vs **0.6151** for the best MuRIL recipe (+0.064, CI [+0.024, +0.105]) |
+| Task B model | **Gemma-4-12B, 4-bit QLoRA**, last-token head, 4 epochs: **0.6872** two-seed holdout macro-F1 (Run 23); 3 epochs gave 0.6792 / 0.6753 (Runs 21, 24) vs **0.6151** for the best MuRIL recipe (+0.064, CI [+0.024, +0.105]) |
 | Task A model | **Gemma-4-12B**, same recipe: **0.8563** on the 1,079-row holdout (Run 28, seed 42) vs the char SVM's 0.8117 (+0.043, CI [+0.021, +0.067]) and SVM + MuRIL's 0.8155 |
 | Measured and rejected on Gemma | Task B R-Drop (inconclusive, -0.002, CI [-0.027, +0.023], 2x cost); Task A Gemma + SVM blend (-0.007); translation to English (Task A Run 20, -5.3) |
-| Being measured | Task B: epochs (23), LoRA capacity (26, Robin), TAPT (27, Robin), definitions prompt and lr (28). Task A: epochs (29), definitions prompt (30), TAPT (31), lr (32) |
+| Being measured | Task B: LoRA capacity (26, Robin), TAPT (27, Robin), definitions prompt and lr (28). Task A: epochs (29), definitions prompt (30), TAPT (31), lr (32) |
 | Final fits | Task B Run 25 and Task A Run 33: four seeds on all labelled rows, flags set from the runs above |
-| Fallback ZIPs already built | Task B `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22); Task A `RECOMMENDED_a28_gemma.zip` (Run 28) |
+| Best ZIPs already built | Task B `RECOMMENDED_b23_gemma.zip` (Run 23: 4 epochs, 4 seeds, all rows); Task A `RECOMMENDED_a28_gemma.zip` (Run 28) |
 | Known hazard | Gemma can collapse onto one class (Task A Run 28, seed 43). The classifier exits with code 4 after epoch 1 and the notebooks rerun the job with another seed |
 | Holdouts | Task B 530 rows `f85f4f049b`; Task A 1,079 rows `815110ff24` |
 | Branch | `task-b` |
@@ -85,7 +85,7 @@ record.
 | Task B 20 | 2026-10-04, completed; main arm crashed | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM beat the Run 9 MuRIL recipe on the fixed 530-row holdout? | MuRIL **0.6151**; Sarvam-1 0.5567 (-0.058, CI [-0.104, -0.014]); 50/50 ensemble 0.6187. Gemma-4-12B screened best but crashed on a peft/torchao version check, so the main arm is untested |
 | Task B 21 | 2026-10-05, completed | `21_llm_confirm_final.ipynb` | Gemma-4-12B QLoRA vs the Run 9 MuRIL recipe on the 530-row holdout, then full fits on 3,532 rows | **Gemma 2 seeds 0.6792** vs MuRIL 0.6151, **+0.064, CI [+0.024, +0.105]**; ensemble 0.6825 (+0.003 over Gemma, inside noise) -> LLM recommended. Packaging bug left only the MuRIL ZIP; Run 22 packages the saved Gemma probabilities |
 | Task B 22 | 2026-10-05, completed | `22_package_run21.ipynb` | Run 21's 2-seed Gemma-4-12B submission, standalone (nothing attached, so both full fits retrained) | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written; predicted shares match the prior (Violence 7.6% vs 7.0%, Geo 8.8% vs 5.9%); final-submission candidate (3 epochs, 2 seeds) |
-| Task B 23 | ready; standalone | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout (vs Run 21's recorded 0.6792, or paired when attached), then four full-data models of the winner | `RECOMMENDED_b23_gemma.zip`, CodaBench pending |
+| Task B 23 | 2026-10-05, completed | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout, then four 4-epoch full fits | 4 epochs **0.6872** vs 3 epochs 0.6792 (2 seeds each, +0.008, unpaired); Violence 0.410 -> 0.483; **`RECOMMENDED_b23_gemma.zip`, 4 models: the current best Task B submission** |
 | Task B 24 | 2026-10-05, completed; TAPT arm failed | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma-4-12B, 2 seeds each on the 530-row holdout | base **0.6753** (reproduces Run 21's 0.6792); **R-Drop 0.6734, -0.002, CI [-0.027, +0.023]: inconclusive, left off (2x cost)**; TAPT OOM in the 262k-vocabulary logits, unmeasured (fixed since) |
 | Task B 25 | ready; standalone | `25_gemma_final_recipe.ipynb` | final Gemma recipe on all 3,532 rows, four seeds; `EPOCHS`/`TAPT`/`RDROP` flags set from Runs 23-24 (defaults: Run 21's recipe) | `RECOMMENDED_b25_gemma.zip`, CodaBench pending |
 | Task B 26 | ready (Robin) | `26_gemma_lora_capacity_ablation.ipynb` | LoRA rank 8/16/32 x attention-only vs attention + MLP, 2 seeds each, on the holdout | sets `--r` / `--lora-targets` for Run 25 |
@@ -1285,4 +1285,51 @@ T4 x2.
   skipped.
 - **Next:** Runs 29-32 test epochs, the definitions prompt, TAPT and learning rate on
   Task A. Run 33 is the final fit.
+
+### Run 23 result, 2026-10-05 -- four epochs, and a four-model Task B submission
+
+Run on commit `ae088e6`, which predates the collapse guard. Run 21's output was not
+attached, so 4 epochs is compared with Run 21's *recorded* 3-epoch scores on the same rows
+and seeds. That makes the comparison unpaired, with no bootstrap interval.
+
+| holdout, 530 rows | seed 42 | seed 43 | 2 seeds | Gender | Geo-pol | Others | Political | Religion | Violence |
+|---|---|---|---|---|---|---|---|---|---|
+| 3 epochs (Run 21) | 0.6566 | 0.6613 | 0.6792 | 0.793 | 0.712 | 0.566 | 0.806 | 0.788 | 0.410 |
+| **4 epochs** | **0.6614** | **0.6653** | **0.6872** | 0.785 | 0.667 | 0.569 | 0.822 | 0.797 | **0.483** |
+
+Per-epoch holdout (diagnostic):
+
+| seed | epoch 1 | epoch 2 | epoch 3 | epoch 4 |
+|---|---|---|---|---|
+| 42 | 0.557 | 0.632 | 0.654 | 0.661 |
+| 43 | **0.022** | 0.572 | 0.674 | 0.665 |
+
+- **4 epochs is a small, consistent gain:** +0.004 on each seed and +0.008 for the
+  two-seed average. The weakest class gains most (Violence +0.073), while Geo-political
+  falls (0.712 to 0.667). With roughly 2.5 points of noise, this is not a proven effect.
+  The curve is flattening, so more than 4 epochs is unlikely to pay.
+- **The run chose `4ep` and fitted four 4-epoch models on all 3,532 rows** (seeds 42-45,
+  108-118 min each). It averaged them into **`RECOMMENDED_b23_gemma.zip`**. Predicted
+  class shares match the prior:
+
+  | class | predicted | prior |
+  |---|---|---|
+  | Gender | 43.2% | 43.1% |
+  | Geo-political | 7.3% | 5.9% |
+  | Others | 12.4% | 14.2% |
+  | Political | 18.2% | 17.7% |
+  | Religion | 10.9% | 12.1% |
+  | Violence | 8.1% | 7.0% |
+
+  With four models averaged instead of two, this replaces Run 22's ZIP as the best Task B
+  submission.
+- **Seed 43 nearly collapsed.** Its training loss sat at chance (1.70, then 1.89 and
+  1.80, against ln 6 = 1.79) through epoch 2. It recovered in epoch 3 and finished
+  under-trained (final loss 0.75, against 0.48 for seed 42), yet scored 0.665. This is the
+  second early collapse, after Task A Run 28's seed 43: roughly one seed in four on both
+  tasks. The guard added since restarts such a run after epoch 1. That costs one epoch and
+  avoids a model that trains in a degenerate state for half its schedule.
+- **Consequence:** the final Task B recipe (Run 25) now defaults to `EPOCHS = 4`. If Runs
+  27 and 28 leave every other flag at its default, Run 25 would reproduce this
+  submission, and `RECOMMENDED_b23_gemma.zip` is the Task B final as it stands.
 

@@ -19,7 +19,7 @@ attached, and they stop at 11 h.
 | `20_llm_screen_holdout.ipynb` | 20 | Aaryan | screen five LLMs by bits per character; QLoRA the top two; MuRIL baseline | done: MuRIL 0.6151; Gemma-4-12B screened best but crashed (torchao) | ~3.5 h |
 | `21_llm_confirm_final.ipynb` | 21 | Aaryan | Gemma-4-12B on the holdout + full fits | done: **0.6792**, +0.064 over MuRIL, CI [+0.024, +0.105] | ~6 h |
 | `22_package_run21.ipynb` | 22 | Aaryan | Run 21's recipe, two full fits, packaged | done: `RECOMMENDED_b22_gemma_3ep_2seeds.zip` | ~1.5 h |
-| `23_gemma_epochs_seeds_final.ipynb` | 23 | Aaryan | 4 vs 3 epochs, then four full-data models of the winner | ready | ~5.5-6 h |
+| `23_gemma_epochs_seeds_final.ipynb` | 23 | Aaryan | 4 vs 3 epochs, then four full-data models of the winner | done: 4 epochs **0.6872** vs 0.6792; `RECOMMENDED_b23_gemma.zip` (4 models), the best Task B ZIP | ~5.7 h |
 | `24_gemma_muril_lessons.ipynb` | 24 | Aaryan | TAPT and R-Drop vs base | done: base 0.6753, R-Drop 0.6734 (inconclusive); TAPT OOM | ~3.2 h |
 | `25_gemma_final_recipe.ipynb` | 25 | Aaryan | **the final Task B fit**: four seeds on all 3,532 rows, flags from Runs 23-28 | run last | ~3-8.5 h |
 | `26_gemma_lora_capacity_ablation.ipynb` | 26 | Robin | LoRA rank 8/16/32 x attention-only vs attention + MLP | ready | long: 12 fits |

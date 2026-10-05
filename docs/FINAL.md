@@ -20,14 +20,14 @@ its outputs.
 | | Task B | Task A |
 |---|---|---|
 | model | Gemma-4-12B, 4-bit QLoRA, last-token classification head | Gemma-4-12B, same recipe |
-| holdout evidence | **0.6792 / 0.6753** two-seed macro-F1 (Runs 21, 24) vs MuRIL **0.6151**: +0.064, CI [+0.024, +0.105] | **0.8563** (Run 28, seed 42) vs char SVM 0.8117: +0.043, CI [+0.021, +0.067]; the MuRIL-era best was 0.8155; the Gemma + SVM blend is 0.007 *worse* |
-| fallback already built | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22) | `RECOMMENDED_a28_gemma.zip` (Run 28, two healthy full fits) |
+| holdout evidence | **0.6872** two-seed macro-F1 at 4 epochs (Run 23); 0.6792 / 0.6753 at 3 epochs (Runs 21, 24) vs MuRIL **0.6151**: +0.064, CI [+0.024, +0.105] | **0.8563** (Run 28, seed 42) vs char SVM 0.8117: +0.043, CI [+0.021, +0.067]; the MuRIL-era best was 0.8155; the Gemma + SVM blend is 0.007 *worse* |
+| best ZIP already built | **`RECOMMENDED_b23_gemma.zip`** (Run 23: 4 epochs, 4 seeds, all 3,532 rows) | `RECOMMENDED_a28_gemma.zip` (Run 28, two healthy full fits) |
 
 ## Open questions, each answered on the holdout before the final fit
 
 | question | notebook | owner | status | sets |
 |---|---|---|---|---|
-| 4 epochs or 3? | `task_b/23_gemma_epochs_seeds_final` | Aaryan | ready | `EPOCHS` |
+| 4 epochs or 3? | `task_b/23_gemma_epochs_seeds_final` | Aaryan | **done**: 4 epochs, 0.6872 vs 0.6792 | `EPOCHS = 4` |
 | R-Drop? | `task_b/24_gemma_muril_lessons` | Aaryan | **done**: inconclusive, -0.002 [-0.027, +0.023] | `RDROP = 0` |
 | LoRA rank and attention-only vs attention + MLP? | `task_b/26_gemma_lora_capacity_ablation` | Robin | ready | `--r`, `--lora-targets` |
 | TAPT (LoRA next-token pretraining)? | `task_b/27_gemma_tapt_holdout` | Robin | ready; memory fixed | `TAPT` |
@@ -53,13 +53,15 @@ earlier outputs.
 
    | flag | default | change it when |
    |---|---|---|
-   | `EPOCHS` | 3 | Run 23 chose `4ep` or `mix`: use 4 |
+   | `EPOCHS` | 4 | set by Run 23 |
    | `TAPT` | False | Run 27's TAPT - no TAPT interval is clearly above 0 |
    | `RDROP` | 0.0 | stays 0 |
    | `PROMPT` | `"short"` | Run 28 printed `defs: True` |
    | `LR` | 1e-4 | Run 28 printed `lr2e-4: True` |
 
-   Four seeds are trained on all 3,532 rows. It writes `RECOMMENDED_b25_gemma.zip`.
+   Four seeds are trained on all 3,532 rows. It writes `RECOMMENDED_b25_gemma.zip`. If
+   every other flag stays at its default, Run 25 reproduces Run 23's recipe, and
+   `RECOMMENDED_b23_gemma.zip` already is the Task B final.
 2. **Task A.** Open `task_a/33_gemma_final_recipe` and set `EPOCHS`, `PROMPT`, `TAPT` and
    `LR` from Task A Runs 29-32. Each flag is printed `True` when the arm beats the base
    with P(better) >= 0.7. Four seeds are trained on all 7,193 rows. It writes

@@ -501,13 +501,14 @@ b25 = [("markdown", r'''
 # Task B Run 25 -- the final Gemma-4-12B recipe, all 3,532 rows
 
 This run combines whatever Runs 23 and 24 showed into four full-data models, averaged
-into one submission. Set the four flags in the next cell from those runs' printed
-results. The defaults are Run 21's proven recipe (0.6792 holdout) with four seeds, so the
-notebook is a safe submission even with nothing changed.
+into one submission. Set the flags in the next cell from those runs' printed results.
+The defaults are Run 23's recipe (4 epochs, 0.6872 on the holdout) with four seeds, so the
+notebook is a safe submission even with nothing changed. Unchanged, it reproduces
+`RECOMMENDED_b23_gemma.zip`.
 
 | flag | default | set it to | when |
 |---|---|---|---|
-| `EPOCHS` | 3 | 4 | Run 23 chose `4ep` or `mix` |
+| `EPOCHS` | 4 | -- | set by Run 23 (4 epochs 0.6872 vs 3 epochs 0.6792) |
 | `TAPT` | False | True | Run 24 printed `tapt: True` |
 | `RDROP` | 0.0 | 0.5 | Run 24 printed `rdrop: True` |
 | `PROMPT` | `"short"` | `"defs"` | Run 28 printed `defs: True` |
@@ -529,7 +530,7 @@ TAPT here reads all 3,532 labelled comments' text plus the external corpus; neve
 text. The output is `RECOMMENDED_b25_gemma.zip`.
 
 ''' + SETTINGS), ("code", setup("b", "b25_outputs")), ("code", LLM_ENV), ("code", r'''
-EPOCHS = 3          # 4 if Run 23 chose 4ep or mix
+EPOCHS = 4          # Run 23: 4 epochs 0.6872 vs 3 epochs 0.6792
 TAPT = False        # True if Run 24 printed tapt: True
 RDROP = 0.0         # 0.5 if Run 24 printed rdrop: True (it did not: inconclusive)
 PROMPT = "short"    # "defs" if Run 28 printed defs: True
