@@ -78,6 +78,7 @@ one-layer choice, while Run 9 supports adding R-Drop to the full-data recipe.
 | Task B 20 | 2026-10-04, completed; main arm crashed | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM beat the Run 9 MuRIL recipe on the fixed 530-row holdout? | MuRIL **0.6151**; Sarvam-1 0.5567 (-0.058, CI [-0.104, -0.014]); 50/50 ensemble 0.6187. Gemma-4-12B screened best but crashed on a peft/torchao version check, so the main arm is untested |
 | Task B 21 | 2026-10-05, completed | `21_llm_confirm_final.ipynb` | Gemma-4-12B QLoRA vs the Run 9 MuRIL recipe on the 530-row holdout, then full fits on 3,532 rows | **Gemma 2 seeds 0.6792** vs MuRIL 0.6151, **+0.064, CI [+0.024, +0.105]**; ensemble 0.6825 (+0.003 over Gemma, inside noise) -> LLM recommended. Packaging bug left only the MuRIL ZIP; Run 22 packages the saved Gemma probabilities |
 | Task B 22 | ready; not run | `22_package_run21.ipynb` | write Run 21's LLM, MuRIL and ensemble ZIPs from its saved output, CPU only | CodaBench pending for `RECOMMENDED_b21_llm.zip` |
+| Task B 23 | ready; not run | `23_gemma_epochs_seeds_final.ipynb` | Gemma-4-12B with 4 epochs vs Run 21's 3 on the same holdout (`3ep` / `4ep` / `mix` candidates), then four full-data models of the winner averaged for the test file | holdout candidates + bootstraps; `RECOMMENDED_b23_llm.zip`, CodaBench pending |
 
 ## Ordered next steps
 

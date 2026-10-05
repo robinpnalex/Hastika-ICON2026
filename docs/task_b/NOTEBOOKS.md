@@ -129,3 +129,10 @@ Run 21 reads Run 20's output when attached with **Add Input -> Notebook Output**
 models need a Hugging Face token with the license accepted, stored as the Kaggle secret
 `HF_TOKEN`; without it they are skipped.
 
+## Runs 22 and 23 -- package Run 21, then more epochs and seeds
+
+| notebook | run | what | time |
+|---|---|---|---|
+| `22_package_run21.ipynb` | 22 | build Run 21's LLM, MuRIL and ensemble ZIPs from its saved output; attach Run 21's output | ~1 min, CPU |
+| `23_gemma_epochs_seeds_final.ipynb` | 23 | 4 epochs vs 3 on the holdout, then four full-data Gemma-4-12B models of the winner averaged into `RECOMMENDED_b23_llm.zip`; attach Run 21's output | ~5.5-7 h, T4 x2 |
+
