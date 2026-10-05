@@ -167,6 +167,8 @@ def main():
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--head-lr", type=float, default=5e-4)
     ap.add_argument("--r", type=int, default=16)
+    ap.add_argument("--lora-targets", default=",".join(LORA_TARGETS),
+                    help="comma-separated module suffixes to adapt; default is attention + MLP")
     ap.add_argument("--lora-dropout", type=float, default=0.05)
     ap.add_argument("--bs", type=int, default=8)
     ap.add_argument("--grad-accum", type=int, default=2)
@@ -180,10 +182,13 @@ def main():
                     help="R-Drop weight: two dropout passes tied by symmetric KL. In the 0.6410 "
                          "MuRIL recipe at 0.5; doubles the cost of a step")
     ap.add_argument("--init-adapter", default="",
-                    help="start from a LoRA adapter saved by llm_tapt.py (domain-adapted) "
+                    help="start from a LoRA adapter saved by Gemma TAPT "
                          "instead of a fresh one")
     ap.add_argument("--cache", default=os.environ.get("HF_HUB_CACHE"))
     args = ap.parse_args()
+    lora_targets = [x.strip() for x in args.lora_targets.split(",") if x.strip()]
+    if not lora_targets:
+        ap.error("--lora-targets must contain at least one module suffix")
 
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -227,13 +232,14 @@ def main():
     backbone.config.use_cache = False
     backbone.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     if args.init_adapter:
-        # llm_tapt.py applies LoRA to the same decoder stack, so the keys line up
+        # TAPT applies LoRA to the same decoder stack, so the keys line up
         backbone = PeftModel.from_pretrained(backbone, args.init_adapter, is_trainable=True)
         print("initialised from TAPT adapter", args.init_adapter, flush=True)
     else:
         backbone = get_peft_model(backbone, LoraConfig(
             r=args.r, lora_alpha=2 * args.r, lora_dropout=args.lora_dropout,
-            target_modules=LORA_TARGETS, bias="none"))
+            target_modules=lora_targets, bias="none"))
+    print(f"LoRA rank={args.r}; target modules={lora_targets}", flush=True)
     backbone.print_trainable_parameters()
     model = LLMClassifier(backbone, len(labels))
     model.head.cuda()       # never .cuda() the whole wrapper: 4-bit weights refuse to move
