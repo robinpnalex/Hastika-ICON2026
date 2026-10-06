@@ -73,6 +73,17 @@ python -m hastika.common.combine_probs --task b \
     --out submissions/task_b/final/final_task_b.zip
 ```
 
+**Did it work? Each final has a holdout twin.** It trains the same members on the 85%
+split and scores the combination against the current best on the fixed holdout. Run each
+twin in parallel with its full-data fit:
+
+| final | twin | compares | attach to save time |
+|---|---|---|---|
+| Task A: Run 28 + Run 33 | `task_a/34_final_holdout_check` | four-model combination vs Run 28's recipe | Run 28's output |
+| Task B: Run 23 + Run 32 | `task_b/33_final_holdout_check` | eight-model combination vs Run 23's recipe | Runs 23 and 30 |
+
+Each prints a verdict. If it says *probably WORSE*, submit the current best ZIP instead.
+
 The combiner weights each file by its model count, checks shapes, and refuses a collapsed
 file. If a run does not finish, the existing ZIPs stand: `RECOMMENDED_a28_gemma.zip` for
 Task A and `RECOMMENDED_b23_gemma.zip` for Task B.

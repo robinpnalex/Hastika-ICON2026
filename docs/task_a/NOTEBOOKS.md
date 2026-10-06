@@ -29,6 +29,7 @@ probabilities are reused when attached, and they stop at 11 h. They are generate
 | `31_gemma_tapt.ipynb` | 31 | TAPT (LoRA next-token on training text + external corpus), then classification | ready | ~6.5 h |
 | `32_gemma_lr.ipynb` | 32 | learning rate 2e-4 vs 1e-4 | ready | ~5 h |
 | `33_gemma_final_recipe.ipynb` | 33 | **the final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | run last | ~5-8.5 h |
+| `34_final_holdout_check.ipynb` | 34 | holdout twin of the Task A final (Run 28 + Run 33): four-model combination vs Run 28's recipe | ready | ~5.6 h (~3.2 h with Run 28 attached) |
 
 Runs 29-32 are independent of one another. Run 33's defaults (Run 28's recipe) are
 already a safe final submission.

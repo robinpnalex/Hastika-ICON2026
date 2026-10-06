@@ -15,6 +15,8 @@ Writes:
     notebooks/task_a/28_gemma_holdout_final.ipynb    Gemma on Task A, holdout + submission
     notebooks/task_a/29-32_gemma_*.ipynb             Task A ablations: epochs, prompt, TAPT, lr
     notebooks/task_a/33_gemma_final_recipe.ipynb     the final Task A fit
+    notebooks/task_a/34_final_holdout_check.ipynb    holdout twin of the Task A final ensemble
+    notebooks/task_b/33_final_holdout_check.ipynb    holdout twin of the Task B final ensemble
 """
 import json
 import pathlib
@@ -922,6 +924,137 @@ print(f"{(time.time() - T_START) / 3600:.1f} h")
 a33 = [("markdown", A33_MD), ("code", setup("a", "a33_outputs")), ("code", LLM_ENV),
        ("code", A33_CODE)]
 
+# ---------------------------------------------------------------------------- holdout twins
+TWIN_CODE = r'''
+# Each member: (tag, seed, classifier flags, holdout files of earlier runs that are the
+# same recipe and seed -- reused when attached). Edit to mirror the full-data fit exactly.
+MEMBERS = __MEMBERS__
+GROUPS = __GROUPS__            # group name -> member keys "<tag>_s<seed>"
+FINAL, REFERENCE = __FINAL__, __REFERENCE__
+HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv"], evalf=SPLIT / "holdout.csv")
+
+probs, jobs = {}, []
+for tag, seed, extra, reuse in MEMBERS:
+    key = f"{tag}_s{seed}"
+    for pat in reuse:
+        got = [load_probs(h.parent, SPLIT / "holdout.csv") for h in find_prior(pat.format(seed=seed))]
+        got = [g for g in got if g is not None]
+        if got:
+            probs[key] = got[0]
+            print(f"{key}: reused from an attached run ({pat.format(seed=seed)})")
+            break
+    else:
+        jobs.append(llm_job(key, seed=seed, extra=extra, **HO))
+print("training on the 85% split:", [j["name"] for j in jobs])
+codes = run_jobs(jobs)
+for j in jobs:
+    p = load_probs(RUNS / j["name"], SPLIT / "holdout.csv")
+    if p is not None:
+        probs[j["name"]] = p
+print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
+'''
+
+TWIN_REPORT = r'''
+for key in sorted(probs):
+    report(y_ho, probs[key], key)
+print()
+avg, scores = {}, {}
+for name, keys in GROUPS.items():
+    have = [k for k in keys if k in probs]
+    if have:
+        avg[name] = np.mean([probs[k] for k in have], 0)
+        scores[name] = report(y_ho, avg[name], f"{name} ({len(have)}/{len(keys)})")
+print()
+boots = {}
+if FINAL in avg:
+    for other in avg:
+        if other != FINAL:
+            boots[f"{FINAL} - {other}"] = boot_line(f"final - {other}"[:28], avg[FINAL], avg[other])
+if FINAL in avg and REFERENCE in avg:
+    b = boots[f"{FINAL} - {REFERENCE}"]
+    verdict = ("the final combination BEATS the current best" if b["ci95"][0] > 0 else
+               "the final combination is probably better" if b["p_better"] >= 0.7 else
+               "no clear gain over the current best" if b["p_better"] >= 0.3 else
+               "the final combination is probably WORSE -- submit the current best")
+    print(f"\nverdict: {verdict} (P(better) {b['p_better']:.2f})")
+json.dump({"commit": head, "holdout_fingerprint": HOLDOUT_FP, "scores": scores,
+           "bootstrap": boots, "members": sorted(probs), "exit_codes": codes},
+          open(OUT / "result.json", "w"), indent=2)
+'''
+
+
+def holdout_twin(task, run, title, intro, members, groups, final, reference, minutes):
+    md = (f"# Task {task.upper()} Run {run} -- holdout check: {title}\n\n" + intro + """
+
+**How it works.** Every member of the full-data ensemble is trained with the same flags
+and seed on the 85% training split, then scored on the fixed holdout. The members are
+averaged exactly as the final fit averages them, and the final combination is compared
+with the current best by paired bootstrap. That makes this the evidence for or against
+submitting the full-data version.
+
+**Reuse.** A member whose identical recipe and seed already ran on the holdout is reused
+when that run's output is attached. Everything else is trained here. The `MEMBERS`
+list in the next cell mirrors the full-data fit; if you change the final fit's flags,
+change them here too.
+
+""" + f"**Time:** {minutes}.\n\n" + SETTINGS)
+    code = (TWIN_CODE.replace("__MEMBERS__", "[\n" + "".join(f"    {m!r},\n" for m in members) + "]")
+            .replace("__GROUPS__", "{\n" + "".join(f"    {k!r}: {v!r},\n" for k, v in groups.items()) + "}")
+            .replace("__FINAL__", repr(final)).replace("__REFERENCE__", repr(reference)))
+    return [("markdown", md), ("code", setup(task, f"{task}{run}_outputs")), ("code", LLM_ENV),
+            ("code", code), ("code", TWIN_REPORT)]
+
+
+A_REUSE_3EP = ["*/runs/ho_s{seed}/holdout_probs.npy", "*/runs/base_s{seed}/holdout_probs.npy"]
+a34 = holdout_twin(
+    "a", 34, "Run 28 + Run 33 (4 epochs, seeds 44/45), the Task A final",
+    """Today's Task A final averages four full-data Gemma-4-12B models:
+
+| source | models |
+|---|---|
+| Run 28 | 3 epochs, seeds 42 and 43 |
+| Run 33, run with `EPOCHS = 4`, `SEEDS = [44, 45]` | 4 epochs, seeds 44 and 45 |
+
+Run 28's seed-42 holdout score is 0.8563; its seed 43 collapsed and is retrained here.
+This notebook measures the four-model combination against **Run 28's recipe**, the
+current best, on the 1,079-row holdout.""",
+    [("3ep", 42, "", A_REUSE_3EP), ("3ep", 43, "", A_REUSE_3EP),
+     ("4ep", 44, "--epochs 4", ["*/runs/ep4_s{seed}/holdout_probs.npy"]),
+     ("4ep", 45, "--epochs 4", ["*/runs/ep4_s{seed}/holdout_probs.npy"])],
+    {"current best: Run 28 recipe, 3 epochs x2": ["3ep_s42", "3ep_s43"],
+     "Run 33 today: 4 epochs x2": ["4ep_s44", "4ep_s45"],
+     "FINAL: all four": ["3ep_s42", "3ep_s43", "4ep_s44", "4ep_s45"]},
+    "FINAL: all four", "current best: Run 28 recipe, 3 epochs x2",
+    "about 5.6 h standalone (four fits, two per GPU), about 3.2 h with Run 28 attached")
+
+B_REUSE_SHORT3 = ["*/runs/short_s{seed}/holdout_probs.npy", "*/runs/gemma-4-12b_ho_s{seed}/holdout_probs.npy",
+                  "*/runs/base_s{seed}/holdout_probs.npy"]
+B_REUSE_EP4 = ["*/runs/gemma-4-12b_ep4_ho_s{seed}/holdout_probs.npy"]
+b33 = holdout_twin(
+    "b", 33, "Run 23 + Run 32 (prompt ensemble), the Task B final",
+    """Today's Task B final averages eight full-data Gemma-4-12B models:
+
+| source | models |
+|---|---|
+| Run 23 | 4 epochs, standard prompt, seeds 42-45 |
+| Run 32 (Robin) | 3 epochs, standard and definitions prompts, seeds 42 and 43 each |
+
+This notebook measures the eight-model combination against **Run 23's recipe**, the
+current best (`RECOMMENDED_b23_gemma.zip`), on the 530-row holdout. Members reused when
+attached:
+- Run 23's 4-epoch seeds 42 and 43
+- Run 30's prompt-ensemble members, the same recipe as Run 32
+- Run 21 or 24's 3-epoch standard seeds""",
+    [("ep4", s, "--epochs 4", B_REUSE_EP4) for s in (42, 43, 44, 45)]
+    + [("short3", s, "--prompt short", B_REUSE_SHORT3) for s in (42, 43)]
+    + [("defs3", s, "--prompt defs", ["*/runs/defs_s{seed}/holdout_probs.npy"]) for s in (42, 43)],
+    {"current best: Run 23 recipe, 4 epochs x4": [f"ep4_s{s}" for s in (42, 43, 44, 45)],
+     "Run 32: prompt ensemble x4": ["short3_s42", "short3_s43", "defs3_s42", "defs3_s43"],
+     "FINAL: all eight": [f"ep4_s{s}" for s in (42, 43, 44, 45)]
+                         + ["short3_s42", "short3_s43", "defs3_s42", "defs3_s43"]},
+    "FINAL: all eight", "current best: Run 23 recipe, 4 epochs x4",
+    "about 6.3 h standalone (eight fits), about 3 h with Runs 23 and 30 attached")
+
 if __name__ == "__main__":
     notebook(b22, "notebooks/task_b/22_package_run21.ipynb")
     notebook(b23, "notebooks/task_b/23_gemma_epochs_seeds_final.ipynb")
@@ -934,3 +1067,5 @@ if __name__ == "__main__":
     notebook(a31, "notebooks/task_a/31_gemma_tapt.ipynb")
     notebook(a32, "notebooks/task_a/32_gemma_lr.ipynb")
     notebook(a33, "notebooks/task_a/33_gemma_final_recipe.ipynb")
+    notebook(a34, "notebooks/task_a/34_final_holdout_check.ipynb")
+    notebook(b33, "notebooks/task_b/33_final_holdout_check.ipynb")

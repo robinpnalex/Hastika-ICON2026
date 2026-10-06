@@ -66,6 +66,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 31 | ready; standalone | `31_gemma_tapt.ipynb` | TAPT: LoRA next-token pretraining on training text + external corpus, then classification | holdout bootstrap vs base; flag for Run 33 (~6.5 h) |
 | Task A 32 | ready; standalone | `32_gemma_lr.ipynb` | learning rate 2e-4 vs 1e-4 | holdout bootstrap vs base; flag for Run 33 (~5 h) |
 | Task A 33 | ready; standalone | `33_gemma_final_recipe.ipynb` | **final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | `RECOMMENDED_a33_gemma.zip` (~5-8.5 h) |
+| Task A 34 | ready; standalone | `34_final_holdout_check.ipynb` | holdout twin of the Task A final: Run 28's 3-epoch seeds 42/43 + Run 33's 4-epoch seeds 44/45, each trained on the 85% split; four-model combination vs Run 28's recipe | paired bootstrap verdict on the 1,079-row holdout (~5.6 h, ~3.2 h with Run 28 attached) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -98,6 +99,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 30 | 2026-10-06, completed | `30_gemma_prompt_ensemble_holdout.ipynb` | average the standard and definitions-prompt Gemma probabilities across two seeds each on the fixed holdout | standard **0.6830**, definitions **0.6840**, four-model ensemble **0.6882 / 0.7321**; +0.0052 vs standard but inconclusive (CI [-0.0176, +0.0273], P=.67); no ZIP |
 | Task B 31 | 2026-10-06, completed | `31_gemma_class_weight_holdout.ipynb` | compare Gemma's current balanced class weights with square-root inverse-frequency weights, two seeds each | balanced **0.6864 / 0.7283**, sqrt **0.6822 / 0.7509**; sqrt -0.0042 (CI [-0.0392, +0.0300], P=.41); reject sqrt; no ZIP |
 | Task B 32 | ready; full-data prediction | `32_gemma_prompt_ensemble_full.ipynb` | reproduce the Run 30 four-model prompt ensemble on all 3,532 labelled rows and infer the 396-row released test file | `RECOMMENDED_b32_gemma_prompt_ensemble.zip`; no local score because test labels are unavailable |
+| Task B 33 | ready; standalone | `33_final_holdout_check.ipynb` | holdout twin of the Task B final: Run 23's four 4-epoch seeds + Run 32's prompt ensemble (standard and definitions, seeds 42/43); eight-model combination vs Run 23's recipe | paired bootstrap verdict on the 530-row holdout (~6.3 h, ~3 h with Runs 23 and 30 attached) |
 
 ## Ordered next steps
 
