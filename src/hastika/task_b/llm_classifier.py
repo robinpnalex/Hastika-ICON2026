@@ -190,6 +190,8 @@ def main():
     ap.add_argument("--r", type=int, default=16)
     ap.add_argument("--lora-targets", default=",".join(LORA_TARGETS),
                     help="comma-separated module suffixes to adapt; default is attention + MLP")
+    ap.add_argument("--head-only", action="store_true",
+                    help="freeze Gemma completely and train only the classification head")
     ap.add_argument("--lora-dropout", type=float, default=0.05)
     ap.add_argument("--bs", type=int, default=8)
     ap.add_argument("--grad-accum", type=int, default=2)
@@ -255,8 +257,13 @@ def main():
     t0 = time.time()
     backbone = load_backbone(args.model, token, args.cache, dtype)
     backbone.config.use_cache = False
-    backbone.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
-    if args.init_adapter:
+    if not args.head_only:
+        backbone.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    if args.head_only:
+        for p in backbone.parameters():
+            p.requires_grad_(False)
+        print("head-only mode: Gemma backbone is frozen", flush=True)
+    elif args.init_adapter:
         # TAPT applies LoRA to the same decoder stack, so the keys line up
         backbone = PeftModel.from_pretrained(backbone, args.init_adapter, is_trainable=True)
         print("initialised from TAPT adapter", args.init_adapter, flush=True)
@@ -265,7 +272,12 @@ def main():
             r=args.r, lora_alpha=2 * args.r, lora_dropout=args.lora_dropout,
             target_modules=lora_targets, bias="none"))
     print(f"LoRA rank={args.r}; target modules={lora_targets}", flush=True)
-    backbone.print_trainable_parameters()
+    if hasattr(backbone, "print_trainable_parameters"):
+        backbone.print_trainable_parameters()
+    else:
+        total = sum(p.numel() for p in backbone.parameters())
+        trainable = sum(p.numel() for p in backbone.parameters() if p.requires_grad)
+        print(f"trainable params: {trainable:,} || all params: {total:,}", flush=True)
     model = LLMClassifier(backbone, len(labels))
     model.head.cuda()       # never .cuda() the whole wrapper: 4-bit weights refuse to move
     print(f"loaded in {(time.time() - t0) / 60:.1f} min; "
@@ -279,9 +291,9 @@ def main():
                                   label_smoothing=args.label_smoothing)
 
     lora = [p for n, p in model.named_parameters() if p.requires_grad and "head" not in n.split(".")[0]]
-    opt = torch.optim.AdamW([{"params": lora, "lr": args.lr},
-                             {"params": model.head.parameters(), "lr": args.head_lr}],
-                            weight_decay=args.weight_decay)
+    groups = ([{"params": lora, "lr": args.lr}] if lora else [])
+    groups.append({"params": model.head.parameters(), "lr": args.head_lr})
+    opt = torch.optim.AdamW(groups, weight_decay=args.weight_decay)
     steps = math.ceil(len(X) / args.bs / args.grad_accum) * args.epochs
     sched = get_cosine_schedule_with_warmup(opt, int(args.warmup * steps), steps)
     scaler = torch.amp.GradScaler("cuda", enabled=(dtype == torch.float16))
@@ -291,6 +303,8 @@ def main():
     rng = np.random.default_rng(args.seed)
     t_train = time.time()
     model.train()
+    if args.head_only:
+        model.backbone.eval()
     for epoch in range(args.epochs):
         order = bucketed_order(lens, args.bs, rng)
         run_loss, n = 0.0, 0
@@ -354,6 +368,8 @@ def main():
                 sys.exit(4)
         if ev is not None:
             p = predict(model, Xev, pad_id, args.eval_bs, dtype)
+            if args.head_only:
+                model.backbone.eval()
             rec["eval_macro_f1"] = float(f1_score(yev, p.argmax(1), average="macro"))
             print(f"== epoch {epoch + 1}: eval macro-F1 {rec['eval_macro_f1']:.4f} "
                   "(diagnostic only, not used for selection)", flush=True)

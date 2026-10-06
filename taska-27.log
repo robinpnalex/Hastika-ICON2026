@@ -1,0 +1,112 @@
+7.9s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+7.9s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+7.9s 3 0.00s - to python to disable frozen modules.
+7.9s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+8.5s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.5s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.5s 7 0.00s - to python to disable frozen modules.
+8.5s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+13.0s 9 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.2 MB/s eta 0:00:00
+13.2s 10 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.2 MB/s eta 0:00:00
+24.8s 11 gpu: Tesla T4
+24.9s 12 $ /usr/bin/python3 -u -m hastika.models.baseline_svm --task a --tag a_run27_val_char_only --demojize --full-fit
+26.6s 13 dedupe task A: 6446 -> 6401 rows (39 duplicate, 6 in label-conflict groups)
+29.0s 14 task A full fit on 6401 rows
+29.0s 15 wrote /kaggle/working/hastika/artifacts/runs/a_run27_val_char_only/  ({'Non-Hate': 418, 'Hate': 388})
+29.0s 16 $ /usr/bin/python3 -u -m hastika.models.baseline_svm --task a --tag a_run27_val_wordchar --demojize --full-fit
+30.6s 17 dedupe task A: 6446 -> 6401 rows (39 duplicate, 6 in label-conflict groups)
+33.0s 18 task A full fit on 6401 rows
+33.0s 19 wrote /kaggle/working/hastika/artifacts/runs/a_run27_val_wordchar/  ({'Non-Hate': 418, 'Hate': 388})
+33.0s 20 $ /usr/bin/python3 -u -m hastika.models.muril --tag a_run27_val_muril_reinit2 --model google/muril-base-cased --folds 1 --seeds 42 --epochs 6 --bs 8 --grad-accum 2 --eval-bs 32 --select last --reinit-layers 2
+54.9s 21 device=cuda (Tesla T4) model=google/muril-base-cased pooling=meanmax fgm=True ema=True rdrop=0.0 reinit=2 seeds=[42] external=-
+55.2s 22 dedupe task A: 6446 -> 6401 rows (39 duplicate, 6 in label-conflict groups)
+56.1s 23 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+56.6s 24 ===== seed 42 FULL FIT, 6401 rows, no validation =====
+70.5s 25 
+70.5s 26 Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+70.5s 27 Loading weights: 100%|██████████| 199/199 [00:00<00:00, 15610.00it/s]
+70.5s 28 [transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+70.5s 29 Key                                        | Status     |  |
+70.5s 30 -------------------------------------------+------------+--+-
+70.5s 31 cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  |
+70.5s 32 cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  |
+70.5s 33 cls.predictions.decoder.weight             | UNEXPECTED |  |
+70.5s 34 cls.predictions.transform.dense.bias       | UNEXPECTED |  |
+70.5s 35 cls.predictions.decoder.bias               | UNEXPECTED |  |
+70.5s 36 cls.predictions.transform.dense.weight     | UNEXPECTED |  |
+70.5s 37 cls.seq_relationship.bias                  | UNEXPECTED |  |
+70.5s 38 cls.predictions.bias                       | UNEXPECTED |  |
+70.5s 39 cls.seq_relationship.weight                | UNEXPECTED |  |
+70.5s 40 
+70.5s 41 Notes:
+70.5s 42 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+354.8s 43 [s42full] ep1 done 4.7min  no val
+644.6s 44 [s42full] ep2 done 4.8min  no val
+932.5s 45 [s42full] ep3 done 4.8min  no val
+1223.8s 46 [s42full] ep4 done 4.9min  no val
+1513.5s 47 [s42full] ep5 done 4.8min  no val
+1809.1s 48 [s42full] ep6 800/800 loss 0.4963   no val (0.37s/step)
+1809.1s 49 [s42full] ep6 done 4.9min  no val
+1809.1s 50 [s42full] trained on every row; final checkpoint taken, no score
+1809.1s 51 wrote /kaggle/working/hastika/artifacts/runs/a_run27_val_muril_reinit2/predictions.csv (threshold 0.500)
+1812.8s 52 VALIDATION RESULTS: {'macro_f1': 0.8149858189789974, 'accuracy': 0.815136476426799, 'rows': 806, 'w_char': 0.6, 'w_muril': 0.33, 'w_wordchar': 0.07}
+1812.8s 53 precision    recall  f1-score   support
+1812.8s 54 
+1812.8s 55 Non-Hate     0.8134    0.8273    0.8203       411
+1812.8s 56 Hate     0.8170    0.8025    0.8097       395
+1812.8s 57 
+1812.8s 58 accuracy                         0.8151       806
+1812.8s 59 macro avg     0.8152    0.8149    0.8150       806
+1812.8s 60 weighted avg     0.8152    0.8151    0.8151       806
+1812.8s 61 
+1812.9s 62 $ /usr/bin/python3 -u -m hastika.models.baseline_svm --task a --tag a_run27_test_char_only --demojize --full-fit
+1814.6s 63 dedupe task A: 7252 -> 7193 rows (49 duplicate, 10 in label-conflict groups)
+1817.5s 64 task A full fit on 7193 rows
+1817.5s 65 wrote /kaggle/working/hastika/artifacts/runs/a_run27_test_char_only/  ({'Non-Hate': 405, 'Hate': 401})
+1817.5s 66 $ /usr/bin/python3 -u -m hastika.models.baseline_svm --task a --tag a_run27_test_wordchar --demojize --full-fit
+1819.2s 67 dedupe task A: 7252 -> 7193 rows (49 duplicate, 10 in label-conflict groups)
+1822.0s 68 task A full fit on 7193 rows
+1822.0s 69 wrote /kaggle/working/hastika/artifacts/runs/a_run27_test_wordchar/  ({'Non-Hate': 405, 'Hate': 401})
+1822.0s 70 $ /usr/bin/python3 -u -m hastika.models.muril --tag a_run27_test_muril_reinit2 --model google/muril-base-cased --folds 1 --seeds 42 --epochs 6 --bs 8 --grad-accum 2 --eval-bs 32 --select last --reinit-layers 2
+1830.6s 71 device=cuda (Tesla T4) model=google/muril-base-cased pooling=meanmax fgm=True ema=True rdrop=0.0 reinit=2 seeds=[42] external=-
+1830.9s 72 dedupe task A: 7252 -> 7193 rows (49 duplicate, 10 in label-conflict groups)
+1832.0s 73 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+1832.2s 74 ===== seed 42 FULL FIT, 7193 rows, no validation =====
+1832.5s 75 
+1832.5s 76 Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+1832.5s 77 Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11458.43it/s]
+1832.5s 78 [transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+1832.5s 79 Key                                        | Status     |  |
+1832.5s 80 -------------------------------------------+------------+--+-
+1832.5s 81 cls.predictions.decoder.weight             | UNEXPECTED |  |
+1832.5s 82 cls.seq_relationship.bias                  | UNEXPECTED |  |
+1832.5s 83 cls.seq_relationship.weight                | UNEXPECTED |  |
+1832.5s 84 cls.predictions.transform.dense.weight     | UNEXPECTED |  |
+1832.5s 85 cls.predictions.bias                       | UNEXPECTED |  |
+1832.5s 86 cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  |
+1832.5s 87 cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  |
+1832.5s 88 cls.predictions.transform.dense.bias       | UNEXPECTED |  |
+1832.5s 89 cls.predictions.decoder.bias               | UNEXPECTED |  |
+1832.5s 90 
+1832.5s 91 Notes:
+1832.5s 92 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+2159.8s 93 [s42full] ep1 done 5.4min  no val
+2485.6s 94 [s42full] ep2 done 5.4min  no val
+2812.4s 95 [s42full] ep3 done 5.4min  no val
+3139.8s 96 [s42full] ep4 done 5.5min  no val
+3466.8s 97 [s42full] ep5 done 5.4min  no val
+3801.5s 98 [s42full] ep6 899/899 loss 0.3091   no val (0.37s/step)
+3801.5s 99 [s42full] ep6 done 5.6min  no val
+3801.5s 100 [s42full] trained on every row; final checkpoint taken, no score
+3801.5s 101 wrote /kaggle/working/hastika/artifacts/runs/a_run27_test_muril_reinit2/predictions.csv (threshold 0.500)
+3802.6s 102 TEST PREDICTIONS: /kaggle/working/task_a_run27_outputs/test_predictions.csv
+3802.6s 103 test class counts: {'Non-Hate': 406, 'Hate': 400}
+3802.6s 104 restored canonical repository data files
+3805.6s 105 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+3805.6s 106 cells[i][c] = re.sub('\\\\\|', '|', cell)
+3805.7s 107 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+3805.7s 108 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+3806.5s 109 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+3806.6s 110 [NbConvertApp] Writing 21510 bytes to __notebook__.ipynb
+3808.9s 111 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+3809.4s 112 [NbConvertApp] Writing 324234 bytes to __results__.html

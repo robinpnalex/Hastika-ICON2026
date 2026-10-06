@@ -17,12 +17,12 @@ two people working in parallel are in [`COLLABORATION.md`](COLLABORATION.md).
 
 | item | current state |
 |---|---|
-| Task B model | **Gemma-4-12B, 4-bit QLoRA**, last-token head, 4 epochs: **0.6872** two-seed holdout macro-F1 (Run 23); 3 epochs gave 0.6792 / 0.6753 (Runs 21, 24) vs **0.6151** for the best MuRIL recipe (+0.064, CI [+0.024, +0.105]) |
+| Task B model | **Gemma-4-12B, 4-bit QLoRA**, four-model prompt ensemble: **0.6882 / 0.7321** holdout macro-F1/accuracy (Run 30), versus **0.6830** for the two-seed standard-prompt mean; the gain is promising but inconclusive (CI [-0.0176, +0.0273], P=.67) |
 | Task A model | **Gemma-4-12B**, same recipe: **0.8563** on the 1,079-row holdout (Run 28, seed 42) vs the char SVM's 0.8117 (+0.043, CI [+0.021, +0.067]) and SVM + MuRIL's 0.8155 |
-| Measured and rejected on Gemma | Task B R-Drop (inconclusive, -0.002, CI [-0.027, +0.023], 2x cost); Task A Gemma + SVM blend (-0.007); translation to English (Task A Run 20, -5.3) |
-| Being measured | Task B: LoRA capacity (26, Robin), TAPT (27, Robin), definitions prompt and lr (28). Task A: epochs (29), definitions prompt (30), TAPT (31), lr (32) |
+| Measured and rejected on Gemma | Task B R-Drop (inconclusive, -0.002, CI [-0.027, +0.023], 2x cost); Task B square-root class weights (-0.0042, P=.41); Task A Gemma + SVM blend (-0.007); translation to English (Task A Run 20, -5.3) |
+| Being measured | Task B: LoRA capacity (26), TAPT (27), frozen-head ablation (29). Task A: epochs (29), definitions prompt (30), TAPT (31), lr (32) |
 | Final fits | Task B Run 25 and Task A Run 33: four seeds on all labelled rows, flags set from the runs above |
-| Best ZIPs already built | Task B `RECOMMENDED_b23_gemma.zip` (Run 23: 4 epochs, 4 seeds, all rows); Task A `RECOMMENDED_a28_gemma.zip` (Run 28) |
+| Fallback ZIPs already built | Task B `RECOMMENDED_b23_gemma.zip` (Run 23, 4-epoch four-model fit) and `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22); Task A `RECOMMENDED_a28_gemma.zip` (Run 28) |
 | Known hazard | Gemma can collapse onto one class (Task A Run 28, seed 43). The classifier exits with code 4 after epoch 1 and the notebooks rerun the job with another seed |
 | Holdouts | Task B 530 rows `f85f4f049b`; Task A 1,079 rows `815110ff24` |
 | Branch | `task-b` |
@@ -85,12 +85,15 @@ record.
 | Task B 20 | 2026-10-04, completed; main arm crashed | `20_llm_screen_holdout.ipynb` | does a 4-bit QLoRA LLM beat the Run 9 MuRIL recipe on the fixed 530-row holdout? | MuRIL **0.6151**; Sarvam-1 0.5567 (-0.058, CI [-0.104, -0.014]); 50/50 ensemble 0.6187. Gemma-4-12B screened best but crashed on a peft/torchao version check, so the main arm is untested |
 | Task B 21 | 2026-10-05, completed | `21_llm_confirm_final.ipynb` | Gemma-4-12B QLoRA vs the Run 9 MuRIL recipe on the 530-row holdout, then full fits on 3,532 rows | **Gemma 2 seeds 0.6792** vs MuRIL 0.6151, **+0.064, CI [+0.024, +0.105]**; ensemble 0.6825 (+0.003 over Gemma, inside noise) -> LLM recommended. Packaging bug left only the MuRIL ZIP; Run 22 packages the saved Gemma probabilities |
 | Task B 22 | 2026-10-05, completed | `22_package_run21.ipynb` | Run 21's 2-seed Gemma-4-12B submission, standalone (nothing attached, so both full fits retrained) | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written; predicted shares match the prior (Violence 7.6% vs 7.0%, Geo 8.8% vs 5.9%); final-submission candidate (3 epochs, 2 seeds) |
-| Task B 23 | 2026-10-05, completed | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout, then four 4-epoch full fits | 4 epochs **0.6872** vs 3 epochs 0.6792 (2 seeds each, +0.008, unpaired); Violence 0.410 -> 0.483; **`RECOMMENDED_b23_gemma.zip`, 4 models: the current best Task B submission** |
+| Task B 23 | 2026-10-06, completed | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout, then four 4-epoch full fits | 4 epochs **0.6872** vs 3 epochs 0.6792 (2 seeds each, +0.008, unpaired); Violence 0.410 -> 0.483; **`RECOMMENDED_b23_gemma.zip`, 4 models: the current best Task B submission** |
 | Task B 24 | 2026-10-05, completed; TAPT arm failed | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma-4-12B, 2 seeds each on the 530-row holdout | base **0.6753** (reproduces Run 21's 0.6792); **R-Drop 0.6734, -0.002, CI [-0.027, +0.023]: inconclusive, left off (2x cost)**; TAPT OOM in the 262k-vocabulary logits, unmeasured (fixed since) |
 | Task B 25 | ready; standalone | `25_gemma_final_recipe.ipynb` | final Gemma recipe on all 3,532 rows, four seeds; `EPOCHS`/`TAPT`/`RDROP` flags set from Runs 23-24 (defaults: Run 21's recipe) | `RECOMMENDED_b25_gemma.zip`, CodaBench pending |
 | Task B 26 | ready (Robin) | `26_gemma_lora_capacity_ablation.ipynb` | LoRA rank 8/16/32 x attention-only vs attention + MLP, 2 seeds each, on the holdout | sets `--r` / `--lora-targets` for Run 25 |
 | Task B 27 | ready (Robin); standalone since 2026-10-05 | `27_gemma_tapt_holdout.ipynb` | TAPT then classification vs no TAPT on the holdout | sets `TAPT` for Run 25 |
-| Task B 28 | ready; standalone | `28_gemma_prompt_lr.ipynb` | the organisers' category definitions in the prompt; lr 2e-4 | sets `PROMPT` / `LR` for Run 25 |
+| Task B 28 | definitions prompt measured in Run 30; lr arm pending | `28_gemma_prompt_lr.ipynb` | the organisers' category definitions in the prompt; lr 2e-4 | definitions prompt alone was effectively tied; Run 30 evaluates the prompt ensemble |
+| Task B 29 | ready; not run | `29_gemma_frozen_head_holdout.ipynb` | freeze Gemma-4-12B and train only the six-way classification head, two seeds on the fixed 530-row holdout | quick ablation against Run 21's 0.6792 QLoRA baseline; no ZIP |
+| Task B 30 | 2026-10-06, completed | `30_gemma_prompt_ensemble_holdout.ipynb` | average the standard and definitions-prompt Gemma probabilities across two seeds each on the fixed holdout | standard **0.6830**, definitions **0.6840**, four-model ensemble **0.6882 / 0.7321**; +0.0052 vs standard but inconclusive (CI [-0.0176, +0.0273], P=.67); no ZIP |
+| Task B 31 | 2026-10-06, completed | `31_gemma_class_weight_holdout.ipynb` | compare Gemma's current balanced class weights with square-root inverse-frequency weights, two seeds each | balanced **0.6864 / 0.7283**, sqrt **0.6822 / 0.7509**; sqrt -0.0042 (CI [-0.0392, +0.0300], P=.41); reject sqrt; no ZIP |
 
 ## Ordered next steps
 
@@ -106,8 +109,9 @@ record.
    candidate and submit it against Run 11's `0.8188`.
 6. Prefer a Task A recipe only when its nested estimate and the honest non-derived
    validation slice agree; disclose Run 26's transductive labels.
-7. For Task B, either recover/package Run 12's saved artifacts or run Run 14/15; keep
-   `b_reinit1_rdrop_full` as the `0.6410` baseline.
+7. For Task B, use the Run 30 four-model prompt ensemble only if the small holdout gain is
+   worth the added complexity; otherwise use the confirmed four-seed Gemma recipe from
+   Run 25. Do not use Run 31's square-root class weights.
 8. Keep the full-data Task B runs separate from local OOF measurements: their only valid
    evaluation is CodaBench.
 
@@ -1221,7 +1225,48 @@ against the 0.6410 MuRIL best; record its CodaBench score here. Log:
   (checked against the unchunked loss, max difference 7e-9). TAPT is being measured in
   Robin's `27_gemma_tapt_holdout.ipynb`.
 
-### Final-submission plan, 2026-10-05
+### Run 30 result, 2026-10-06 -- prompt diversity gives the best numerical holdout
+
+All four Gemma jobs completed on the fixed 530-row holdout in 4.3 h. The standard prompt
+and definitions prompt were each trained with seeds 42 and 43; their probability matrices
+were then averaged within prompt and across prompts.
+
+| arm | macro-F1 | accuracy |
+|---|---:|---:|
+| standard prompt, 2 seeds | 0.6830 | 0.7226 |
+| definitions prompt, 2 seeds | 0.6840 | 0.7302 |
+| **four-model prompt ensemble** | **0.6882** | **0.7321** |
+
+The definitions prompt alone was effectively tied with the standard prompt: +0.0010,
+95% CI [-0.0279, +0.0287], P(better) 0.53. Averaging both prompt families improved the
+standard-prompt mean by +0.0052, but this also remains inconclusive: 95% CI
+[-0.0176, +0.0273], P(better) 0.67. The ensemble is therefore the best numerical Task B
+holdout result so far, but it does not clear the pre-set P(better) >= 0.70 rule for a
+confident recipe change. It is a reasonable final-submission candidate if no more
+evaluation is affordable, but the single-prompt four-seed recipe remains the simpler
+default.
+
+No ZIP was produced. Uploaded execution log: [`task-b-30.log`](../task-b-30.log).
+
+### Run 31 result, 2026-10-06 -- square-root class weights do not help
+
+All four jobs completed in 2.5 h. The experiment kept the Gemma backbone, short prompt,
+QLoRA settings and seeds fixed, changing only the class-weight formula.
+
+| arm | macro-F1 | accuracy |
+|---|---:|---:|
+| balanced inverse-frequency weights, 2 seeds | **0.6864** | 0.7283 |
+| square-root inverse-frequency weights, 2 seeds | 0.6822 | **0.7509** |
+
+The square-root arm was -0.0042 macro-F1 below balanced weights, with 95% CI
+[-0.0392, +0.0300] and P(better) 0.41. Its seed-42 model was unstable (0.1382 macro-F1),
+while seed 43 scored 0.6874; the higher accuracy of the averaged square-root arm came
+from favouring easier/majority predictions and did not translate into macro-F1. Keep the
+existing balanced weighting and reject square-root weighting.
+
+No ZIP was produced. Uploaded execution log: [`task-b-31.log`](../task-b-31.log).
+
+### Final-submission plan, 2026-10-06
 
 There is no CodaBench scoring from here on. **One final submission, for Task A and Task B
 together**, made from models fine-tuned on all labelled data. Every choice is therefore
@@ -1234,7 +1279,9 @@ made on the fixed holdouts:
 | flag | setting | source |
 |---|---|---|
 | `RDROP` | 0 | Run 24 |
-| `EPOCHS` | 3 or 4 | Run 23 |
+| `EPOCHS` | 4 | Run 23: 0.6872 vs 0.6792 for 3 epochs |
+| `CLASS_WEIGHT` | `balanced` | Run 31: square-root weights lost 0.0042 macro-F1 |
+| `PROMPT` | standard prompt by default; prompt ensemble is optional | Run 30: ensemble 0.6882, but P(better)=.67 |
 | `TAPT` | True only if `27_gemma_tapt_holdout` shows a gain | Robin's run |
 
 Fallback: `RECOMMENDED_b22_gemma_3ep_2seeds.zip` from Run 22 is already a complete Task B
@@ -1285,7 +1332,6 @@ T4 x2.
   skipped.
 - **Next:** Runs 29-32 test epochs, the definitions prompt, TAPT and learning rate on
   Task A. Run 33 is the final fit.
-
 ### Run 23 result, 2026-10-05 -- four epochs, and a four-model Task B submission
 
 Run on commit `ae088e6`, which predates the collapse guard. Run 21's output was not
@@ -1332,4 +1378,3 @@ Per-epoch holdout (diagnostic):
 - **Consequence:** the final Task B recipe (Run 25) now defaults to `EPOCHS = 4`. If Runs
   27 and 28 leave every other flag at its default, Run 25 would reproduce this
   submission, and `RECOMMENDED_b23_gemma.zip` is the Task B final as it stands.
-

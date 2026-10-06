@@ -15,12 +15,12 @@ All notebooks below run standalone on Kaggle: **GPU T4 x2, Internet on, nothing 
 attach, no token.** Each clones the latest `task-b` and stops at 11 h, so it always saves
 its outputs.
 
-## Where things stand (2026-10-05)
+## Where things stand (2026-10-06)
 
 | | Task B | Task A |
 |---|---|---|
 | model | Gemma-4-12B, 4-bit QLoRA, last-token classification head | Gemma-4-12B, same recipe |
-| holdout evidence | **0.6872** two-seed macro-F1 at 4 epochs (Run 23); 0.6792 / 0.6753 at 3 epochs (Runs 21, 24) vs MuRIL **0.6151**: +0.064, CI [+0.024, +0.105] | **0.8563** (Run 28, seed 42) vs char SVM 0.8117: +0.043, CI [+0.021, +0.067]; the MuRIL-era best was 0.8155; the Gemma + SVM blend is 0.007 *worse* |
+| holdout evidence | **0.6882 / 0.7321** macro-F1/accuracy for the four-model prompt ensemble (Run 30); +0.0052 over the standard-prompt mean, but inconclusive (CI [-0.0176, +0.0273], P=.67). Four-epoch single-prompt Gemma scored **0.6872** (Run 23). | **0.8563** (Run 28, seed 42) vs char SVM 0.8117: +0.043, CI [+0.021, +0.067]; the MuRIL-era best was 0.8155; the Gemma + SVM blend is 0.007 *worse* |
 | best ZIP already built | **`RECOMMENDED_b23_gemma.zip`** (Run 23: 4 epochs, 4 seeds, all 3,532 rows) | `RECOMMENDED_a28_gemma.zip` (Run 28, two healthy full fits) |
 
 ## Open questions, each answered on the holdout before the final fit
@@ -31,7 +31,9 @@ its outputs.
 | R-Drop? | `task_b/24_gemma_muril_lessons` | Aaryan | **done**: inconclusive, -0.002 [-0.027, +0.023] | `RDROP = 0` |
 | LoRA rank and attention-only vs attention + MLP? | `task_b/26_gemma_lora_capacity_ablation` | Robin | ready | `--r`, `--lora-targets` |
 | TAPT (LoRA next-token pretraining)? | `task_b/27_gemma_tapt_holdout` | Robin | ready; memory fixed | `TAPT` |
-| definitions prompt, learning rate 2e-4? | `task_b/28_gemma_prompt_lr` | Aaryan | ready | `PROMPT`, `LR` |
+| definitions prompt, learning rate 2e-4? | `task_b/28_gemma_prompt_lr` | Aaryan | definitions prompt measured through Run 30; lr still pending | `PROMPT`, `LR` |
+| prompt ensemble? | `task_b/30_gemma_prompt_ensemble_holdout` | Robin | **done**: 0.6882, promising but P=.67 | optional full-data ensemble |
+| square-root class weights? | `task_b/31_gemma_class_weight_holdout` | Robin | **done**: 0.6822 vs balanced 0.6864; reject | `CLASS_WEIGHT = balanced` |
 | Gemma on Task A, alone or blended with the SVM? | `task_a/28_gemma_holdout_final` | Aaryan | **done**: Gemma alone, 0.8563 | Task A model |
 | Task A: 4 epochs or 3? | `task_a/29_gemma_epochs` | Aaryan | ready | `EPOCHS` |
 | Task A: definitions prompt? | `task_a/30_gemma_definitions_prompt` | Aaryan | ready | `PROMPT` |
@@ -53,10 +55,11 @@ earlier outputs.
 
    | flag | default | change it when |
    |---|---|---|
-   | `EPOCHS` | 4 | set by Run 23 |
+   | `EPOCHS` | 4 | Run 23: 4 epochs scored 0.6872 vs 0.6792 for 3 |
    | `TAPT` | False | Run 27's TAPT - no TAPT interval is clearly above 0 |
    | `RDROP` | 0.0 | stays 0 |
-   | `PROMPT` | `"short"` | Run 28 printed `defs: True` |
+   | `CLASS_WEIGHT` | `balanced` | Run 31: square-root weights lost 0.0042 macro-F1 |
+   | `PROMPT` | `"short"` | definitions prompt alone was tied; Run 30's ensemble requires two prompt families |
    | `LR` | 1e-4 | Run 28 printed `lr2e-4: True` |
 
    Four seeds are trained on all 3,532 rows. It writes `RECOMMENDED_b25_gemma.zip`. If

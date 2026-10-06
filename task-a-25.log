@@ -1,0 +1,286 @@
+6.4s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+6.4s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+6.4s 3 0.00s - to python to disable frozen modules.
+6.4s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+7.0s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+7.0s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+7.0s 7 0.00s - to python to disable frozen modules.
+7.0s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+10.8s 9 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.2 MB/s eta 0:00:00
+11.0s 10 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 2.2 MB/s eta 0:00:00
+21.2s 11 dedupe task A: 7252 -> 7193 rows (49 duplicate, 10 in label-conflict groups)
+22.1s 12 deduplicated OOF rows: 7193
+30.4s 13 char-only OOF: 0.8183566471156668 0.8184345891839289
+30.4s 14 $ /usr/bin/python3 -u -m hastika.models.baseline_svm --task a --tag a_run25_svm_wordchar --demojize
+32.2s 15 dedupe task A: 7252 -> 7193 rows (49 duplicate, 10 in label-conflict groups)
+41.0s 16 task A  5-fold OOF  macro-F1 0.8111  acc 0.8112  (proba=calibrated)
+41.0s 17 precision    recall  f1-score   support
+41.0s 18 
+41.0s 19 Non-Hate      0.811     0.821     0.816      3663
+41.0s 20 Hate      0.812     0.801     0.806      3530
+41.0s 21 
+41.0s 22 accuracy                          0.811      7193
+41.0s 23 macro avg      0.811     0.811     0.811      7193
+41.0s 24 weighted avg      0.811     0.811     0.811      7193
+41.0s 25 
+42.9s 26 wrote /kaggle/working/hastika/artifacts/runs/a_run25_svm_wordchar/  ({'Non-Hate': 414, 'Hate': 392})
+42.9s 27 $ /usr/bin/python3 -u -m hastika.models.muril --tag a_run25_muril_reinit2 --model google/muril-base-cased --folds 5 --seeds 42 --epochs 6 --bs 8 --grad-accum 2 --eval-bs 32 --select last --reinit-layers 2
+63.1s 28 device=cuda (Tesla T4) model=google/muril-base-cased pooling=meanmax fgm=True ema=True rdrop=0.0 reinit=2 seeds=[42] external=-
+63.5s 29 dedupe task A: 7252 -> 7193 rows (49 duplicate, 10 in label-conflict groups)
+64.4s 30 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+64.8s 31 ===== seed 42 fold 1/5 =====
+71.6s 32 
+71.6s 33 Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+71.6s 34 Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9937.45it/s]
+75.3s 35 [transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+75.3s 36 Key                                        | Status     |  |
+75.3s 37 -------------------------------------------+------------+--+-
+75.3s 38 cls.predictions.decoder.bias               | UNEXPECTED |  |
+75.3s 39 cls.predictions.transform.dense.bias       | UNEXPECTED |  |
+75.3s 40 cls.predictions.bias                       | UNEXPECTED |  |
+75.3s 41 cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  |
+75.3s 42 cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  |
+75.3s 43 cls.seq_relationship.bias                  | UNEXPECTED |  |
+75.3s 44 cls.seq_relationship.weight                | UNEXPECTED |  |
+75.3s 45 cls.predictions.decoder.weight             | UNEXPECTED |  |
+75.3s 46 cls.predictions.transform.dense.weight     | UNEXPECTED |  |
+75.3s 47 
+75.3s 48 Notes:
+75.3s 49 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+220.7s 50 [s42f1] ep1 359/719 loss 0.5806 val 0.7060 * (0.39s/step)
+369.3s 51 [s42f1] ep1 718/719 loss 0.4207 val 0.7324 * (0.40s/step)
+381.1s 52 [s42f1] ep1 719/719 loss 0.5482 val 0.7324 (0.42s/step)
+381.1s 53 [s42f1] ep1 done 5.0min  best 0.7324
+524.0s 54 [s42f1] ep2 359/719 loss 0.4777 val 0.7544 * (0.40s/step)
+672.2s 55 [s42f1] ep2 718/719 loss 0.4747 val 0.7637 * (0.41s/step)
+684.2s 56 [s42f1] ep2 719/719 loss 0.6623 val 0.7637 (0.42s/step)
+684.2s 57 [s42f1] ep2 done 5.1min  best 0.7637
+833.2s 58 [s42f1] ep3 359/719 loss 0.7063 val 0.7727 * (0.42s/step)
+977.5s 59 [s42f1] ep3 718/719 loss 0.2995 val 0.7818 * (0.41s/step)
+989.3s 60 [s42f1] ep3 719/719 loss 0.5907 val 0.7818 (0.42s/step)
+989.3s 61 [s42f1] ep3 done 5.1min  best 0.7818
+1137.3s 62 [s42f1] ep4 359/719 loss 0.4135 val 0.7867 * (0.41s/step)
+1283.1s 63 [s42f1] ep4 718/719 loss 0.4346 val 0.7929 * (0.41s/step)
+1294.9s 64 [s42f1] ep4 719/719 loss 0.3781 val 0.7929 (0.43s/step)
+1294.9s 65 [s42f1] ep4 done 5.1min  best 0.7929
+1440.0s 66 [s42f1] ep5 359/719 loss 0.3556 val 0.7986 * (0.40s/step)
+1585.5s 67 [s42f1] ep5 718/719 loss 0.4884 val 0.7993 * (0.40s/step)
+1597.6s 68 [s42f1] ep5 719/719 loss 0.5482 val 0.7993 (0.42s/step)
+1597.6s 69 [s42f1] ep5 done 5.0min  best 0.7993
+1744.2s 70 [s42f1] ep6 359/719 loss 0.5579 val 0.8050 * (0.41s/step)
+1889.8s 71 [s42f1] ep6 718/719 loss 0.4371 val 0.8085 * (0.41s/step)
+1908.6s 72 [s42f1] ep6 719/719 loss 0.4715 val 0.8085 (0.43s/step)
+1908.6s 73 [s42f1] ep6 done 5.2min  best 0.8085
+1908.6s 74 [s42f1] best 0.8085  last 0.8085  (selected: last)
+1908.6s 75 ===== seed 42 fold 2/5 =====
+1908.9s 76 
+1908.9s 77 Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+1908.9s 78 Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8321.37it/s]
+1908.9s 79 [transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+1908.9s 80 Key                                        | Status     |  |
+1908.9s 81 -------------------------------------------+------------+--+-
+1908.9s 82 cls.predictions.decoder.bias               | UNEXPECTED |  |
+1908.9s 83 cls.predictions.transform.dense.bias       | UNEXPECTED |  |
+1908.9s 84 cls.predictions.bias                       | UNEXPECTED |  |
+1908.9s 85 cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  |
+1908.9s 86 cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  |
+1908.9s 87 cls.seq_relationship.bias                  | UNEXPECTED |  |
+1908.9s 88 cls.seq_relationship.weight                | UNEXPECTED |  |
+1908.9s 89 cls.predictions.decoder.weight             | UNEXPECTED |  |
+1908.9s 90 cls.predictions.transform.dense.weight     | UNEXPECTED |  |
+1908.9s 91 
+1908.9s 92 Notes:
+1908.9s 93 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+2058.5s 94 [s42f2] ep1 359/719 loss 0.2848 val 0.6664 * (0.41s/step)
+2203.8s 95 [s42f2] ep1 718/719 loss 0.4446 val 0.7184 * (0.41s/step)
+2216.5s 96 [s42f2] ep1 719/719 loss 0.5526 val 0.7184 (0.43s/step)
+2216.5s 97 [s42f2] ep1 done 5.1min  best 0.7184
+2362.5s 98 [s42f2] ep2 359/719 loss 0.3522 val 0.7414 * (0.41s/step)
+2509.5s 99 [s42f2] ep2 718/719 loss 0.4752 val 0.7504 * (0.41s/step)
+2522.1s 100 [s42f2] ep2 719/719 loss 0.4451 val 0.7504 (0.42s/step)
+2522.1s 101 [s42f2] ep2 done 5.1min  best 0.7504
+2665.6s 102 [s42f2] ep3 359/719 loss 0.3933 val 0.7517 * (0.40s/step)
+2814.9s 103 [s42f2] ep3 718/719 loss 0.3714 val 0.7654 * (0.41s/step)
+2827.6s 104 [s42f2] ep3 719/719 loss 0.4097 val 0.7654 (0.42s/step)
+2827.6s 105 [s42f2] ep3 done 5.1min  best 0.7654
+2973.9s 106 [s42f2] ep4 359/719 loss 0.4061 val 0.7730 * (0.41s/step)
+3121.9s 107 [s42f2] ep4 718/719 loss 0.5078 val 0.7758 * (0.41s/step)
+3134.6s 108 [s42f2] ep4 719/719 loss 0.4782 val 0.7758 (0.43s/step)
+3134.6s 109 [s42f2] ep4 done 5.1min  best 0.7758
+3282.3s 110 [s42f2] ep5 359/719 loss 0.3316 val 0.7807 * (0.41s/step)
+3419.3s 111 [s42f2] ep5 718/719 loss 0.3508 val 0.7778 (0.40s/step)
+3431.8s 112 [s42f2] ep5 719/719 loss 0.6604 val 0.7778 (0.41s/step)
+3431.8s 113 [s42f2] ep5 done 5.0min  best 0.7807
+3578.9s 114 [s42f2] ep6 359/719 loss 0.6229 val 0.7820 * (0.41s/step)
+3718.1s 115 [s42f2] ep6 718/719 loss 0.3129 val 0.7813 (0.40s/step)
+3737.9s 116 [s42f2] ep6 719/719 loss 0.2745 val 0.7813 (0.43s/step)
+3737.9s 117 [s42f2] ep6 done 5.1min  best 0.7820
+3737.9s 118 [s42f2] best 0.7820  last 0.7813  (selected: last)
+3737.9s 119 ===== seed 42 fold 3/5 =====
+3738.2s 120 
+3738.2s 121 Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+3738.2s 122 Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8680.25it/s]
+3738.2s 123 [transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+3738.2s 124 Key                                        | Status     |  |
+3738.2s 125 -------------------------------------------+------------+--+-
+3738.2s 126 cls.predictions.decoder.bias               | UNEXPECTED |  |
+3738.2s 127 cls.predictions.transform.dense.bias       | UNEXPECTED |  |
+3738.2s 128 cls.predictions.bias                       | UNEXPECTED |  |
+3738.2s 129 cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  |
+3738.2s 130 cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  |
+3738.2s 131 cls.seq_relationship.bias                  | UNEXPECTED |  |
+3738.2s 132 cls.seq_relationship.weight                | UNEXPECTED |  |
+3738.2s 133 cls.predictions.decoder.weight             | UNEXPECTED |  |
+3738.2s 134 cls.predictions.transform.dense.weight     | UNEXPECTED |  |
+3738.2s 135 
+3738.2s 136 Notes:
+3738.2s 137 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+3886.0s 138 [s42f3] ep1 359/719 loss 0.9593 val 0.7047 * (0.41s/step)
+4032.7s 139 [s42f3] ep1 718/719 loss 0.7373 val 0.7496 * (0.41s/step)
+4045.4s 140 [s42f3] ep1 719/719 loss 0.9564 val 0.7496 (0.43s/step)
+4045.4s 141 [s42f3] ep1 done 5.1min  best 0.7496
+4190.9s 142 [s42f3] ep2 359/719 loss 0.5406 val 0.7739 * (0.41s/step)
+4338.3s 143 [s42f3] ep2 718/719 loss 0.6795 val 0.7762 * (0.41s/step)
+4351.0s 144 [s42f3] ep2 719/719 loss 0.4917 val 0.7762 (0.43s/step)
+4351.0s 145 [s42f3] ep2 done 5.1min  best 0.7762
+4498.5s 146 [s42f3] ep3 359/719 loss 0.5678 val 0.7867 * (0.41s/step)
+4644.7s 147 [s42f3] ep3 718/719 loss 0.1828 val 0.7901 * (0.41s/step)
+4657.2s 148 [s42f3] ep3 719/719 loss 0.2976 val 0.7901 (0.43s/step)
+4657.2s 149 [s42f3] ep3 done 5.1min  best 0.7901
+4806.3s 150 [s42f3] ep4 359/719 loss 0.4237 val 0.7964 * (0.42s/step)
+4950.3s 151 [s42f3] ep4 718/719 loss 0.8413 val 0.8005 * (0.41s/step)
+4963.0s 152 [s42f3] ep4 719/719 loss 0.1746 val 0.8005 (0.43s/step)
+4963.0s 153 [s42f3] ep4 done 5.1min  best 0.8005
+5110.4s 154 [s42f3] ep5 359/719 loss 0.6159 val 0.8033 * (0.41s/step)
+5256.4s 155 [s42f3] ep5 718/719 loss 0.4831 val 0.8047 * (0.41s/step)
+5268.9s 156 [s42f3] ep5 719/719 loss 0.6829 val 0.8047 (0.43s/step)
+5268.9s 157 [s42f3] ep5 done 5.1min  best 0.8047
+5410.9s 158 [s42f3] ep6 359/719 loss 0.1939 val 0.8047 (0.40s/step)
+5549.5s 159 [s42f3] ep6 718/719 loss 0.1925 val 0.8026 (0.39s/step)
+5569.3s 160 [s42f3] ep6 719/719 loss 0.2640 val 0.8026 (0.42s/step)
+5569.3s 161 [s42f3] ep6 done 5.0min  best 0.8047
+5569.3s 162 [s42f3] best 0.8047  last 0.8026  (selected: last)
+5569.3s 163 ===== seed 42 fold 4/5 =====
+5569.6s 164 
+5569.6s 165 Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+5569.6s 166 Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7366.94it/s]
+5569.6s 167 [transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+5569.6s 168 Key                                        | Status     |  |
+5569.6s 169 -------------------------------------------+------------+--+-
+5569.6s 170 cls.predictions.decoder.bias               | UNEXPECTED |  |
+5569.6s 171 cls.predictions.transform.dense.bias       | UNEXPECTED |  |
+5569.6s 172 cls.predictions.bias                       | UNEXPECTED |  |
+5569.6s 173 cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  |
+5569.6s 174 cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  |
+5569.6s 175 cls.seq_relationship.bias                  | UNEXPECTED |  |
+5569.6s 176 cls.seq_relationship.weight                | UNEXPECTED |  |
+5569.6s 177 cls.predictions.decoder.weight             | UNEXPECTED |  |
+5569.6s 178 cls.predictions.transform.dense.weight     | UNEXPECTED |  |
+5569.6s 179 
+5569.6s 180 Notes:
+5569.6s 181 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+5715.6s 182 [s42f4] ep1 359/719 loss 0.3679 val 0.6790 * (0.40s/step)
+5862.0s 183 [s42f4] ep1 718/719 loss 0.5761 val 0.7266 * (0.41s/step)
+5874.9s 184 [s42f4] ep1 719/719 loss 0.8404 val 0.7266 (0.42s/step)
+5874.9s 185 [s42f4] ep1 done 5.1min  best 0.7266
+6017.5s 186 [s42f4] ep2 359/719 loss 0.4262 val 0.7336 * (0.40s/step)
+6167.0s 187 [s42f4] ep2 718/719 loss 0.6920 val 0.7444 * (0.41s/step)
+6179.8s 188 [s42f4] ep2 719/719 loss 0.4398 val 0.7444 (0.42s/step)
+6179.8s 189 [s42f4] ep2 done 5.1min  best 0.7444
+6327.1s 190 [s42f4] ep3 359/719 loss 0.6401 val 0.7561 * (0.41s/step)
+6472.8s 191 [s42f4] ep3 718/719 loss 0.4793 val 0.7606 * (0.41s/step)
+6485.6s 192 [s42f4] ep3 719/719 loss 0.5960 val 0.7606 (0.43s/step)
+6485.6s 193 [s42f4] ep3 done 5.1min  best 0.7606
+6629.4s 194 [s42f4] ep4 359/719 loss 0.4382 val 0.7689 * (0.40s/step)
+6777.0s 195 [s42f4] ep4 718/719 loss 0.3836 val 0.7700 * (0.41s/step)
+6790.0s 196 [s42f4] ep4 719/719 loss 0.3823 val 0.7700 (0.42s/step)
+6790.0s 197 [s42f4] ep4 done 5.1min  best 0.7700
+6938.2s 198 [s42f4] ep5 359/719 loss 0.3449 val 0.7727 * (0.41s/step)
+7079.8s 199 [s42f4] ep5 718/719 loss 0.6549 val 0.7770 * (0.40s/step)
+7092.6s 200 [s42f4] ep5 719/719 loss 0.5717 val 0.7770 (0.42s/step)
+7092.6s 201 [s42f4] ep5 done 5.0min  best 0.7770
+7235.6s 202 [s42f4] ep6 359/719 loss 0.6890 val 0.7799 * (0.40s/step)
+7377.8s 203 [s42f4] ep6 718/719 loss 0.2631 val 0.7785 (0.40s/step)
+7397.7s 204 [s42f4] ep6 719/719 loss 0.6109 val 0.7785 (0.42s/step)
+7397.7s 205 [s42f4] ep6 done 5.1min  best 0.7799
+7397.7s 206 [s42f4] best 0.7799  last 0.7785  (selected: last)
+7397.7s 207 ===== seed 42 fold 5/5 =====
+7398.0s 208 
+7398.0s 209 Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+7398.0s 210 Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9768.92it/s]
+7398.0s 211 [transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+7398.0s 212 Key                                        | Status     |  |
+7398.0s 213 -------------------------------------------+------------+--+-
+7398.0s 214 cls.predictions.decoder.bias               | UNEXPECTED |  |
+7398.0s 215 cls.predictions.transform.dense.bias       | UNEXPECTED |  |
+7398.0s 216 cls.predictions.bias                       | UNEXPECTED |  |
+7398.0s 217 cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  |
+7398.0s 218 cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  |
+7398.0s 219 cls.seq_relationship.bias                  | UNEXPECTED |  |
+7398.0s 220 cls.seq_relationship.weight                | UNEXPECTED |  |
+7398.0s 221 cls.predictions.decoder.weight             | UNEXPECTED |  |
+7398.0s 222 cls.predictions.transform.dense.weight     | UNEXPECTED |  |
+7398.0s 223 
+7398.0s 224 Notes:
+7398.0s 225 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+7546.4s 226 [s42f5] ep1 359/719 loss 0.3006 val 0.6785 * (0.41s/step)
+7692.9s 227 [s42f5] ep1 718/719 loss 0.4706 val 0.7147 * (0.41s/step)
+7705.8s 228 [s42f5] ep1 719/719 loss 0.7450 val 0.7147 (0.43s/step)
+7705.8s 229 [s42f5] ep1 done 5.1min  best 0.7147
+7850.0s 230 [s42f5] ep2 359/719 loss 0.5167 val 0.7410 * (0.40s/step)
+7997.3s 231 [s42f5] ep2 718/719 loss 0.7351 val 0.7476 * (0.41s/step)
+8010.0s 232 [s42f5] ep2 719/719 loss 0.3352 val 0.7476 (0.42s/step)
+8010.0s 233 [s42f5] ep2 done 5.1min  best 0.7476
+8157.5s 234 [s42f5] ep3 359/719 loss 0.6652 val 0.7593 * (0.41s/step)
+8301.0s 235 [s42f5] ep3 718/719 loss 0.8988 val 0.7630 * (0.41s/step)
+8313.8s 236 [s42f5] ep3 719/719 loss 0.4261 val 0.7630 (0.42s/step)
+8313.8s 237 [s42f5] ep3 done 5.1min  best 0.7630
+8458.1s 238 [s42f5] ep4 359/719 loss 0.3047 val 0.7670 * (0.40s/step)
+8606.1s 239 [s42f5] ep4 718/719 loss 0.2940 val 0.7756 * (0.41s/step)
+8618.8s 240 [s42f5] ep4 719/719 loss 0.8632 val 0.7756 (0.42s/step)
+8618.8s 241 [s42f5] ep4 done 5.1min  best 0.7756
+8761.7s 242 [s42f5] ep5 359/719 loss 0.4456 val 0.7763 * (0.40s/step)
+8909.4s 243 [s42f5] ep5 718/719 loss 0.3420 val 0.7806 * (0.40s/step)
+8922.1s 244 [s42f5] ep5 719/719 loss 0.3724 val 0.7806 (0.42s/step)
+8922.1s 245 [s42f5] ep5 done 5.1min  best 0.7806
+9068.6s 246 [s42f5] ep6 359/719 loss 0.2493 val 0.7827 * (0.41s/step)
+9215.3s 247 [s42f5] ep6 718/719 loss 0.2078 val 0.7835 * (0.41s/step)
+9235.1s 248 [s42f5] ep6 719/719 loss 0.2186 val 0.7835 (0.44s/step)
+9235.1s 249 [s42f5] ep6 done 5.2min  best 0.7835
+9235.1s 250 [s42f5] best 0.7835  last 0.7835  (selected: last)
+9235.1s 251 
+9235.1s 252 OOF macro-F1 0.7910 acc 0.7913
+9236.0s 253 threshold-tuned OOF macro-F1 0.7939 at p(Hate) > 0.463
+9236.0s 254 wrote /kaggle/working/hastika/artifacts/runs/a_run25_muril_reinit2/predictions.csv (threshold 0.463)
+9238.9s 255 $ /usr/bin/python3 -u -m hastika.models.ensemble --task a --tags a_run25_svm_wordchar a_run25_svm_char_only a_run25_muril_reinit2 --out a_run25_ensemble
+9240.6s 256 dedupe task A: 7252 -> 7193 rows (49 duplicate, 10 in label-conflict groups)
+9240.6s 257 
+9240.6s 258 individual OOF macro-F1:
+9240.6s 259 a_run25_muril_reinit2 0.7910
+9240.6s 260 a_run25_svm_char_only 0.8184
+9240.6s 261 a_run25_svm_wordchar 0.8111
+9245.7s 262 
+9245.7s 263 best blend OOF macro-F1 0.8270  acc 0.8271
+9245.7s 264 a_run25_muril_reinit2 0.33
+9245.7s 265 a_run25_svm_char_only 0.60
+9245.7s 266 a_run25_svm_wordchar 0.07
+9277.9s 267 
+9277.9s 268 nested estimate      0.8250  vs best single 0.8184  -- blending pays
+9277.9s 269 
+9277.9s 270 wrote /kaggle/working/hastika/artifacts/runs/a_run25_ensemble/predictions.csv  ({'Non-Hate': 418, 'Hate': 388})
+9277.9s 271 Run 25 three-member OOF and nested blend completed
+9277.9s 272 model  macro_f1  accuracy
+9277.9s 273 word+char SVM  0.811086  0.811205
+9277.9s 274 char-only SVM  0.818357  0.818435
+9277.9s 275 MuRIL  0.790956  0.791325
+9277.9s 276 The ensemble command above prints its in-sample search and nested estimate.
+9277.9s 277 DOWNLOAD RESULTS FROM: /kaggle/working/task_a_run25_outputs and artifacts/runs
+9277.9s 278 restored data/raw/binary_train.csv
+9281.1s 279 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+9281.1s 280 cells[i][c] = re.sub('\\\\\|', '|', cell)
+9281.2s 281 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+9281.2s 282 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+9282.0s 283 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+9282.1s 284 [NbConvertApp] Writing 31908 bytes to __notebook__.ipynb
+9284.5s 285 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+9285.0s 286 [NbConvertApp] Writing 325465 bytes to __results__.html
