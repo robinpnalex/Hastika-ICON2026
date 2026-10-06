@@ -30,6 +30,9 @@ two people working in parallel are in [`COLLABORATION.md`](COLLABORATION.md).
 MuRIL-era CodaBench results (Task B best 0.6410, Task A best 0.8188) are kept below as a
 record.
 
+For the concise ranked list of final-submission candidates and notebook/ZIP status, see
+[`FINAL_SUBMISSION_NOTEBOOKS.md`](FINAL_SUBMISSION_NOTEBOOKS.md).
+
 ## Experiment roadmap
 
 | run | date/status | notebook or runner | question | result/status |

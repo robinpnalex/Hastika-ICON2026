@@ -11,6 +11,9 @@ validation. Every choice behind it is made on the fixed 15% holdouts:
 
 No cross-task label derivation, and no test text in training, TAPT or screening.
 
+The ranked notebook and ZIP checklist is in
+[`FINAL_SUBMISSION_NOTEBOOKS.md`](FINAL_SUBMISSION_NOTEBOOKS.md).
+
 All notebooks below run standalone on Kaggle: **GPU T4 x2, Internet on, nothing to
 attach, no token.** Each clones the latest `task-b` and stops at 11 h, so it always saves
 its outputs.
