@@ -88,6 +88,19 @@ The combiner weights each file by its model count, checks shapes, and refuses a 
 file. If a run does not finish, the existing ZIPs stand: `RECOMMENDED_a28_gemma.zip` for
 Task A and `RECOMMENDED_b23_gemma.zip` for Task B.
 
+## The TAPT option (2026-10-06)
+
+TAPT was the largest MuRIL gain on both tasks. It is applied on top of each task's current
+best recipe, with a holdout check and a submission run in parallel:
+
+| task | holdout check | submission (full data) |
+|---|---|---|
+| A | `task_a/31_gemma_tapt`: TAPT + 3 epochs vs Run 28's recipe | `task_a/33_gemma_final_recipe` with `TAPT = True`, other settings at their defaults |
+| B | `task_b/34_gemma_tapt_4ep_holdout`: TAPT + 4 epochs vs Run 23's recipe | `task_b/25_gemma_final_recipe` with `TAPT = True` (`EPOCHS = 4` is the default) |
+
+Submit a TAPT ZIP only if its holdout check prints `tapt: True`. Otherwise submit the
+current best ZIPs, `RECOMMENDED_a28_gemma.zip` and `RECOMMENDED_b23_gemma.zip`.
+
 ## The final run
 
 1. **Task B.** Choose one of the two final-data recipes:

@@ -100,6 +100,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 31 | 2026-10-06, completed | `31_gemma_class_weight_holdout.ipynb` | compare Gemma's current balanced class weights with square-root inverse-frequency weights, two seeds each | balanced **0.6864 / 0.7283**, sqrt **0.6822 / 0.7509**; sqrt -0.0042 (CI [-0.0392, +0.0300], P=.41); reject sqrt; no ZIP |
 | Task B 32 | ready; full-data prediction | `32_gemma_prompt_ensemble_full.ipynb` | reproduce the Run 30 four-model prompt ensemble on all 3,532 labelled rows and infer the 396-row released test file | `RECOMMENDED_b32_gemma_prompt_ensemble.zip`; no local score because test labels are unavailable |
 | Task B 33 | ready; standalone | `33_final_holdout_check.ipynb` | holdout twin of the Task B final: Run 23's four 4-epoch seeds + Run 32's prompt ensemble (standard and definitions, seeds 42/43); eight-model combination vs Run 23's recipe | paired bootstrap verdict on the 530-row holdout (~6.3 h, ~3 h with Runs 23 and 30 attached) |
+| Task B 34 | ready; standalone | `34_gemma_tapt_4ep_holdout.ipynb` | TAPT on top of the current best recipe (4 epochs) vs that recipe, 2 seeds, on the holdout | sets `TAPT` for Run 25 (~5 h, ~3 h with Run 23 attached) |
 
 ## Ordered next steps
 
@@ -1405,4 +1406,18 @@ hidden behind the previous one:
    - Every generated notebook with a TAPT path was regenerated.
 
 TAPT has still never completed a run, so it is not used in today's final fits.
+
+### TAPT made memory-safe, 2026-10-06
+
+Task A Run 31's TAPT ran out of CUDA memory at micro-batch 4. TAPT holds the LM head and
+its gradients on top of everything the classifier holds. The changes:
+
+| change | detail |
+|---|---|
+| `llm_tapt.py` defaults | micro-batch **1** x 16 accumulation (same effective batch), max 128 tokens (> 99% of comments), logit chunk 16; the first step prints peak memory |
+| allocator | both `llm_tapt.py` and `llm_classifier.py` set `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`, against fragmentation OOMs |
+| `run_jobs` retry | a TAPT job that still runs out of memory reruns once at 64 tokens |
+| fallback | if TAPT cannot run at all, the final fits (Runs 25 and 33) train without it and still write their ZIP, and the holdout runs (A31, B34) still report the base |
+
+A TAPT failure can therefore no longer fail a notebook.
 

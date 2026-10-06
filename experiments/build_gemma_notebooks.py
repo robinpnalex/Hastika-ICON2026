@@ -247,9 +247,9 @@ def run_jobs(jobs, on_done=None):
                 print(f"{name} collapsed -- rerunning with seed {int(seed.group(1)) + 1000}")
                 nxt = [{**job, "cmd": job["cmd"] + f" --seed {int(seed.group(1)) + 1000}"}]
             elif "OutOfMemoryError" in log and "llm_tapt" in job["cmd"]:
-                # TAPT: same effective batch (16) at micro-batch 1, smaller logit chunks
-                print(f"{name} ran out of GPU memory -- rerunning TAPT at micro-batch 1")
-                nxt = [{**job, "cmd": job["cmd"] + " --bs 1 --grad-accum 16 --logit-chunk 16"}]
+                # TAPT already runs at micro-batch 1 by default: last resort is shorter text
+                print(f"{name} ran out of GPU memory -- rerunning TAPT at 64 tokens")
+                nxt = [{**job, "cmd": job["cmd"] + " --bs 1 --grad-accum 16 --max-len 64 --logit-chunk 8"}]
             elif "OutOfMemoryError" in log:
                 print(f"{name} ran out of GPU memory -- rerunning at micro-batch 4")
                 nxt = [{**job, "cmd": job["cmd"] + " --bs 4 --grad-accum 4 --eval-bs 8"}]
@@ -759,9 +759,10 @@ epoch 1 and reruns a collapsed job with another seed. Seed 42's holdout curve wa
 rising at the last epoch: 0.817, 0.846, 0.856."""
 
 ABLATION_CODE = r'''
+BASE_EXTRA = __BASE_EXTRA__     # the current best recipe's flags; every arm adds to them
 base = {}
 for s in (42, 43):
-    for pat in (f"*/runs/base_s{s}/holdout_probs.npy", f"*/runs/ho_s{s}/holdout_probs.npy"):
+    for pat in [p.format(seed=s) for p in __BASE_REUSE__]:
         got = [load_probs(h.parent, SPLIT / "holdout.csv") for h in find_prior(pat)]
         got = [g for g in got if g is not None]
         if got:
@@ -772,8 +773,9 @@ print("base reused for seeds:", list(base))
 ARMS = __ARMS__
 HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv"], evalf=SPLIT / "holdout.csv")
 TAPT_DIR = RUNS / "tapt_train"
-jobs = [llm_job(f"{a}_s{s}", seed=s, extra=x, **HO) for a, x in ARMS.items() if x for s in (42, 43)]
-jobs += [llm_job(f"base_s{s}", seed=s, **HO) for s in (42, 43) if s not in base]
+jobs = [llm_job(f"{a}_s{s}", seed=s, extra=f"{BASE_EXTRA} {x}", **HO)
+        for a, x in ARMS.items() if x for s in (42, 43)]
+jobs += [llm_job(f"base_s{s}", seed=s, extra=BASE_EXTRA, **HO) for s in (42, 43) if s not in base]
 USE_TAPT = __TAPT__
 if USE_TAPT:
     jobs.insert(0, tapt_job("tapt_train", [SPLIT / "train.csv", EXTERNAL]))
@@ -782,7 +784,7 @@ if USE_TAPT:
 def on_done(name, code):
     if name == "tapt_train":
         if code == 0:
-            return [llm_job(f"tapt_s{s}", seed=s, extra=f"--init-adapter {TAPT_DIR}", **HO)
+            return [llm_job(f"tapt_s{s}", seed=s, extra=f"{BASE_EXTRA} --init-adapter {TAPT_DIR}", **HO)
                     for s in (42, 43)]
         print("TAPT failed -- the tapt arm is skipped, see", LOGS / "tapt_train.log")
     return []
@@ -821,24 +823,28 @@ json.dump({"commit": head, "holdout_scores": scores, "bootstrap": boots, "use": 
 '''
 
 
-def ablation(run, title, why, arms, tapt=False, minutes=""):
+def ablation(run, title, why, arms, tapt=False, minutes="", task="a", base_extra="",
+             base_reuse=("*/runs/base_s{seed}/holdout_probs.npy", "*/runs/ho_s{seed}/holdout_probs.npy"),
+             facts=None, base_desc="Run 28's recipe", final_run="Task A Run 33", n_train="6,114"):
     """Task A holdout ablation: each arm vs a no-change base, 2 seeds, paired bootstrap.
     The base is reused from an attached earlier output when found, else trained here."""
     rows = "\n".join(f"| `{n}` | `{x}` | {why[n]} |" if x else f"| `{n}` | TAPT adapter | {why[n]} |"
                      for n, x in arms.items())
-    md = (f"# Task A Run {run} -- Gemma-4-12B: {title}\n\n{A_FACTS}\n\n"
-          "**This run** trains Gemma-4-12B QLoRA, 3 epochs unless stated otherwise, seeds 42 and "
-          "43, on the 6,114 training rows. Every arm is scored on the same holdout against "
-          "`base`, which is Run 28's recipe:\n\n"
+    md = (f"# Task {task.upper()} Run {run} -- Gemma-4-12B: {title}\n\n{facts or A_FACTS}\n\n"
+          "**This run** trains Gemma-4-12B QLoRA, seeds 42 and 43, on the "
+          f"{n_train} training rows. Every arm is scored on the same holdout against `base`, "
+          f"which is {base_desc}:\n\n"
           "| arm | change | why |\n|---|---|---|\n" + rows + "\n\n"
           "**How each arm is judged.** Paired bootstrap against `base`. A flag is printed "
-          "`True` for the final recipe (Task A Run 33) when P(better) >= 0.7.\n\n"
-          "**The base is reused when available.** If an earlier Task A Gemma output is "
-          "attached (Run 28, or any run of this line), its healthy holdout probabilities are "
-          "reused. Otherwise the base trains here.\n\n"
+          f"`True` for the final recipe ({final_run}) when P(better) >= 0.7.\n\n"
+          "**The base is reused when available.** If an earlier output with the same base "
+          "recipe and seeds is attached, its healthy holdout probabilities are reused. "
+          "Otherwise the base trains here.\n\n"
           f"**Time:** {minutes}.\n\n" + SETTINGS)
-    code = ABLATION_CODE.replace("__ARMS__", repr(arms)).replace("__TAPT__", repr(tapt))
-    return [("markdown", md), ("code", setup("a", f"a{run}_outputs")), ("code", LLM_ENV),
+    code = (ABLATION_CODE.replace("__ARMS__", repr(arms)).replace("__TAPT__", repr(tapt))
+            .replace("__BASE_EXTRA__", repr(base_extra))
+            .replace("__BASE_REUSE__", repr(list(base_reuse))))
+    return [("markdown", md), ("code", setup(task, f"{task}{run}_outputs")), ("code", LLM_ENV),
             ("code", code), ("code", ABLATION_REPORT)]
 
 
@@ -1055,6 +1061,30 @@ attached:
     "FINAL: all eight", "current best: Run 23 recipe, 4 epochs x4",
     "about 6.3 h standalone (eight fits), about 3 h with Runs 23 and 30 attached")
 
+B_FACTS = """**What Task B already knows** (530-row holdout of train + released validation,
+`f85f4f049b`):
+
+| recipe | macro-F1 |
+|---|---|
+| MuRIL, Run 9 recipe | 0.6151 |
+| Gemma-4-12B, 3 epochs, 2 seeds (Run 21) | 0.6792 |
+| **Gemma-4-12B, 4 epochs, 2 seeds (Run 23): the current best recipe** | **0.6872** |
+
+For MuRIL, TAPT was the single largest gain on this task: +2.9 OOF. On Gemma it has never
+completed. Three bugs stopped it, all now fixed: the logits ran out of memory, every chunk
+ran its own decoder backward, and the out-of-memory retry used a flag TAPT did not
+accept."""
+
+b34 = ablation(34, "TAPT on the current best recipe (4 epochs)", {
+    "tapt": "LoRA next-token pretraining on the 3,002 training comments plus the external "
+            "Kannada corpus, one epoch, then the 4-epoch classifier continues from that "
+            "adapter. Holdout and test text are never read"},
+    {"tapt": ""}, tapt=True, task="b", base_extra="--epochs 4",
+    base_reuse=("*/runs/gemma-4-12b_ep4_ho_s{seed}/holdout_probs.npy",),
+    facts=B_FACTS, base_desc="Run 23's recipe, 4 epochs (the current best)",
+    final_run="Task B Run 25", n_train="3,002",
+    minutes="about 5 h standalone, about 3 h with Run 23's output attached")
+
 if __name__ == "__main__":
     notebook(b22, "notebooks/task_b/22_package_run21.ipynb")
     notebook(b23, "notebooks/task_b/23_gemma_epochs_seeds_final.ipynb")
@@ -1069,3 +1099,4 @@ if __name__ == "__main__":
     notebook(a33, "notebooks/task_a/33_gemma_final_recipe.ipynb")
     notebook(a34, "notebooks/task_a/34_final_holdout_check.ipynb")
     notebook(b33, "notebooks/task_b/33_final_holdout_check.ipynb")
+    notebook(b34, "notebooks/task_b/34_gemma_tapt_4ep_holdout.ipynb")

@@ -19,6 +19,9 @@ never holdout or test comments.
 import argparse
 import math
 import os
+
+# Reduce fragmentation-type CUDA OOMs ("reserved but unallocated" memory on a 15 GB T4).
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 import pathlib
 import sys
 import time
@@ -41,12 +44,13 @@ def main():
     ap.add_argument("--epochs", type=int, default=1)
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--r", type=int, default=16)
-    # Micro-batch 2 x 8: at micro-batch 4 the 12B decoder's own activations ran out of
-    # memory on a T4 (Task A Run 31), even with the LM-head logits chunked.
-    ap.add_argument("--bs", type=int, default=2)
-    ap.add_argument("--grad-accum", type=int, default=8)
-    ap.add_argument("--max-len", type=int, default=160)
-    ap.add_argument("--logit-chunk", type=int, default=32,
+    # The most memory-safe settings by default, at the same effective batch (16). Micro-batch
+    # 4 ran out of memory on a T4 (Task A Run 31): TAPT holds the LM head and its gradients
+    # on top of everything the classifier holds. 128 tokens covers > 99% of comments.
+    ap.add_argument("--bs", type=int, default=1)
+    ap.add_argument("--grad-accum", type=int, default=16)
+    ap.add_argument("--max-len", type=int, default=128)
+    ap.add_argument("--logit-chunk", type=int, default=16,
                     help="hidden-state positions projected through the LM head at once")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--cache", default=os.environ.get("HF_HUB_CACHE"))
@@ -156,6 +160,11 @@ def main():
                 opt.zero_grad(set_to_none=True)
                 sched.step()
                 step += 1
+                if step == 1:
+                    print(f"first step done; peak GPU memory "
+                          f"{torch.cuda.max_memory_allocated() / 2**30:.1f} GB of "
+                          f"{torch.cuda.get_device_properties(0).total_memory / 2**30:.1f} GB",
+                          flush=True)
                 if step % 25 == 0:
                     el = time.time() - t_train
                     print(f"epoch {epoch + 1} step {step}/{steps} lm loss {run / n:.4f} "
