@@ -504,36 +504,36 @@ json.dump({"commit": head, "holdout_scores": scores, "bootstrap": boots, "use": 
 
 # ---------------------------------------------------------------------------- B25
 b25 = [("markdown", r'''
-# Task B Run 25 -- the final Gemma-4-12B recipe, all 3,532 rows
+# Task B Run 25 -- TAPT Gemma-4-12B, final submission on all 3,532 rows
 
-This run combines whatever Runs 23 and 24 showed into four full-data models, averaged
-into one submission. Set the flags in the next cell from those runs' printed results.
-The defaults are Run 23's recipe (4 epochs, 0.6872 on the holdout) with four seeds, so the
-notebook is a safe submission even with nothing changed. Unchanged, it reproduces
-`RECOMMENDED_b23_gemma.zip`.
+**This is the TAPT recipe, and it runs TAPT only.**
 
-| flag | default | set it to | when |
-|---|---|---|---|
-| `EPOCHS` | 4 | -- | set by Run 23 (4 epochs 0.6872 vs 3 epochs 0.6792) |
-| `TAPT` | False | True | Run 24 printed `tapt: True` |
-| `RDROP` | 0.0 | 0.5 | Run 24 printed `rdrop: True` |
-| `PROMPT` | `"short"` | `"defs"` | Run 28 printed `defs: True` |
-| `LR` | 1e-4 | 2e-4 | Run 28 printed `lr2e-4: True` |
-| `SEEDS` | 42-45 | -- | four models, two per GPU round |
+1. **TAPT.** One epoch of LoRA next-token pretraining on the text of all 3,532 labelled
+   comments plus the external Kannada corpus (`offenseval_kn`). Test text is never read.
+2. **Classifier.** Four Gemma-4-12B QLoRA classifiers (seeds 42-45, 4 epochs) continue
+   from that TAPT adapter, trained on all 3,532 labelled rows, two per GPU round.
+3. **Output.** Their test probabilities are averaged into `RECOMMENDED_b25_gemma.zip`.
 
-**Time:**
+**If TAPT fails, the notebook stops with an error and writes no ZIP.** A non-TAPT model is
+never substituted.
 
-| recipe | time |
+TAPT is memory-safe on a T4: micro-batch 1 x 16 accumulation, 128 tokens, chunked logits,
+expandable CUDA segments, and one retry at 64 tokens. The log prints peak GPU memory after
+the first TAPT step.
+
+**Does it work?** Run `task_b/34_gemma_tapt_4ep_holdout` at the same time. It runs the
+same TAPT + 4-epoch recipe on the 85% split, scores it against Run 23's recipe on the
+holdout (0.6872, `RECOMMENDED_b23_gemma.zip`), and prints `tapt: True` if TAPT wins.
+
+| setting | value |
 |---|---|
-| 3 epochs | about 3 h |
-| 4 epochs | about 4 h |
-| R-Drop | roughly doubles training time |
-| TAPT | adds about 50 min |
+| `TAPT` | **True** |
+| `EPOCHS` | 4: Run 23 measured 0.6872 vs 0.6792 for 3 |
+| `RDROP` | 0.0: inconclusive in Run 24 and doubles the time |
+| `PROMPT`, `LR` | `"short"`, 1e-4 |
+| `SEEDS` | 42-45 |
 
-The worst combination is about 8.5 h, inside the 11 h stop.
-
-TAPT here reads all 3,532 labelled comments' text plus the external corpus; never the test
-text. The output is `RECOMMENDED_b25_gemma.zip`.
+**Time:** about 5 h (TAPT about 50 min, then two rounds of two 4-epoch fits).
 
 ''' + SETTINGS), ("code", setup("b", "b25_outputs")), ("code", LLM_ENV), ("code", r'''
 EPOCHS = 4          # Run 23: 4 epochs 0.6872 vs 3 epochs 0.6792
@@ -874,26 +874,41 @@ a32 = ablation(32, "learning rate 2e-4", {
               "improving at its last epoch at 1e-4"},
     {"lr2e-4": "--lr 2e-4"}, minutes="about 5 h standalone, about 2.5 h with a base attached")
 
-A33_MD = ("# Task A Run 33 -- the final Task A recipe: Gemma-4-12B, all 7,193 rows\n\n" + A_FACTS + """
+A33_MD = ("""# Task A Run 33 -- TAPT Gemma-4-12B, final submission on all 7,193 rows
 
-This run fits the final Task A models. Set the flags in the next cell from Task A Runs
-29-32. The defaults are Run 28's recipe, which is already measured at 0.8563 on the
-holdout, so the notebook is a safe final submission even with nothing changed:
+**This is the TAPT recipe, and it runs TAPT only.**
 
-| flag | default | set it to | when |
-|---|---|---|---|
-| `EPOCHS` | 3 | 4 | Run 29 printed `ep4: True` |
-| `PROMPT` | `"short"` | `"defs"` | Run 30 printed `defs: True` |
-| `TAPT` | False | True | Run 31 printed `tapt: True` |
-| `LR` | 1e-4 | 2e-4 | Run 32 printed `lr2e-4: True` |
-| `SEEDS` | 42-45 | -- | four models, two per GPU round |
+1. **TAPT.** One epoch of LoRA next-token pretraining on the text of all 7,193 labelled
+   comments plus the external Kannada corpus (`offenseval_kn`). Test text is never read.
+2. **Classifier.** Four Gemma-4-12B QLoRA classifiers (seeds 42-45, 3 epochs, Run 28's
+   recipe) continue from that TAPT adapter, trained on all 7,193 labelled rows, two per
+   GPU round.
+3. **Output.** Their test probabilities are averaged into `RECOMMENDED_a33_gemma.zip`, for
+   `hastika_binary_test.csv` (806 rows).
 
-A full Task A fit takes about 2.5 h at 3 epochs. Four seeds take about 5 h, about 6.5 h at
-4 epochs, and TAPT adds about 1.5 h. With every option on, the 11 h stop may cut the
-second round of seeds. The models that finished are still averaged and packaged.
+**If TAPT fails, the notebook stops with an error and writes no ZIP.** A non-TAPT model is
+never substituted.
 
-The SVM blend is left out: on the holdout it was 0.007 below Gemma alone. The output is
-`RECOMMENDED_a33_gemma.zip`, for `hastika_binary_test.csv` (806 rows).
+TAPT is memory-safe on a T4: micro-batch 1 x 16 accumulation, 128 tokens, chunked logits,
+expandable CUDA segments, and one retry at 64 tokens. The log prints peak GPU memory after
+the first TAPT step.
+
+**Does it work?** Run `task_a/31_gemma_tapt` at the same time. It runs the same TAPT +
+3-epoch recipe on the 85% split, scores it against Run 28's recipe on the holdout
+(0.8563, `RECOMMENDED_a28_gemma.zip`), and prints `tapt: True` if TAPT wins.
+
+| setting | value |
+|---|---|
+| `TAPT` | **True** |
+| `EPOCHS` | 3: Run 28's measured recipe |
+| `PROMPT`, `LR` | `"short"`, 1e-4 |
+| `SEEDS` | 42-45 |
+
+The SVM blend is left out: on the holdout it was 0.007 below Gemma alone.
+
+**Time:** about 6.5-7 h (TAPT about 1-1.5 h, then two rounds of two 3-epoch fits, about
+2.5 h each). If the 11 h stop cuts the second round, the TAPT models that finished are
+averaged and packaged.
 
 """ + SETTINGS)
 
