@@ -24,7 +24,7 @@ The current candidates, both in Kaggle outputs and not yet copied into this fold
 | task | ZIP | what it is | holdout |
 |---|---|---|---|
 | B | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22) | Gemma-4-12B, 3 epochs, 2 seeds, all 3,532 rows | 0.6792 |
-| A | `RECOMMENDED_a28_gemma.zip` (Task A Run 28) | Gemma-4-12B, 3 epochs, 2 seeds, all 7,193 rows | 0.8563 |
+| A | **submitted:** `task_a/final/Project MANAS_taskA.csv`, from `RECOMMENDED_a28_gemma.zip` (Task A Run 28) | Gemma-4-12B, 3 epochs, 2 seeds, all 7,193 rows | 0.8563 |
 
 The tables below are the CodaBench history of the MuRIL era, kept as a record.
 
