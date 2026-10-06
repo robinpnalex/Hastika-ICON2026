@@ -16,6 +16,9 @@ These are the captured Kaggle logs for the completed Task B experiments:
 | `run22_gemma_3ep_2seeds_full.log` | Run 22: standalone Gemma-4-12B full fits, 3 epochs, seeds 42/43, on all 3,532 rows | both fits completed (77 and 93 min); `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written |
 | `run24_gemma_rdrop_tapt_holdout.log` | Run 24: MuRIL lessons on Gemma-4-12B, holdout | base 0.6753, R-Drop 0.6734 (-0.002, CI [-0.027, +0.023]); TAPT arm OOM in the LM-head logits, not measured |
 | `run23_gemma_4ep_holdout_full.log` | Run 23: Gemma-4-12B 4 epochs on the holdout, then four 4-epoch full fits | 4 epochs 0.6872 vs 3 epochs 0.6792 (2 seeds each); seed 43 near-collapsed through epoch 2, recovered; `RECOMMENDED_b23_gemma.zip` (4 models) |
+| `run19_oof_best_recipe.log` | Run 19: MuRIL best recipe OOF on train + released validation | see `docs/EXPERIMENTS.md` |
+| `run30_gemma_prompt_ensemble_holdout.log` | Run 30 (Robin): Gemma prompt ensemble on the holdout | see `docs/EXPERIMENTS.md` |
+| `run31_gemma_class_weight_holdout.log` | Run 31 (Robin): square-root vs balanced class weights | see `docs/EXPERIMENTS.md` |
 
 The logs are retained as raw captured output. The corresponding experiment descriptions
 and results are recorded in `docs/EXPERIMENTS.md`.

@@ -1250,7 +1250,7 @@ confident recipe change. It is a reasonable final-submission candidate if no mor
 evaluation is affordable, but the single-prompt four-seed recipe remains the simpler
 default.
 
-No ZIP was produced. Uploaded execution log: [`task-b-30.log`](../task-b-30.log).
+No ZIP was produced. Uploaded execution log: [`run30_gemma_prompt_ensemble_holdout.log`](../results/task_b/logs/run30_gemma_prompt_ensemble_holdout.log).
 
 ### Run 31 result, 2026-10-06 -- square-root class weights do not help
 
@@ -1268,7 +1268,7 @@ while seed 43 scored 0.6874; the higher accuracy of the averaged square-root arm
 from favouring easier/majority predictions and did not translate into macro-F1. Keep the
 existing balanced weighting and reject square-root weighting.
 
-No ZIP was produced. Uploaded execution log: [`task-b-31.log`](../task-b-31.log).
+No ZIP was produced. Uploaded execution log: [`run31_gemma_class_weight_holdout.log`](../results/task_b/logs/run31_gemma_class_weight_holdout.log).
 
 ### Final-submission plan, 2026-10-06
 
