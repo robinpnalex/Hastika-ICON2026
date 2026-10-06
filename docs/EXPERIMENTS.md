@@ -1382,3 +1382,25 @@ Per-epoch holdout (diagnostic):
 - **Consequence:** the final Task B recipe (Run 25) now defaults to `EPOCHS = 4`. If Runs
   27 and 28 leave every other flag at its default, Run 25 would reproduce this
   submission, and `RECOMMENDED_b23_gemma.zip` is the Task B final as it stands.
+
+### Why Gemma TAPT kept failing, and the fix, 2026-10-06
+
+TAPT never completed in three attempts. The causes were three separate bugs, each
+hidden behind the previous one:
+
+1. **Logits out of memory** (Task B Run 24). The LM loss projected every position
+   through the 262k-vocabulary head at once. Fixed by chunked logits (Robin, `f818d4b`).
+2. **One decoder backward per chunk** (`f818d4b`). Correct, but about 10x slower. Fixed
+   by a detached-head single backward (`09e27dc`), with gradients checked identical.
+3. **Decoder activations out of memory, then a retry that could never run** (Task A
+   Run 31). At micro-batch 4, the 12B decoder's activations alone exceed a T4. The
+   notebooks' generic OOM retry then appended the classifier's `--eval-bs 8`, which
+   `llm_tapt.py` did not accept, and argparse killed the retry before it started.
+   Robin hand-patched notebook 31 (`7a21c3a`). The fix is now at the source:
+   - `llm_tapt.py` defaults to micro-batch 2 x 8 accumulation with logit chunk 32, and
+     accepts and ignores `--eval-bs`.
+   - `run_jobs` retries TAPT jobs at micro-batch 1 x 16 with logit chunk 16.
+   - Every generated notebook with a TAPT path was regenerated.
+
+TAPT has still never completed a run, so it is not used in today's final fits.
+

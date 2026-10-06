@@ -244,6 +244,10 @@ def run_jobs(jobs, on_done=None):
             if code == 4 and seed:
                 print(f"{name} collapsed -- rerunning with seed {int(seed.group(1)) + 1000}")
                 nxt = [{**job, "cmd": job["cmd"] + f" --seed {int(seed.group(1)) + 1000}"}]
+            elif "OutOfMemoryError" in log and "llm_tapt" in job["cmd"]:
+                # TAPT: same effective batch (16) at micro-batch 1, smaller logit chunks
+                print(f"{name} ran out of GPU memory -- rerunning TAPT at micro-batch 1")
+                nxt = [{**job, "cmd": job["cmd"] + " --bs 1 --grad-accum 16 --logit-chunk 16"}]
             elif "OutOfMemoryError" in log:
                 print(f"{name} ran out of GPU memory -- rerunning at micro-batch 4")
                 nxt = [{**job, "cmd": job["cmd"] + " --bs 4 --grad-accum 4 --eval-bs 8"}]

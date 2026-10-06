@@ -41,15 +41,18 @@ def main():
     ap.add_argument("--epochs", type=int, default=1)
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--r", type=int, default=16)
-    # the LM head's logits are chunked (--logit-chunk), so micro-batch size is bounded by
-    # the decoder's activations, not by the 262k-vocabulary logits
-    ap.add_argument("--bs", type=int, default=4)
-    ap.add_argument("--grad-accum", type=int, default=4)
+    # Micro-batch 2 x 8: at micro-batch 4 the 12B decoder's own activations ran out of
+    # memory on a T4 (Task A Run 31), even with the LM-head logits chunked.
+    ap.add_argument("--bs", type=int, default=2)
+    ap.add_argument("--grad-accum", type=int, default=8)
     ap.add_argument("--max-len", type=int, default=160)
-    ap.add_argument("--logit-chunk", type=int, default=64,
+    ap.add_argument("--logit-chunk", type=int, default=32,
                     help="hidden-state positions projected through the LM head at once")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--cache", default=os.environ.get("HF_HUB_CACHE"))
+    # Accepted and ignored. A generic out-of-memory retry once appended the classifier's
+    # --eval-bs here, and argparse killed the retry instantly (Task A Run 31).
+    ap.add_argument("--eval-bs", type=int, default=None, help=argparse.SUPPRESS)
     args = ap.parse_args()
     torch.manual_seed(args.seed)
     dtype = torch.bfloat16 if torch.cuda.get_device_capability(0)[0] >= 8 else torch.float16

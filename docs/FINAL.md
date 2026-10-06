@@ -52,6 +52,31 @@ rows, and exits with code 4 if one class takes more than 95% of them. Every note
 reruns such a job once with seed + 1000, and skips collapsed probabilities when reusing
 earlier outputs.
 
+## Today's plan (2026-10-06): two runs, then combine
+
+The runs most likely to improve each submission use the most reliable measured gain: more
+models averaged.
+
+| task | run | settings | adds | combined final |
+|---|---|---|---|---|
+| A | `task_a/33_gemma_final_recipe` | `EPOCHS = 4`, `SEEDS = [44, 45]` (~3.5-4.5 h) | 2 more full-data models | with Run 28's 2: **4 models** |
+| B | `task_b/32_gemma_prompt_ensemble_full` (Robin) | as is (~4-6 h) | 4 models across 2 prompts | with Run 23's 4: **8 models, 2 prompts** |
+
+Download `submissions/<name>_test_probs.npy` from each run's output, then:
+
+```bash
+python -m hastika.common.combine_probs --task a \
+    --probs a28_gemma_test_probs.npy:2 a33_gemma_test_probs.npy:2 \
+    --out submissions/task_a/final/final_task_a.zip
+python -m hastika.common.combine_probs --task b \
+    --probs b23_gemma_test_probs.npy:4 prompt_ensemble_test_probs.npy:4 \
+    --out submissions/task_b/final/final_task_b.zip
+```
+
+The combiner weights each file by its model count, checks shapes, and refuses a collapsed
+file. If a run does not finish, the existing ZIPs stand: `RECOMMENDED_a28_gemma.zip` for
+Task A and `RECOMMENDED_b23_gemma.zip` for Task B.
+
 ## The final run
 
 1. **Task B.** Choose one of the two final-data recipes:
