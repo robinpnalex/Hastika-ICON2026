@@ -60,7 +60,10 @@ Directories: `task_b/b_tapt_5f/`, `task_b/fast_svm/`, `task_b/fast_svm_calibrate
 
 ## Task A
 
-`task_a/task_a_predictions.zip` is the preserved Task A upload. `task_a/fast_svm/` and
+`task_a/task_a_predictions.zip` is the preserved Task A upload. `task_a/task_a_predictions_2026-09-10_main.zip` is a
+second, different early MuRIL-era Task A upload. It was preserved from `main`'s commit
+`fe18b8a` when `main` and `task-b` were reconciled on 2026-10-06: 806 rows, 462 Hate,
+91.9% agreement with `task_a_predictions.zip`. `task_a/fast_svm/` and
 `task_a/embeddings_svm/` hold the SVM baselines.
 
 | rank | arm | macro-F1 | measured on | submitted |
