@@ -34,6 +34,7 @@ its outputs.
 | definitions prompt, learning rate 2e-4? | `task_b/28_gemma_prompt_lr` | Aaryan | definitions prompt measured through Run 30; lr still pending | `PROMPT`, `LR` |
 | prompt ensemble? | `task_b/30_gemma_prompt_ensemble_holdout` | Robin | **done**: 0.6882, promising but P=.67 | optional full-data ensemble |
 | square-root class weights? | `task_b/31_gemma_class_weight_holdout` | Robin | **done**: 0.6822 vs balanced 0.6864; reject | `CLASS_WEIGHT = balanced` |
+| full-data prompt ensemble predictions? | `task_b/32_gemma_prompt_ensemble_full` | Robin | ready | `RECOMMENDED_b32_gemma_prompt_ensemble.zip` |
 | Gemma on Task A, alone or blended with the SVM? | `task_a/28_gemma_holdout_final` | Aaryan | **done**: Gemma alone, 0.8563 | Task A model |
 | Task A: 4 epochs or 3? | `task_a/29_gemma_epochs` | Aaryan | ready | `EPOCHS` |
 | Task A: definitions prompt? | `task_a/30_gemma_definitions_prompt` | Aaryan | ready | `PROMPT` |
@@ -50,8 +51,15 @@ earlier outputs.
 
 ## The final run
 
-1. **Task B.** Open `task_b/25_gemma_final_recipe` and set the flags in its third code
-   cell from the results above:
+1. **Task B.** Choose one of the two final-data recipes:
+
+   - For the simpler four-seed single-prompt fit, open `task_b/25_gemma_final_recipe` and
+     set the flags in its third code cell from the results below.
+   - For the best measured Run 30 ensemble, open `task_b/32_gemma_prompt_ensemble_full`.
+     It trains the two prompts with seeds 42 and 43 on all 3,532 labelled rows and writes
+     `RECOMMENDED_b32_gemma_prompt_ensemble.zip`.
+
+   The Run 25 flags are:
 
    | flag | default | change it when |
    |---|---|---|
@@ -64,7 +72,7 @@ earlier outputs.
 
    Four seeds are trained on all 3,532 rows. It writes `RECOMMENDED_b25_gemma.zip`. If
    every other flag stays at its default, Run 25 reproduces Run 23's recipe, and
-   `RECOMMENDED_b23_gemma.zip` already is the Task B final.
+   `RECOMMENDED_b23_gemma.zip` remains the packaged single-prompt fallback.
 2. **Task A.** Open `task_a/33_gemma_final_recipe` and set `EPOCHS`, `PROMPT`, `TAPT` and
    `LR` from Task A Runs 29-32. Each flag is printed `True` when the arm beats the base
    with P(better) >= 0.7. Four seeds are trained on all 7,193 rows. It writes

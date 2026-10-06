@@ -21,7 +21,7 @@ two people working in parallel are in [`COLLABORATION.md`](COLLABORATION.md).
 | Task A model | **Gemma-4-12B**, same recipe: **0.8563** on the 1,079-row holdout (Run 28, seed 42) vs the char SVM's 0.8117 (+0.043, CI [+0.021, +0.067]) and SVM + MuRIL's 0.8155 |
 | Measured and rejected on Gemma | Task B R-Drop (inconclusive, -0.002, CI [-0.027, +0.023], 2x cost); Task B square-root class weights (-0.0042, P=.41); Task A Gemma + SVM blend (-0.007); translation to English (Task A Run 20, -5.3) |
 | Being measured | Task B: LoRA capacity (26), TAPT (27), frozen-head ablation (29). Task A: epochs (29), definitions prompt (30), TAPT (31), lr (32) |
-| Final fits | Task B Run 25 and Task A Run 33: four seeds on all labelled rows, flags set from the runs above |
+| Final fits | Task B Run 25 (single-prompt recipe) or Run 32 (Run 30 prompt ensemble), and Task A Run 33: four seeds on all labelled rows |
 | Fallback ZIPs already built | Task B `RECOMMENDED_b23_gemma.zip` (Run 23, 4-epoch four-model fit) and `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22); Task A `RECOMMENDED_a28_gemma.zip` (Run 28) |
 | Known hazard | Gemma can collapse onto one class (Task A Run 28, seed 43). The classifier exits with code 4 after epoch 1 and the notebooks rerun the job with another seed |
 | Holdouts | Task B 530 rows `f85f4f049b`; Task A 1,079 rows `815110ff24` |
@@ -94,6 +94,7 @@ record.
 | Task B 29 | ready; not run | `29_gemma_frozen_head_holdout.ipynb` | freeze Gemma-4-12B and train only the six-way classification head, two seeds on the fixed 530-row holdout | quick ablation against Run 21's 0.6792 QLoRA baseline; no ZIP |
 | Task B 30 | 2026-10-06, completed | `30_gemma_prompt_ensemble_holdout.ipynb` | average the standard and definitions-prompt Gemma probabilities across two seeds each on the fixed holdout | standard **0.6830**, definitions **0.6840**, four-model ensemble **0.6882 / 0.7321**; +0.0052 vs standard but inconclusive (CI [-0.0176, +0.0273], P=.67); no ZIP |
 | Task B 31 | 2026-10-06, completed | `31_gemma_class_weight_holdout.ipynb` | compare Gemma's current balanced class weights with square-root inverse-frequency weights, two seeds each | balanced **0.6864 / 0.7283**, sqrt **0.6822 / 0.7509**; sqrt -0.0042 (CI [-0.0392, +0.0300], P=.41); reject sqrt; no ZIP |
+| Task B 32 | ready; full-data prediction | `32_gemma_prompt_ensemble_full.ipynb` | reproduce the Run 30 four-model prompt ensemble on all 3,532 labelled rows and infer the 396-row released test file | `RECOMMENDED_b32_gemma_prompt_ensemble.zip`; no local score because test labels are unavailable |
 
 ## Ordered next steps
 
