@@ -95,10 +95,10 @@ best recipe, with a holdout check and a submission run in parallel:
 
 | task | holdout check | submission (full data) |
 |---|---|---|
-| A | `task_a/31_gemma_tapt`: TAPT + 3 epochs vs Run 28's recipe | `task_a/33_gemma_final_recipe`, as is (`TAPT = True` is the default) |
-| B | `task_b/34_gemma_tapt_4ep_holdout`: TAPT + 4 epochs vs Run 23's recipe | `task_b/25_gemma_final_recipe`, as is (`TAPT = True` and `EPOCHS = 4` are the defaults) |
+| A | **`task_a/35_tapt_final_holdout_twin`**, the exact twin of Run 33: TAPT, then four 3-epoch classifiers, vs Run 28's recipe | `task_a/33_gemma_final_recipe`, as is (`TAPT = True` is the default) |
+| B | **`task_b/35_tapt_final_holdout_twin`**, the exact twin of Run 25: TAPT, then four 4-epoch classifiers, vs Run 23's recipe | `task_b/25_gemma_final_recipe`, as is (`TAPT = True` and `EPOCHS = 4` are the defaults) |
 
-These are TAPT-only. If TAPT cannot run, the notebook stops with an error and writes no ZIP; it never substitutes a non-TAPT model. Submit a TAPT ZIP only if its holdout check prints `tapt: True`. Otherwise submit the
+These are TAPT-only. If TAPT cannot run, the notebook stops with an error and writes no ZIP; it never substitutes a non-TAPT model. Each twin's verdict compares TAPT x2 with the current best recipe x2, a fair test. Submit the TAPT ZIP only if the verdict says it BEATS or is probably better. Its TAPT x4 line is the level to expect from the submission. Otherwise submit the
 current best ZIPs, `RECOMMENDED_a28_gemma.zip` and `RECOMMENDED_b23_gemma.zip`.
 
 ## The final run

@@ -962,9 +962,11 @@ TWIN_CODE = r'''
 MEMBERS = __MEMBERS__
 GROUPS = __GROUPS__            # group name -> member keys "<tag>_s<seed>"
 FINAL, REFERENCE = __FINAL__, __REFERENCE__
+VERDICT = __VERDICT__          # (candidate, baseline) groups that decide the verdict
 HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv"], evalf=SPLIT / "holdout.csv")
 
-probs, jobs = {}, []
+probs, jobs, after_tapt = {}, [], []
+TAPT_DIR = RUNS / "tapt_train"
 for tag, seed, extra, reuse in MEMBERS:
     key = f"{tag}_s{seed}"
     for pat in reuse:
@@ -975,10 +977,27 @@ for tag, seed, extra, reuse in MEMBERS:
             print(f"{key}: reused from an attached run ({pat.format(seed=seed)})")
             break
     else:
-        jobs.append(llm_job(key, seed=seed, extra=extra, **HO))
-print("training on the 85% split:", [j["name"] for j in jobs])
-codes = run_jobs(jobs)
-for j in jobs:
+        if "{tapt}" in extra:      # a TAPT member: classifier continues from the TAPT adapter
+            after_tapt.append(llm_job(key, seed=seed, extra=extra.format(tapt=f"--init-adapter {TAPT_DIR}"), **HO))
+        else:
+            jobs.append(llm_job(key, seed=seed, extra=extra, **HO))
+state = {"tapt_ok": not after_tapt}
+if after_tapt:   # TAPT on training-split text + external corpus only, never holdout or test
+    jobs.insert(0, tapt_job("tapt_train", [SPLIT / "train.csv", EXTERNAL]))
+
+
+def on_done(name, code):
+    if name == "tapt_train":
+        state["tapt_ok"] = code == 0
+        if code == 0:
+            return after_tapt
+        print(f"TAPT FAILED (exit {code}) -- no TAPT member is trained; see {LOGS / 'tapt_train.log'}")
+    return []
+
+
+print("training on the 85% split:", [j["name"] for j in jobs + after_tapt])
+codes = run_jobs(jobs, on_done)
+for j in jobs + after_tapt:
     p = load_probs(RUNS / j["name"], SPLIT / "holdout.csv")
     if p is not None:
         probs[j["name"]] = p
@@ -997,24 +1016,26 @@ for name, keys in GROUPS.items():
         scores[name] = report(y_ho, avg[name], f"{name} ({len(have)}/{len(keys)})")
 print()
 boots = {}
-if FINAL in avg:
-    for other in avg:
-        if other != FINAL:
-            boots[f"{FINAL} - {other}"] = boot_line(f"final - {other}"[:28], avg[FINAL], avg[other])
-if FINAL in avg and REFERENCE in avg:
-    b = boots[f"{FINAL} - {REFERENCE}"]
-    verdict = ("the final combination BEATS the current best" if b["ci95"][0] > 0 else
-               "the final combination is probably better" if b["p_better"] >= 0.7 else
+pairs = [(FINAL, o) for o in avg if o != FINAL] + ([VERDICT] if VERDICT[0] != FINAL else [])
+for a, b_ in pairs:
+    if a in avg and b_ in avg:
+        boots[f"{a} - {b_}"] = boot_line(f"{a[:13]} - {b_[:13]}", avg[a], avg[b_])
+if f"{VERDICT[0]} - {VERDICT[1]}" in boots:
+    b = boots[f"{VERDICT[0]} - {VERDICT[1]}"]
+    verdict = (f"{VERDICT[0]} BEATS {VERDICT[1]}" if b["ci95"][0] > 0 else
+               f"{VERDICT[0]} is probably better" if b["p_better"] >= 0.7 else
                "no clear gain over the current best" if b["p_better"] >= 0.3 else
-               "the final combination is probably WORSE -- submit the current best")
-    print(f"\nverdict: {verdict} (P(better) {b['p_better']:.2f})")
+               "probably WORSE -- submit the current best")
+    print(f"\nverdict ({VERDICT[0]} vs {VERDICT[1]}): {verdict} (P(better) {b['p_better']:.2f})")
+if not state["tapt_ok"]:
+    raise SystemExit("TAPT did not complete -- no TAPT result. See the tapt_train log above.")
 json.dump({"commit": head, "holdout_fingerprint": HOLDOUT_FP, "scores": scores,
            "bootstrap": boots, "members": sorted(probs), "exit_codes": codes},
           open(OUT / "result.json", "w"), indent=2)
 '''
 
 
-def holdout_twin(task, run, title, intro, members, groups, final, reference, minutes):
+def holdout_twin(task, run, title, intro, members, groups, final, reference, minutes, verdict=None):
     md = (f"# Task {task.upper()} Run {run} -- holdout check: {title}\n\n" + intro + """
 
 **How it works.** Every member of the full-data ensemble is trained with the same flags
@@ -1031,7 +1052,8 @@ change them here too.
 """ + f"**Time:** {minutes}.\n\n" + SETTINGS)
     code = (TWIN_CODE.replace("__MEMBERS__", "[\n" + "".join(f"    {m!r},\n" for m in members) + "]")
             .replace("__GROUPS__", "{\n" + "".join(f"    {k!r}: {v!r},\n" for k, v in groups.items()) + "}")
-            .replace("__FINAL__", repr(final)).replace("__REFERENCE__", repr(reference)))
+            .replace("__FINAL__", repr(final)).replace("__REFERENCE__", repr(reference))
+            .replace("__VERDICT__", repr(verdict or (final, reference))))
     return [("markdown", md), ("code", setup(task, f"{task}{run}_outputs")), ("code", LLM_ENV),
             ("code", code), ("code", TWIN_REPORT)]
 
@@ -1110,6 +1132,67 @@ b34 = ablation(34, "TAPT on the current best recipe (4 epochs)", {
     final_run="Task B Run 25", n_train="3,002",
     minutes="about 5 h standalone, about 3 h with Run 23's output attached")
 
+a35 = holdout_twin(
+    "a", 35, "exact twin of the TAPT submission (Task A Run 33)",
+    """Task A Run 33, the TAPT submission, does three things:
+
+1. TAPT on the comments' text plus the external Kannada corpus.
+2. Four Gemma-4-12B classifiers (seeds 42-45, 3 epochs) continue from that adapter.
+3. Their probabilities are averaged.
+
+**This notebook runs exactly that recipe, on the 85% split.** TAPT reads only the 6,114
+training comments plus the external corpus, and the four classifiers train on the same
+6,114 rows. Everything is scored on the 1,079-row holdout. The one difference from Run 33
+is that holdout rows are kept out of everything.
+
+**Two numbers come out of it:**
+
+| number | groups compared | what it tells you |
+|---|---|---|
+| the verdict, a fair test of TAPT | TAPT at 2 seeds vs Run 28's recipe (no TAPT) at the same 2 seeds | whether TAPT helps, with seed count held equal |
+| the expected submission level | TAPT at 4 seeds, exactly what Run 33 submits | what to expect from the submission |
+
+Run 28's seed-42 holdout probabilities are reused when attached. Its seed 43 collapsed,
+so it is retrained here.""",
+    [("tapt", s, "{tapt}", []) for s in (42, 43, 44, 45)]
+    + [("base", s, "", A_REUSE_3EP) for s in (42, 43)],
+    {"current best: Run 28 recipe x2": ["base_s42", "base_s43"],
+     "TAPT x2": ["tapt_s42", "tapt_s43"],
+     "FINAL: TAPT x4 (= Run 33)": [f"tapt_s{s}" for s in (42, 43, 44, 45)]},
+    "FINAL: TAPT x4 (= Run 33)", "current best: Run 28 recipe x2",
+    "about 8 h standalone (TAPT, then six 3-epoch fits two at a time), about 6.5 h with Run 28 attached",
+    verdict=("TAPT x2", "current best: Run 28 recipe x2"))
+
+b35 = holdout_twin(
+    "b", 35, "exact twin of the TAPT submission (Task B Run 25)",
+    """Task B Run 25, the TAPT submission, does three things:
+
+1. TAPT on the comments' text plus the external Kannada corpus.
+2. Four Gemma-4-12B classifiers (seeds 42-45, 4 epochs) continue from that adapter.
+3. Their probabilities are averaged.
+
+**This notebook runs exactly that recipe, on the 85% split.** TAPT reads only the 3,002
+training comments plus the external corpus, and the four classifiers train on the same
+3,002 rows. Everything is scored on the 530-row holdout. The one difference from Run 25 is
+that holdout rows are kept out of everything.
+
+**Two numbers come out of it:**
+
+| number | groups compared | what it tells you |
+|---|---|---|
+| the verdict, a fair test of TAPT | TAPT at 2 seeds vs Run 23's recipe (4 epochs, no TAPT) at the same 2 seeds | whether TAPT helps, with seed count held equal |
+| the expected submission level | TAPT at 4 seeds, exactly what Run 25 submits | what to expect from the submission |
+
+Run 23's 4-epoch holdout probabilities (seeds 42 and 43) are reused when attached.""",
+    [("tapt", s, "--epochs 4 {tapt}", []) for s in (42, 43, 44, 45)]
+    + [("base", s, "--epochs 4", B_REUSE_EP4) for s in (42, 43)],
+    {"current best: Run 23 recipe x2": ["base_s42", "base_s43"],
+     "TAPT x2": ["tapt_s42", "tapt_s43"],
+     "FINAL: TAPT x4 (= Run 25)": [f"tapt_s{s}" for s in (42, 43, 44, 45)]},
+    "FINAL: TAPT x4 (= Run 25)", "current best: Run 23 recipe x2",
+    "about 5.5 h standalone, about 4 h with Run 23 attached",
+    verdict=("TAPT x2", "current best: Run 23 recipe x2"))
+
 if __name__ == "__main__":
     notebook(b22, "notebooks/task_b/22_package_run21.ipynb")
     notebook(b23, "notebooks/task_b/23_gemma_epochs_seeds_final.ipynb")
@@ -1125,3 +1208,5 @@ if __name__ == "__main__":
     notebook(a34, "notebooks/task_a/34_final_holdout_check.ipynb")
     notebook(b33, "notebooks/task_b/33_final_holdout_check.ipynb")
     notebook(b34, "notebooks/task_b/34_gemma_tapt_4ep_holdout.ipynb")
+    notebook(a35, "notebooks/task_a/35_tapt_final_holdout_twin.ipynb")
+    notebook(b35, "notebooks/task_b/35_tapt_final_holdout_twin.ipynb")

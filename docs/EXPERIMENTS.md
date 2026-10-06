@@ -67,6 +67,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 32 | ready; standalone | `32_gemma_lr.ipynb` | learning rate 2e-4 vs 1e-4 | holdout bootstrap vs base; flag for Run 33 (~5 h) |
 | Task A 33 | ready; standalone | `33_gemma_final_recipe.ipynb` | **final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | `RECOMMENDED_a33_gemma.zip` (~5-8.5 h) |
 | Task A 34 | ready; standalone | `34_final_holdout_check.ipynb` | holdout twin of the Task A final: Run 28's 3-epoch seeds 42/43 + Run 33's 4-epoch seeds 44/45, each trained on the 85% split; four-model combination vs Run 28's recipe | paired bootstrap verdict on the 1,079-row holdout (~5.6 h, ~3.2 h with Run 28 attached) |
+| Task A 35 | ready; standalone | `35_tapt_final_holdout_twin.ipynb` | **exact holdout twin of Task A Run 33 (TAPT)**: TAPT on training-split text + external corpus, four 3-epoch classifiers from the adapter, plus Run 28's recipe x2 | verdict: TAPT x2 vs Run 28 recipe x2 (fair); TAPT x4 = the submission's expected level (~8 h, ~6.5 h with Run 28 attached) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -101,6 +102,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 32 | ready; full-data prediction | `32_gemma_prompt_ensemble_full.ipynb` | reproduce the Run 30 four-model prompt ensemble on all 3,532 labelled rows and infer the 396-row released test file | `RECOMMENDED_b32_gemma_prompt_ensemble.zip`; no local score because test labels are unavailable |
 | Task B 33 | ready; standalone | `33_final_holdout_check.ipynb` | holdout twin of the Task B final: Run 23's four 4-epoch seeds + Run 32's prompt ensemble (standard and definitions, seeds 42/43); eight-model combination vs Run 23's recipe | paired bootstrap verdict on the 530-row holdout (~6.3 h, ~3 h with Runs 23 and 30 attached) |
 | Task B 34 | ready; standalone | `34_gemma_tapt_4ep_holdout.ipynb` | TAPT on top of the current best recipe (4 epochs) vs that recipe, 2 seeds, on the holdout | sets `TAPT` for Run 25 (~5 h, ~3 h with Run 23 attached) |
+| Task B 35 | ready; standalone | `35_tapt_final_holdout_twin.ipynb` | **exact holdout twin of Task B Run 25 (TAPT)**: TAPT on training-split text + external corpus, four 4-epoch classifiers from the adapter, plus Run 23's recipe x2 | verdict: TAPT x2 vs Run 23 recipe x2 (fair); TAPT x4 = the submission's expected level (~5.5 h, ~4 h with Run 23 attached) |
 
 ## Ordered next steps
 
