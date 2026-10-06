@@ -1417,7 +1417,7 @@ its gradients on top of everything the classifier holds. The changes:
 | `llm_tapt.py` defaults | micro-batch **1** x 16 accumulation (same effective batch), max 128 tokens (> 99% of comments), logit chunk 16; the first step prints peak memory |
 | allocator | both `llm_tapt.py` and `llm_classifier.py` set `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`, against fragmentation OOMs |
 | `run_jobs` retry | a TAPT job that still runs out of memory reruns once at 64 tokens |
-| fallback | if TAPT cannot run at all, the final fits (Runs 25 and 33) train without it and still write their ZIP, and the holdout runs (A31, B34) still report the base |
+| no fallback (TAPT-only) | if TAPT cannot run, the final fits (Runs 25 and 33) stop with an error and write no ZIP, and the holdout runs (A31, B34) end with an error after reporting the base. A non-TAPT model is never silently substituted |
 
-A TAPT failure can therefore no longer fail a notebook.
+Runs 25 and 33 now default to `TAPT = True`.
 

@@ -537,7 +537,7 @@ text. The output is `RECOMMENDED_b25_gemma.zip`.
 
 ''' + SETTINGS), ("code", setup("b", "b25_outputs")), ("code", LLM_ENV), ("code", r'''
 EPOCHS = 4          # Run 23: 4 epochs 0.6872 vs 3 epochs 0.6792
-TAPT = False        # True if Run 24 printed tapt: True
+TAPT = True         # TAPT-only final: TAPT on the labelled text + external corpus first
 RDROP = 0.0         # 0.5 if Run 24 printed rdrop: True (it did not: inconclusive)
 PROMPT = "short"    # "defs" if Run 28 printed defs: True
 LR = 1e-4           # 2e-4 if Run 28 printed lr2e-4: True
@@ -555,8 +555,10 @@ def on_done(name, code):
     if name == "tapt_all":
         state["tapt_ok"] = code == 0
         if code:
-            print("TAPT failed -- training without it")
-        return full_jobs(code == 0)
+            # TAPT-only: no silent switch to non-TAPT models
+            print(f"TAPT FAILED (exit {code}) -- no models are trained; see {LOGS / 'tapt_all.log'}")
+            return []
+        return full_jobs(True)
     return []
 
 
@@ -564,6 +566,8 @@ jobs = [tapt_job("tapt_all", [SPLIT / "all.csv", EXTERNAL])] if TAPT else full_j
 codes = run_jobs(jobs, on_done)
 members = {s: load_probs(RUNS / f"full_s{s}", TEST_CSV) for s in SEEDS}
 members = {s: p for s, p in members.items() if p is not None}
+if TAPT and not state["tapt_ok"]:
+    raise SystemExit("TAPT did not complete -- no ZIP written (TAPT-only run). See the TAPT log above.")
 assert members, "no full fit finished -- see the logs"
 print("averaging seeds", list(members))
 write_zip("b25_gemma", np.mean(list(members.values()), 0), recommended=True)
@@ -818,6 +822,8 @@ for a in ARMS:
         boots[a] = boot_line(f"{a} - base", avg[a], avg["base"])
 USE = {k: v["p_better"] >= 0.7 for k, v in boots.items()}
 print("\nflags for the final recipe (P(better than base) >= 0.7):", USE)
+if USE_TAPT and not results.get("tapt"):
+    raise SystemExit("TAPT did not complete -- no TAPT result. See the tapt_train log above.")
 json.dump({"commit": head, "holdout_scores": scores, "bootstrap": boots, "use": USE,
            "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
 '''
@@ -894,7 +900,7 @@ The SVM blend is left out: on the holdout it was 0.007 below Gemma alone. The ou
 A33_CODE = r'''
 EPOCHS = 3          # 4 if Run 29 printed ep4: True
 PROMPT = "short"    # "defs" if Run 30 printed defs: True
-TAPT = False        # True if Run 31 printed tapt: True
+TAPT = True         # TAPT-only final: TAPT on the labelled text + external corpus first
 LR = 1e-4           # 2e-4 if Run 32 printed lr2e-4: True
 SEEDS = [42, 43, 44, 45]
 
@@ -909,8 +915,10 @@ def on_done(name, code):
     if name == "tapt_all":
         state["tapt_ok"] = code == 0
         if code:
-            print("TAPT failed -- training without it")
-        return full_jobs(code == 0)
+            # TAPT-only: no silent switch to non-TAPT models
+            print(f"TAPT FAILED (exit {code}) -- no models are trained; see {LOGS / 'tapt_all.log'}")
+            return []
+        return full_jobs(True)
     return []
 
 
@@ -918,6 +926,8 @@ jobs = [tapt_job("tapt_all", [SPLIT / "all.csv", EXTERNAL])] if TAPT else full_j
 codes = run_jobs(jobs, on_done)
 members = {s: load_probs(RUNS / f"full_s{s}", TEST_CSV) for s in SEEDS}
 members = {s: p for s, p in members.items() if p is not None}
+if TAPT and not state["tapt_ok"]:
+    raise SystemExit("TAPT did not complete -- no ZIP written (TAPT-only run). See the TAPT log above.")
 assert members, "no full fit finished -- see the logs"
 print("averaging seeds", list(members))
 write_zip("a33_gemma", np.mean(list(members.values()), 0), recommended=True)

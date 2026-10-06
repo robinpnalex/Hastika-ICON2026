@@ -95,10 +95,10 @@ best recipe, with a holdout check and a submission run in parallel:
 
 | task | holdout check | submission (full data) |
 |---|---|---|
-| A | `task_a/31_gemma_tapt`: TAPT + 3 epochs vs Run 28's recipe | `task_a/33_gemma_final_recipe` with `TAPT = True`, other settings at their defaults |
-| B | `task_b/34_gemma_tapt_4ep_holdout`: TAPT + 4 epochs vs Run 23's recipe | `task_b/25_gemma_final_recipe` with `TAPT = True` (`EPOCHS = 4` is the default) |
+| A | `task_a/31_gemma_tapt`: TAPT + 3 epochs vs Run 28's recipe | `task_a/33_gemma_final_recipe`, as is (`TAPT = True` is the default) |
+| B | `task_b/34_gemma_tapt_4ep_holdout`: TAPT + 4 epochs vs Run 23's recipe | `task_b/25_gemma_final_recipe`, as is (`TAPT = True` and `EPOCHS = 4` are the defaults) |
 
-Submit a TAPT ZIP only if its holdout check prints `tapt: True`. Otherwise submit the
+These are TAPT-only. If TAPT cannot run, the notebook stops with an error and writes no ZIP; it never substitutes a non-TAPT model. Submit a TAPT ZIP only if its holdout check prints `tapt: True`. Otherwise submit the
 current best ZIPs, `RECOMMENDED_a28_gemma.zip` and `RECOMMENDED_b23_gemma.zip`.
 
 ## The final run
