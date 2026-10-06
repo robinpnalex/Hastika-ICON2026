@@ -18,3 +18,4 @@ depending on the original upload filenames.
 | `run25_char_svm_third_member_oof.log` | Task A Run 25: char-only TF-IDF as a third member, OOF | see `docs/EXPERIMENTS.md` |
 | `run26_transductive_derivable_labels_oof.log` | Task A Run 26: derivable-label diagnostic, OOF | see `docs/EXPERIMENTS.md` |
 | `run27_run25_validation_and_test.log` | Task A Run 27: Run 25 recipe, validation and test predictions | see `docs/EXPERIMENTS.md` |
+| `run34_final_holdout_check.log` | Task A Run 34: holdout twin of Run 28 + a 4-epoch Run 33 | 3 epochs x2 **0.8610** (best Task A holdout); 4 epochs x2 0.8313; all four 0.8563 (-0.005 vs 3 epochs x2); seed 43 collapsed, auto-rerun as 1043, 0.8573 |

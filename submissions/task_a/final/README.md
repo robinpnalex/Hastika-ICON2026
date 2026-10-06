@@ -29,3 +29,8 @@ Gemma minus SVM is +0.043, 95% CI [+0.021, +0.067]. The holdout seed-43 model co
 it is not one of the two full-data models above.
 
 **Predicted labels:** Hate 51.9%, Non-Hate 48.1% (training prior: 49.1% / 50.9%).
+
+**Confirmed by Task A Run 34 (2026-10-06).** The same recipe, 3 epochs with two healthy
+seeds, scored **0.8610** on the holdout. That is the best Task A result, ahead of the 4-epoch
+variant (0.8313) and of a 3 + 4-epoch mix (0.8563).
+

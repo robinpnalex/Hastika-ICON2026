@@ -39,7 +39,7 @@ its outputs.
 | square-root class weights? | `task_b/31_gemma_class_weight_holdout` | Robin | **done**: 0.6822 vs balanced 0.6864; reject | `CLASS_WEIGHT = balanced` |
 | full-data prompt ensemble predictions? | `task_b/32_gemma_prompt_ensemble_full` | Robin | ready | `RECOMMENDED_b32_gemma_prompt_ensemble.zip` |
 | Gemma on Task A, alone or blended with the SVM? | `task_a/28_gemma_holdout_final` | Aaryan | **done**: Gemma alone, 0.8563 | Task A model |
-| Task A: 4 epochs or 3? | `task_a/29_gemma_epochs` | Aaryan | ready | `EPOCHS` |
+| Task A: 4 epochs or 3? | `task_a/34_final_holdout_check` | Aaryan | **done**: 3 epochs (0.8610) beats 4 (0.8313) | `EPOCHS = 3` |
 | Task A: definitions prompt? | `task_a/30_gemma_definitions_prompt` | Aaryan | ready | `PROMPT` |
 | Task A: TAPT? | `task_a/31_gemma_tapt` | Aaryan | ready | `TAPT` |
 | Task A: lr 2e-4? | `task_a/32_gemma_lr` | Aaryan | ready | `LR` |

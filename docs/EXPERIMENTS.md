@@ -61,12 +61,12 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 26 | ready; not run | `26_transductive_derivable_labels_oof.ipynb` | add only the 365 certain cross-task-derived labels to each training fold | matched control, original-train OOF, and derived/non-derived released-validation diagnostics pending; no ZIP by design |
 | Task A 27 | ready; not run | `27_run25_validation_and_test.ipynb` | fit the fixed Run 25 0.60/0.33/0.07 blend on original training data for an honest released-validation score, then refit on train plus validation for released-test predictions | validation score and `test_predictions.csv` pending; no ZIP by design |
 | Task A 28 | 2026-10-05, completed | `28_gemma_holdout_final.ipynb` | Gemma-4-12B QLoRA on Task A: holdout vs char SVM and a 50/50 blend, then full fits and three ZIPs | seed 42 **0.8563** vs SVM 0.8117 (+0.043, CI [+0.021, +0.067]); blend -0.007 vs Gemma; seed 43 **collapsed** (all Non-Hate); both full fits healthy -> `RECOMMENDED_a28_gemma.zip` |
-| Task A 29 | ready; standalone | `29_gemma_epochs.ipynb` | 4 epochs vs 3 on the holdout | holdout bootstrap vs base; flag for Run 33 (~5.5 h) |
+| Task A 29 | answered by Run 34; not needed | `29_gemma_epochs.ipynb` | 4 epochs vs 3 on the holdout | Run 34 measured it: 4 epochs **0.8313** vs 3 epochs **0.8610** (2 seeds each) -> keep 3 epochs |
 | Task A 30 | ready; standalone | `30_gemma_definitions_prompt.ipynb` | the organisers' Hate/Non-hate definitions in the prompt | holdout bootstrap vs base; flag for Run 33 (~6 h) |
 | Task A 31 | ready; standalone | `31_gemma_tapt.ipynb` | TAPT: LoRA next-token pretraining on training text + external corpus, then classification | holdout bootstrap vs base; flag for Run 33 (~6.5 h) |
 | Task A 32 | ready; standalone | `32_gemma_lr.ipynb` | learning rate 2e-4 vs 1e-4 | holdout bootstrap vs base; flag for Run 33 (~5 h) |
 | Task A 33 | ready; standalone | `33_gemma_final_recipe.ipynb` | **final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | `RECOMMENDED_a33_gemma.zip` (~5-8.5 h) |
-| Task A 34 | ready; standalone | `34_final_holdout_check.ipynb` | holdout twin of the Task A final: Run 28's 3-epoch seeds 42/43 + Run 33's 4-epoch seeds 44/45, each trained on the 85% split; four-model combination vs Run 28's recipe | paired bootstrap verdict on the 1,079-row holdout (~5.6 h, ~3.2 h with Run 28 attached) |
+| Task A 34 | 2026-10-06, completed | `34_final_holdout_check.ipynb` | holdout twin of Run 28 (3 epochs x2) + Run 33 at 4 epochs (seeds 44/45) | **3 epochs x2 0.8610**; 4 epochs x2 0.8313; all four 0.8563, -0.005 vs 3 epochs x2 (CI [-0.016, +0.007], P 0.20) -> **4 epochs rejected for Task A; Run 28's recipe confirmed** |
 | Task A 35 | ready; standalone | `35_tapt_final_holdout_twin.ipynb` | **exact holdout twin of Task A Run 33 (TAPT)**: TAPT on training-split text + external corpus, four 3-epoch classifiers from the adapter, plus Run 28's recipe x2 | verdict: TAPT x2 vs Run 28 recipe x2 (fair); TAPT x4 = the submission's expected level (~8 h, ~6.5 h with Run 28 attached) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
@@ -1422,4 +1422,40 @@ its gradients on top of everything the classifier holds. The changes:
 | no fallback (TAPT-only) | if TAPT cannot run, the final fits (Runs 25 and 33) stop with an error and write no ZIP, and the holdout runs (A31, B34) end with an error after reporting the base. A non-TAPT model is never silently substituted |
 
 Runs 25 and 33 now default to `TAPT = True`.
+
+### Task A Run 34 result, 2026-10-06 -- 3 epochs confirmed; 4 epochs overfits Task A
+
+The twin of "Run 28 + Run 33 at 4 epochs" trained every member on the 6,114-row split and
+scored on the 1,079-row holdout (`815110ff24`). It ran on commit `de2fc07`, in 5.5 h.
+
+| member / group | macro-F1 | per-epoch holdout (diagnostic) |
+|---|---|---|
+| 3 epochs, seed 42 | 0.8563 | 0.817, 0.846, 0.856 |
+| 3 epochs, seed 43 (rerun as seed 1043) | 0.8573 | 0.810, 0.858, 0.857 |
+| 4 epochs, seed 44 | 0.8211 | 0.778, 0.815, ..., 0.821 |
+| 4 epochs, seed 45 | 0.8387 | 0.794, 0.822, ..., 0.839 |
+| **3 epochs x2 (Run 28's recipe)** | **0.8610** | |
+| 4 epochs x2 | 0.8313 | |
+| all four | 0.8563 | |
+
+| paired bootstrap | difference | 95% CI | P(better) |
+|---|---|---|---|
+| all four - 3 epochs x2 | -0.0046 | [-0.0158, +0.0065] | 0.20 |
+| all four - 4 epochs x2 | +0.0250 | [+0.0129, +0.0371] | 1.00 |
+
+- **Run 28's recipe (3 epochs, 2 seeds) is the best Task A result: 0.8610** with both seeds
+  healthy. This confirms the submitted `task_a/final/Project MANAS_taskA.csv`, which is
+  two 3-epoch full-data fits of exactly this recipe.
+- **4 epochs hurts Task A by about 3 points.** That is the opposite of Task B, where 4
+  epochs added +0.008. Task A has twice the rows (6,114 vs 3,002), so its steps per epoch
+  double, and it reaches its best by epoch 2-3. Seed 43's curve is already flat between
+  epochs 2 and 3. Task A Run 29 (4 vs 3 epochs) is answered and need not be run, and
+  Task A's final recipe stays at 3 epochs.
+- **Mixing in 4-epoch models makes the ensemble worse.** Averaging only helps when the
+  members are about equally good, and these are 3 points weaker.
+- **The collapse guard worked in production.** Seed 43 collapsed again (100% of
+  training rows predicted Non-Hate after epoch 1, its third early collapse in three
+  runs). It exited with code 4 and was rerun as seed 1043, which trained normally to
+  0.8573. Without the guard, the 3-epoch pair would have been one healthy model plus a
+  broken one.
 
