@@ -57,7 +57,7 @@ the minimum needed to confirm each recipe once.
 
 | task | done | running | still to run |
 |---|---|---|---|
-| A | Runs 33 (TAPT x4), 35, 37, 38 t1, 39 t1 | Run 36 | **bag sessions t2-t3 (Run 38, full data only)** |
+| A | Runs 33 (TAPT x4), 35, **36**, 37, 38 t1, 39 t1 | -- | **bag sessions t2-t3 (Run 38, full data only)** |
 | B | Runs 36, 37, 38 t1 (logs to archive) | -- | **Run 39 t1** (after A36), then **bag sessions t2-t3 (Run 38, full data only)** |
 
 **Why no more holdout bag sessions.** Task A's bag holdout (Run 39 t1, 0.8675) already
@@ -69,7 +69,7 @@ bag sessions are full data only. They add models, not measurements.
 
 | task | members |
 |---|---|
-| A | Run 33 (4) + Run 38 t1, t2, t3 (2 each) = **10 TAPT models from 4 TAPT runs**, plus Run 37's 2 if Run 36 says R-Drop helps |
+| A | Run 33 (4) + **Run 37 (2, TAPT + R-Drop; Run 36: the mix scored 0.8721)** + Run 38 t1, t2, t3 (2 each) = **12 models from 5 TAPT runs** |
 | B | Run 38 t1, t2, t3 (2 each) = **6 TAPT models from 3 TAPT runs**, plus Run 37's 2 if Run 36 says R-Drop helps |
 
 Combine them with `python -m hastika.common.combine_probs`, weighting each file by its

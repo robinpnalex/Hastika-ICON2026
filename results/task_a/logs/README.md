@@ -29,3 +29,4 @@ depending on the original upload filenames.
 | `run37_tapt_rdrop_full.log` | Task A Run 37: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch full fits, commit `360c131` | completed in 7.5 h; `RECOMMENDED_a37_gemma_tapt_rdrop.zip` (51.5% Hate); unvalidated until Run 36 |
 | `run38_tapt_bag_full_t1.log` | Task A Run 38, bag session 1 (`TAPT_SEED` 1, seeds 42/43), full data | completed in 4.7 h; `RECOMMENDED_a38_bag_t1.zip` (51.9% Hate) |
 | `run39_tapt_bag_holdout_t1.log` | Task A Run 39, bag session 1, holdout | singles 0.8535 / 0.8610, **pair 0.8675** |
+| `run36_tapt_rdrop_holdout.log` | Task A Run 36: TAPT + R-Drop vs TAPT, one adapter, seeds 42/43 | TAPT x2 0.8619; TAPT + R-Drop x2 0.8647 (+0.003, P 0.64); **all four 0.8721**, the best Task A holdout |

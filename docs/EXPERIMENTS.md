@@ -68,7 +68,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 33 | 2026-10-07/14, completed twice; now regenerated | `33_gemma_final_recipe.ipynb` | full-data fit, four 3-epoch seeds on all 7,193 rows | run without TAPT (`a99bd69`, 5.6 h) and with TAPT (`de2fc07`, 7.6 h): **`RECOMMENDED_a33_gemma.zip` (TAPT) is the Task A candidate backed by the 0.8702 holdout**; regenerated from `final_tapt()` (TAPT 1 epoch, 4 seeds) |
 | Task A 34 | 2026-10-06, completed | `34_final_holdout_check.ipynb` | holdout twin of Run 28 (3 epochs x2) + Run 33 at 4 epochs (seeds 44/45) | **3 epochs x2 0.8610**; 4 epochs x2 0.8313; all four 0.8563, -0.005 vs 3 epochs x2 (CI [-0.016, +0.007], P 0.20) -> **4 epochs rejected for Task A; Run 28's recipe confirmed** |
 | Task A 35 | 2026-10-14, completed (modified copy); now regenerated | `35_tapt_final_holdout_twin.ipynb` | holdout twin of the TAPT submission | a modified 4 base + 4 TAPT run: **TAPT x4 0.8702** vs base x3 0.8582; regenerated so its holdout models also predict the test set |
-| Task A 36 | running (2026-10-15) | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT + R-Drop 0.5 vs TAPT, seeds 42/43, same adapter, on the holdout (twin of Run 37) | decides whether Run 37's models join the Task A average |
+| Task A 36 | 2026-10-15, completed | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT + R-Drop 0.5 vs TAPT, seeds 42/43, same adapter | TAPT x2 0.8619, TAPT + R-Drop x2 0.8647 (+0.003, P 0.64); **all four 0.8721** (+0.010 vs TAPT x2, CI [0.000, +0.020], P 0.98) -> R-Drop models **join the average** as extra members |
 | Task A 37 | 2026-10-15, completed | `37_tapt_rdrop_final.ipynb` | full data: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch seeds | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` written (7.5 h); **unvalidated: Run 36 measures it** |
 | Task A 38 | session 1 completed 2026-10-15; **sessions t2-t3 still to run** | `38_tapt_bag_full.ipynb` | TAPT bag, full data | t1: `RECOMMENDED_a38_bag_t1.zip` (2 models, 4.7 h) |
 | Task A 39 | session 1 completed 2026-10-15; **no further sessions planned** | `39_tapt_bag_holdout.ipynb` | TAPT bag, holdout | t1: singles 0.8535 / 0.8610, **pair 0.8675** |
@@ -1583,4 +1583,30 @@ Task A holdout so far:
   `combine_probs ... a33:4 a38_bag_t1:2`. That is six TAPT models from two TAPT runs, the
   full-data mirror of the holdout ensemble above. Run 37's TAPT + R-Drop models join only if
   Run 36 shows R-Drop helps.
+
+### Task A Run 36 result, 2026-10-15 -- R-Drop models add diversity: 0.8721
+
+One TAPT run (1 epoch, the 85% split) was followed by two plain classifiers and two with
+R-Drop 0.5, all 3 epochs and all from the same adapter. Run on commit `360c131`, 9.3 h.
+
+| | seed 42 | seed 43 | 2 seeds averaged |
+|---|---|---|---|
+| TAPT | 0.8563 | 0.8573 | 0.8619 |
+| TAPT + R-Drop | 0.8526 | 0.8582 | 0.8647 |
+| **all four** | | | **0.8721** |
+
+| paired bootstrap | difference | 95% CI | P(better) |
+|---|---|---|---|
+| TAPT + R-Drop x2 - TAPT x2 | +0.0028 | [-0.0121, +0.0176] | 0.64 |
+| all four - TAPT x2 | +0.0102 | [+0.0000, +0.0204] | 0.98 |
+| all four - TAPT + R-Drop x2 | +0.0074 | [-0.0037, +0.0185] | 0.91 |
+
+- **R-Drop is not a better recipe, but it is a useful extra member.** As a replacement it
+  is a tie, as on Task B without TAPT. Averaged together, the two families reach
+  **0.8721**, the best Task A holdout. The R-Drop models make different mistakes, which is
+  what averaging needs.
+- **Decision:** Run 37's two full-data TAPT + R-Drop models join the Task A final with
+  equal weight. Run 36's four holdout models also predicted the test set
+  (`a36_holdout_models_test_probs.npy`). They trained on 85% of the rows and are optional
+  extra members.
 
