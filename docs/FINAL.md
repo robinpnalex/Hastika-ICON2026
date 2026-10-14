@@ -37,6 +37,44 @@ Every twin also writes `<run>_holdout_models_test_probs.npy`. Average those with
 full-data probabilities using `python -m hastika.common.combine_probs` to get more models.
 All eight are TAPT-only: if TAPT fails, they stop and write nothing.
 
+## Remaining plan: as few runs as possible (2026-10-15)
+
+**Principle.** Generalise, do not tune to the holdout. Every recipe is already fixed:
+
+| setting | Task A | Task B |
+|---|---|---|
+| TAPT epochs | 1 | 2 |
+| classifier epochs | 3 | 4 |
+| prompt, lr, class weights | short, 1e-4, balanced | short, 1e-4, balanced |
+
+From here on, the only thing that grows is the number of independently trained TAPT
+models averaged together. Averaging reduces variance without fitting anything to the
+holdout, so it is the safe way to improve generalisation. There is no seed picking, and no
+holdout-tuned weights or thresholds: every model gets equal weight. Holdout runs are kept to
+the minimum needed to confirm each recipe once.
+
+**Status:**
+
+| task | done | running | still to run |
+|---|---|---|---|
+| A | Runs 33 (TAPT x4), 35, 37, 38 t1, 39 t1 | Run 36 | **bag sessions t2-t3 (Run 38, full data only)** |
+| B | Runs 36, 37, 38 t1 (logs to archive) | -- | **Run 39 t1** (after A36), then **bag sessions t2-t3 (Run 38, full data only)** |
+
+**Why no more holdout bag sessions.** Task A's bag holdout (Run 39 t1, 0.8675) already
+confirms that an independent TAPT run reproduces the gain. Task B gets exactly one, Run 39
+t1. Further holdout sessions would only re-measure the averaging curve, so the remaining
+bag sessions are full data only. They add models, not measurements.
+
+**Final ensembles, equal weight per model:**
+
+| task | members |
+|---|---|
+| A | Run 33 (4) + Run 38 t1, t2, t3 (2 each) = **10 TAPT models from 4 TAPT runs**, plus Run 37's 2 if Run 36 says R-Drop helps |
+| B | Run 38 t1, t2, t3 (2 each) = **6 TAPT models from 3 TAPT runs**, plus Run 37's 2 if Run 36 says R-Drop helps |
+
+Combine them with `python -m hastika.common.combine_probs`, weighting each file by its
+model count.
+
 ## Task A as of 2026-10-15
 
 | holdout ensemble | macro-F1 |
