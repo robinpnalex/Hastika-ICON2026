@@ -19,6 +19,9 @@ These are the captured Kaggle logs for the completed Task B experiments:
 | `run19_oof_best_recipe.log` | Run 19: MuRIL best recipe OOF on train + released validation | see `docs/EXPERIMENTS.md` |
 | `run30_gemma_prompt_ensemble_holdout.log` | Run 30 (Robin): Gemma prompt ensemble on the holdout | see `docs/EXPERIMENTS.md` |
 | `run31_gemma_class_weight_holdout.log` | Run 31 (Robin): square-root vs balanced class weights | see `docs/EXPERIMENTS.md` |
+| `run01_baseline_sweep_holdout_arms.log` | Run 1 (2026-09-12): holdout arms of the overnight sweep | b_base 0.5948, b_abusive 0.5718 (as recorded) |
+| `run15_muril_large_full.log` | Run 15 (2026-09-20): MuRIL-large full fit on all 3,159 rows | completed; `b_muril_large_full.zip` (validation phase, never scored) |
+| `run16_rdrop_augmented_full.log` | Run 16 (2026-09-20): R-Drop recipe on 3,159 gold + 779 multiclass-labelled binary rows | completed; `b_reinit1_rdrop_augmented_full.zip` (validation phase, never scored; uses cross-task labels) |
 
 The logs are retained as raw captured output. The corresponding experiment descriptions
 and results are recorded in `docs/EXPERIMENTS.md`.

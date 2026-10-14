@@ -22,3 +22,7 @@ depending on the original upload filenames.
 | `run35_tapt_holdout_4x4_modified.log` | Task A Run 35, a modified copy (4 base + 4 TAPT seeds), commit `d138f23` | **TAPT x4 0.8702**; base x3 0.8582 (base seed 43 cut at the 11 h stop); TAPT single seeds 0.848-0.857 |
 | `run33_tapt_full.log` | Task A Run 33, TAPT (1 epoch) + four 3-epoch full fits, commit `de2fc07` | completed in 7.6 h; TAPT peak 10.4 GB; `RECOMMENDED_a33_gemma.zip` (TAPT), 50.2% Hate |
 | `run33_notapt_4seed_full.log` | Task A Run 33, no TAPT, four 3-epoch full fits, commit `a99bd69` | completed in 5.6 h; `RECOMMENDED_a33_gemma.zip` (no TAPT), 51.5% Hate |
+| `run11_reinit1_full_data.log` | Task A Run 11: one reinit layer + refitted blend | OOF nested blend 0.8164 (as recorded); CodaBench 0.8188 |
+| `run12_tapt_oof.log` | Task A Run 12: TAPT vs stock MuRIL, five-fold | stock 0.7894; TAPT 0.8128 (as recorded) |
+| `run16_funnel.log` | Task A Run 16: the funnel, stage 1 | epochs10 +0.028, large +0.021, external arms dead (as recorded) |
+| `run17_final_submission_transductive.log` | Task A Run 17 (2026-09-20): full-corpus TAPT, 10 epochs, 3 seeds, **transductive**, SVM blend | completed; `task_a_final.zip` (validation phase, never scored; uses cross-task derived labels, so excluded from the final) |
