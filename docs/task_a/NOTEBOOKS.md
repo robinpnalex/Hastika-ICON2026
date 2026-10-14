@@ -33,6 +33,8 @@ probabilities are reused when attached, and they stop at 11 h. They are generate
 | `35_tapt_final_holdout_twin.ipynb` | 35 | exact holdout twin of the TAPT submission (Run 33) | ready | ~8 h |
 | `36_tapt_rdrop_holdout_twin.ipynb` | 36 | TAPT + R-Drop vs TAPT on the holdout (twin of Run 37) | ready | ~8.5 h |
 | `37_tapt_rdrop_final.ipynb` | 37 | full data: TAPT + R-Drop, 2 seeds | ready | ~7 h |
+| `38_tapt_bag_full.ipynb` | 38 | TAPT bag, full data: own TAPT + 2 classifiers per session | ready | ~4.7 h per session |
+| `39_tapt_bag_holdout.ipynb` | 39 | TAPT bag, holdout counterpart | ready | ~4.3 h per session |
 
 Runs 29-32 are independent of one another. Run 33's defaults (Run 28's recipe) are
 already a safe final submission.

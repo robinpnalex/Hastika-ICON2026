@@ -1196,6 +1196,105 @@ available. The holdout models also predict the test set.""",
     "about 8 h standalone, about 6.5 h with Run 35 attached",
     verdict=("TAPT + R-Drop x2", "TAPT x2 (Run 25 recipe)"), tapt_extra="--epochs 2")
 
+# ---------------------------------------------------------------------------- TAPT bag
+BAG_CODE = r'''
+# ---- set these two per session (see the table above); keep holdout and full sessions paired
+TAPT_SEED = 1          # 1, 2, 3, 4 ... a different TAPT run in every session
+SEEDS = [42, 43]       # this session's two classifier seeds
+# ------------------------------------------------------------------------------------------
+TAPT_EPOCHS, EPOCHS, HOLDOUT = __TAPT_EPOCHS__, __EPOCHS__, __HOLDOUT__
+train_csv = SPLIT / ("train.csv" if HOLDOUT else "all.csv")
+predict = [SPLIT / "holdout.csv", TEST_CSV] if HOLDOUT else [TEST_CSV]
+tag = f"t{TAPT_SEED}"
+TAPT_DIR = RUNS / f"tapt_{tag}"
+cls_jobs = [llm_job(f"{tag}_s{s}", train_csv, predict, s,
+                    evalf=SPLIT / "holdout.csv" if HOLDOUT else "",
+                    extra=f"--epochs {EPOCHS} --init-adapter {TAPT_DIR}") for s in SEEDS]
+state = {"tapt_ok": False}
+
+
+def on_done(name, code):
+    if name == f"tapt_{tag}":
+        state["tapt_ok"] = code == 0
+        if code:
+            print(f"TAPT FAILED (exit {code}) -- no models are trained; see {LOGS / ('tapt_' + tag + '.log')}")
+            return []
+        return cls_jobs
+    return []
+
+
+# TAPT on the training text (85% split for holdout sessions, all labelled rows otherwise)
+# plus the external corpus -- never holdout or test text
+codes = run_jobs([tapt_job(f"tapt_{tag}", [train_csv, EXTERNAL],
+                           extra=f"--epochs {TAPT_EPOCHS} --seed {TAPT_SEED}")], on_done)
+if not state["tapt_ok"]:
+    raise SystemExit("TAPT did not complete -- nothing written (TAPT-only run).")
+print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
+
+if HOLDOUT:
+    ho = {s: load_probs(RUNS / f"{tag}_s{s}", SPLIT / "holdout.csv") for s in SEEDS}
+    ho = {s: p for s, p in ho.items() if p is not None}
+    for s, p in ho.items():
+        report(y_ho, p, f"TAPT seed {TAPT_SEED}, classifier seed {s}")
+    if ho:
+        report(y_ho, np.mean(list(ho.values()), 0), f"this session's {len(ho)} models")
+    print("\nDownload runs/ from every holdout session, then score the whole bag locally:\n"
+          f"  python -m hastika.common.ensemble_curve --task {TASK} --probs <dirs>/runs/t*_s*/holdout_probs.npy")
+test_p = {s: load_probs(RUNS / f"{tag}_s{s}", TEST_CSV) for s in SEEDS}
+test_p = {s: p for s, p in test_p.items() if p is not None}
+assert test_p, "no classifier finished -- see the logs"
+write_zip(f"__NAME___{tag}", np.mean(list(test_p.values()), 0), recommended=not HOLDOUT)
+print("\ncombine all sessions' test probabilities locally:\n"
+      f"  python -m hastika.common.combine_probs --task {TASK} --probs <dir1>/submissions/__NAME___t1_test_probs.npy:2 ...")
+json.dump({"commit": head, "tapt_seed": TAPT_SEED, "seeds": list(test_p), "holdout": HOLDOUT,
+           "tapt_epochs": TAPT_EPOCHS, "epochs": EPOCHS, "exit_codes": codes},
+          open(OUT / "result.json", "w"), indent=2)
+'''
+
+
+def bag_member(task, run, holdout, tapt_epochs, epochs, twin_run, minutes):
+    n = {"a": ("6,114", "7,193"), "b": ("3,002", "3,532")}[task][0 if holdout else 1]
+    kind = "holdout" if holdout else "full data"
+    name = f"{task}{run}_bag"
+    md = (f"# Task {task.upper()} Run {run} -- TAPT bag, one session ({kind})\n\n"
+          "**Why a bag.** TAPT's whole gain on Task A came from averaging: single TAPT models scored "
+          "about the same as non-TAPT ones (0.852 vs 0.848), but four of them averaged to "
+          "**0.8702**, the best Task A holdout so far. Those four all shared one TAPT run. "
+          "Models built on *different* TAPT runs disagree more, and disagreement is what averaging "
+          "feeds on. So each session runs its own TAPT, then two classifiers from it, and the "
+          "sessions are averaged together.\n\n"
+          f"**This session** runs TAPT ({tapt_epochs} epoch{'s' if tapt_epochs > 1 else ''}) with "
+          f"its own `TAPT_SEED` on the {n} "
+          + ("training-split comments (holdout and test text never read)" if holdout else "labelled comments")
+          + f" plus the external corpus. It then trains two {epochs}-epoch Gemma-4-12B classifiers "
+          f"from that adapter on the {n} rows"
+          + (", scores them on the holdout, and also predicts the test set" if holdout else
+             ", and predicts the test set") + ".\n\n"
+          "**Run one session per account, in parallel,** setting the two lines at the top of the "
+          "code cell:\n\n"
+          "| session | `TAPT_SEED` | `SEEDS` |\n|---|---|---|\n"
+          "| 1 | 1 | `[42, 43]` |\n| 2 | 2 | `[44, 45]` |\n| 3 | 3 | `[46, 47]` |\n| 4 | 4 | `[48, 49]` |\n\n"
+          + (f"Pair each holdout session with the full-data session of the same settings "
+             f"(`task_{task}/{twin_run}`). Then score the holdout bag locally with "
+             "`python -m hastika.common.ensemble_curve`. It prints how macro-F1 grows from 1 to N "
+             "models, and checks the whole bag against the current best by paired bootstrap. That "
+             "measures the full-data bag before you submit it.\n\n" if holdout else
+             f"Its holdout counterpart is `task_{task}/{twin_run}`, run with the same two settings. "
+             "Combine the sessions' `*_test_probs.npy` with `python -m hastika.common.combine_probs` "
+             "(weight 2 each). Run 33's four TAPT models can join with weight 4.\n\n")
+          + f"**Time:** {minutes}. TAPT-only: if TAPT fails, the session stops and writes nothing.\n\n"
+          + SETTINGS)
+    code = (BAG_CODE.replace("__TAPT_EPOCHS__", str(tapt_epochs)).replace("__EPOCHS__", str(epochs))
+            .replace("__HOLDOUT__", str(holdout)).replace("__NAME__", name))
+    return [("markdown", md), ("code", setup(task, f"{task}{run}_outputs")), ("code", LLM_ENV),
+            ("code", code)]
+
+
+a38 = bag_member("a", 38, False, 1, 3, "39_tapt_bag_holdout", "about 4.7 h (TAPT about 2 h, then two 3-epoch fits in parallel)")
+a39 = bag_member("a", 39, True, 1, 3, "38_tapt_bag_full", "about 4.3 h")
+b38 = bag_member("b", 38, False, 2, 4, "39_tapt_bag_holdout", "about 4.7 h (TAPT 2 epochs about 2.8 h, then two 4-epoch fits)")
+b39 = bag_member("b", 39, True, 2, 4, "38_tapt_bag_full", "about 4.4 h")
+
 if __name__ == "__main__":
     notebook(b22, "notebooks/task_b/22_package_run21.ipynb")
     notebook(b23, "notebooks/task_b/23_gemma_epochs_seeds_final.ipynb")
@@ -1217,3 +1316,7 @@ if __name__ == "__main__":
     notebook(a37, "notebooks/task_a/37_tapt_rdrop_final.ipynb")
     notebook(b36, "notebooks/task_b/36_tapt_rdrop_holdout_twin.ipynb")
     notebook(b37, "notebooks/task_b/37_tapt_rdrop_final.ipynb")
+    notebook(a38, "notebooks/task_a/38_tapt_bag_full.ipynb")
+    notebook(a39, "notebooks/task_a/39_tapt_bag_holdout.ipynb")
+    notebook(b38, "notebooks/task_b/38_tapt_bag_full.ipynb")
+    notebook(b39, "notebooks/task_b/39_tapt_bag_holdout.ipynb")
