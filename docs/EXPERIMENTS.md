@@ -72,6 +72,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 37 | 2026-10-15, completed | `37_tapt_rdrop_final.ipynb` | full data: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch seeds | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` written (7.5 h); **unvalidated: Run 36 measures it** |
 | Task A 38 | session 1 completed 2026-10-15; **sessions t2-t3 still to run** | `38_tapt_bag_full.ipynb` | TAPT bag, full data | t1: `RECOMMENDED_a38_bag_t1.zip` (2 models, 4.7 h) |
 | Task A 39 | session 1 completed 2026-10-15; **no further sessions planned** | `39_tapt_bag_holdout.ipynb` | TAPT bag, holdout | t1: singles 0.8535 / 0.8610, **pair 0.8675** |
+| Task A 40 | ready; standalone | `40_qwen_second_family_holdout.ipynb` | **second model family:** Qwen3-8B-Base with Gemma's recipe, 2 seeds; Gemma + Qwen (equal weight per model) vs the best attached Gemma ensemble (Run 36's 0.8721) | paired-bootstrap verdict; full-data Qwen only if significant (~2.5 h with Run 36 attached) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |

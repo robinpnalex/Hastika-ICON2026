@@ -75,6 +75,13 @@ bag sessions are full data only. They add models, not measurements.
 Combine them with `python -m hastika.common.combine_probs`, weighting each file by its
 model count.
 
+## The one remaining idea: a second model family (Task A Run 40)
+
+Every other untried change is expected to fall inside the holdout noise, so it is left out.
+Run 40 trains Qwen3-8B-Base with Gemma's recipe and tests whether adding it to the Gemma
+ensemble, at equal weight per model, beats Gemma alone. A full-data Qwen fit is built only if
+the gain is significant (CI lower bound above 0). Attach Run 36's output when running it.
+
 ## Task A as of 2026-10-15
 
 | holdout ensemble | macro-F1 |

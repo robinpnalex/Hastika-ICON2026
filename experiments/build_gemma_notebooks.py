@@ -1295,6 +1295,114 @@ a39 = bag_member("a", 39, True, 1, 3, "38_tapt_bag_full", "about 4.3 h")
 b38 = bag_member("b", 38, False, 2, 4, "39_tapt_bag_holdout", "about 4.7 h (TAPT 2 epochs about 2.8 h, then two 4-epoch fits)")
 b39 = bag_member("b", 39, True, 2, 4, "38_tapt_bag_full", "about 4.4 h")
 
+# ---------------------------------------------------------------------------- second model family
+QWEN_CODE = r'''
+QWEN = "Qwen/Qwen3-8B-Base"     # second-best reader of Kanglish in Run 20's screen (3.19 bits/char)
+GEMMA = MODEL
+SEEDS = [42, 43]
+
+# The Gemma reference: the best Gemma holdout ensemble among the attached outputs, in order of
+# preference (Run 36's 0.8721 first). Nothing attached: Gemma x2 without TAPT is trained here.
+CANDIDATES = [
+    ("Run 36: TAPT x2 + TAPT/R-Drop x2 (0.8721)", "a36_outputs",
+     ["tapt_s42", "tapt_s43", "tapt_rdrop_s42", "tapt_rdrop_s43"]),
+    ("Run 35: TAPT x4 (0.8702)", "a35_outputs", ["tapt_s42", "tapt_s43", "tapt_s44", "tapt_s45"]),
+    ("Run 39 t1: TAPT x2 (0.8675)", "a39_outputs", ["t1_s42", "t1_s43"]),
+]
+ref, ref_name = {}, None
+for name, out_dir, members in CANDIDATES:
+    got = {}
+    for m in members:
+        hits = find_prior(f"*/{out_dir}/runs/{m}/holdout_probs.npy")
+        p = load_probs(hits[0].parent, SPLIT / "holdout.csv") if hits else None
+        if p is not None:
+            got[m] = p
+    if len(got) == len(members):
+        ref, ref_name = got, name
+        break
+print("Gemma reference:", ref_name or "none attached -- training Gemma x2 (no TAPT) here")
+
+HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv", TEST_CSV], evalf=SPLIT / "holdout.csv")
+download(QWEN)
+MODEL = QWEN                                   # llm_job reads MODEL when each job is built
+jobs = [llm_job(f"qwen_s{s}", seed=s, **HO) for s in SEEDS]
+if not ref:
+    download(GEMMA)
+    MODEL = GEMMA
+    jobs += [llm_job(f"gemma_s{s}", seed=s, **HO) for s in SEEDS]
+    ref_name = "Gemma x2, no TAPT (trained here)"
+codes = run_jobs(jobs)
+print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
+'''
+
+QWEN_REPORT = r'''
+qwen = {s: load_probs(RUNS / f"qwen_s{s}", SPLIT / "holdout.csv") for s in SEEDS}
+qwen = {s: p for s, p in qwen.items() if p is not None}
+if not ref:
+    ref = {s: load_probs(RUNS / f"gemma_s{s}", SPLIT / "holdout.csv") for s in SEEDS}
+    ref = {s: p for s, p in ref.items() if p is not None}
+assert qwen and ref, "missing Qwen or Gemma holdout probabilities -- see the logs"
+for s, p in qwen.items():
+    report(y_ho, p, f"Qwen seed {s}")
+q = np.mean(list(qwen.values()), 0)
+g = np.mean(list(ref.values()), 0)
+# pre-registered: equal weight per model, exactly as combine_probs builds the final
+both = np.mean(list(ref.values()) + list(qwen.values()), 0)
+scores = {"qwen": report(y_ho, q, f"Qwen x{len(qwen)}"),
+          "gemma": report(y_ho, g, f"Gemma ref x{len(ref)}"),
+          "gemma+qwen": report(y_ho, both, f"Gemma + Qwen, {len(ref) + len(qwen)} models")}
+dis = float((q.argmax(1) != g.argmax(1)).mean())
+print(f"\nQwen and Gemma disagree on {dis:.1%} of holdout rows")
+b = boot_line("Gemma+Qwen - Gemma", both, g)
+verdict = ("SIGNIFICANT gain -- build the full-data Qwen fit" if b["ci95"][0] > 0 else
+           "probable gain, but inside the noise -- optional" if b["p_better"] >= 0.7 else
+           "no gain -- stop here, keep Gemma only")
+print(f"\nreference: {ref_name}\nverdict: {verdict} (P(better) {b['p_better']:.2f})")
+test_q = [load_probs(RUNS / f"qwen_s{s}", TEST_CSV) for s in SEEDS]
+test_q = [p for p in test_q if p is not None]
+if test_q:
+    write_zip("a40_qwen_holdout_models", np.mean(test_q, 0))
+json.dump({"commit": head, "reference": ref_name, "scores": scores, "disagreement": dis,
+           "bootstrap": b, "verdict": verdict, "exit_codes": codes},
+          open(OUT / "result.json", "w"), indent=2)
+'''
+
+a40 = [("markdown", """# Task A Run 40 -- does a second model family improve the Gemma ensemble?
+
+Every gain since Gemma has come from **averaging**, and averaging gains most when members
+make *different* mistakes. Seeds, TAPT runs and R-Drop all vary the same Gemma-4-12B, so its
+members share its blind spots. A different architecture, with its own tokenizer and
+pretraining data, is the standard source of more diverse errors.
+
+**This run** trains **Qwen3-8B-Base** with Gemma's exact classifier recipe (4-bit QLoRA,
+3 epochs, lr 1e-4, LoRA r16, short prompt, balanced class weights), seeds 42 and 43, on the
+6,114-row training split. It scores everything on the 1,079-row holdout (`815110ff24`).
+Qwen read Kanglish second-best among the 8B+ models in Run 20's screen: 3.19 bits per
+character against Gemma's 3.01. No TAPT is used for Qwen; this is the minimal test.
+
+**Compared, pre-registered:**
+
+| line | what |
+|---|---|
+| Qwen x2 | Qwen alone |
+| Gemma reference | the best attached Gemma holdout ensemble: Run 36 (0.8721), else Run 35 (0.8702), else Run 39 t1 (0.8675). If none is attached, Gemma x2 without TAPT is trained here |
+| **Gemma + Qwen** | all models averaged with **equal weight per model**, exactly as `combine_probs` would build the final. No weight is tuned on the holdout |
+
+**Verdict.** A paired bootstrap of Gemma + Qwen against Gemma alone.
+
+| result | meaning |
+|---|---|
+| CI lower bound above 0 | significant: build a full-data Qwen fit |
+| P(better) >= 0.7 | a probable gain, but inside the noise; optional |
+| otherwise | stop and keep Gemma only |
+
+**Attach Run 36's output** (Add Input -> Notebook Output) to compare against the current
+best. **Time:** about 2.5 h with Run 36 attached (two Qwen fits in parallel); about 5 h
+standalone. The Qwen holdout models also predict the test set.
+
+""" + SETTINGS), ("code", setup("a", "a40_outputs")), ("code", LLM_ENV), ("code", QWEN_CODE),
+       ("code", QWEN_REPORT)]
+
 if __name__ == "__main__":
     notebook(b22, "notebooks/task_b/22_package_run21.ipynb")
     notebook(b23, "notebooks/task_b/23_gemma_epochs_seeds_final.ipynb")
@@ -1320,3 +1428,4 @@ if __name__ == "__main__":
     notebook(a39, "notebooks/task_a/39_tapt_bag_holdout.ipynb")
     notebook(b38, "notebooks/task_b/38_tapt_bag_full.ipynb")
     notebook(b39, "notebooks/task_b/39_tapt_bag_holdout.ipynb")
+    notebook(a40, "notebooks/task_a/40_qwen_second_family_holdout.ipynb")
