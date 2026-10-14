@@ -37,6 +37,26 @@ Every twin also writes `<run>_holdout_models_test_probs.npy`. Average those with
 full-data probabilities using `python -m hastika.common.combine_probs` to get more models.
 All eight are TAPT-only: if TAPT fails, they stop and write nothing.
 
+## Task A as of 2026-10-15
+
+| holdout ensemble | macro-F1 |
+|---|---|
+| TAPT x4, one TAPT run | **0.8702** |
+| TAPT x2, a second TAPT run (bag t1) | 0.8675 |
+| best no-TAPT | 0.8610 |
+
+**Best submission to build now:** Run 33's 4 TAPT models plus Run 38 t1's 2:
+
+```bash
+python -m hastika.common.combine_probs --task a \
+    --probs a33_gemma_test_probs.npy:4 a38_bag_t1_test_probs.npy:2 \
+    --out submissions/task_a/final/final_task_a_tapt6.zip
+```
+
+Still to run for Task A:
+- **Run 36,** which checks whether R-Drop adds to TAPT. Until it does, Run 37's ZIP stays out.
+- **Bag sessions t2-t4** (Runs 38 and 39), to grow the ensemble.
+
 ## Next: the TAPT bag (most reliable gain)
 
 Averaging is where TAPT gains (1 model about 0.852, 4 models 0.8702), so the next step is

@@ -69,9 +69,9 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 34 | 2026-10-06, completed | `34_final_holdout_check.ipynb` | holdout twin of Run 28 (3 epochs x2) + Run 33 at 4 epochs (seeds 44/45) | **3 epochs x2 0.8610**; 4 epochs x2 0.8313; all four 0.8563, -0.005 vs 3 epochs x2 (CI [-0.016, +0.007], P 0.20) -> **4 epochs rejected for Task A; Run 28's recipe confirmed** |
 | Task A 35 | 2026-10-14, completed (modified copy); now regenerated | `35_tapt_final_holdout_twin.ipynb` | holdout twin of the TAPT submission | a modified 4 base + 4 TAPT run: **TAPT x4 0.8702** vs base x3 0.8582; regenerated so its holdout models also predict the test set |
 | Task A 36 | ready; standalone | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT + R-Drop 0.5 vs TAPT, seeds 42/43, same adapter, on the holdout (twin of Run 37) | verdict TAPT + R-Drop x2 vs TAPT x2 (~8.5 h, ~6.5 h with Run 35 attached) |
-| Task A 37 | ready; standalone | `37_tapt_rdrop_final.ipynb` | full data: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch seeds on all 7,193 rows | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` (~7 h) |
-| Task A 38 | ready; standalone; run once per session | `38_tapt_bag_full.ipynb` | **TAPT bag**, full data: each session runs its own TAPT (`TAPT_SEED`) + two 3-epoch classifiers on all 7,193 rows | per-session `a38_bag_t<k>_test_probs.npy`; combine with `combine_probs` (~4.7 h per session) |
-| Task A 39 | ready; standalone; run once per session | `39_tapt_bag_holdout.ipynb` | holdout counterpart of Run 38, same `TAPT_SEED`/`SEEDS` per session | score the bag locally with `python -m hastika.common.ensemble_curve` (~4.3 h per session) |
+| Task A 37 | 2026-10-15, completed | `37_tapt_rdrop_final.ipynb` | full data: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch seeds | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` written (7.5 h); **unvalidated: Run 36 measures it** |
+| Task A 38 | session 1 completed 2026-10-15; sessions 2-4 pending | `38_tapt_bag_full.ipynb` | TAPT bag, full data | t1: `RECOMMENDED_a38_bag_t1.zip` (2 models, 4.7 h) |
+| Task A 39 | session 1 completed 2026-10-15; sessions 2-4 pending | `39_tapt_bag_holdout.ipynb` | TAPT bag, holdout | t1: singles 0.8535 / 0.8610, **pair 0.8675** |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -1550,4 +1550,37 @@ Each holdout session is paired with the full-data session of the same settings.
 **What is and is not certain.** Gains from averaging shrink as the bag grows, and
 correlated models gain less. The holdout curve shows where the flattening starts, so the
 bag can stop growing once the next pair adds less than the noise.
+
+### Task A Runs 37, 38 and 39, session 1 (2026-10-15)
+
+All three ran on commit `360c131`. TAPT completed every time, peaking at 8.4-9.6 GB of
+14.6 GB.
+
+| run | what | result |
+|---|---|---|
+| 39, holdout, `TAPT_SEED` 1, seeds 42/43 | a new TAPT run + 2 classifiers on the 85% split | 0.8535 and 0.8610 single; **0.8675 for the pair** |
+| 38, full data, same settings | all 7,193 rows | `RECOMMENDED_a38_bag_t1.zip`, 2 models |
+| 37, full data, TAPT + R-Drop 0.5 | 2 seeds, 3 epochs | `RECOMMENDED_a37_gemma_tapt_rdrop.zip`; Run 36 is still to measure R-Drop on top of TAPT |
+
+Task A holdout so far:
+
+| ensemble | macro-F1 | source |
+|---|---|---|
+| **TAPT x4, one TAPT run (seed 42)** | **0.8702** | Run 35, modified |
+| TAPT x2, a new TAPT run (seed 1) | 0.8675 | Run 39, t1 |
+| no TAPT x2 | 0.8610 | Run 34 |
+| no TAPT x3 | 0.8582 | Run 35, modified |
+
+- **A second, independent TAPT run reproduces the TAPT result.** Its two models (0.8675)
+  beat every no-TAPT ensemble, two of them almost reaching the four-model 0.8702. TAPT's
+  benefit is not an accident of one TAPT seed.
+- **The next measurement is the bag curve.** Download `runs/` from Run 35 (modified,
+  4 TAPT models) and Run 39 t1 (2 models), then run
+  `python -m hastika.common.ensemble_curve --task a`. That measures the six models from two
+  TAPT runs together. Sessions t2-t4 extend the curve.
+- **Best Task A submission right now:** Run 33's four TAPT models (`RECOMMENDED_a33_gemma.zip`,
+  `de2fc07`) plus Run 38 t1's two, combined with
+  `combine_probs ... a33:4 a38_bag_t1:2`. That is six TAPT models from two TAPT runs, the
+  full-data mirror of the holdout ensemble above. Run 37's TAPT + R-Drop models join only if
+  Run 36 shows R-Drop helps.
 

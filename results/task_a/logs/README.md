@@ -26,3 +26,6 @@ depending on the original upload filenames.
 | `run12_tapt_oof.log` | Task A Run 12: TAPT vs stock MuRIL, five-fold | stock 0.7894; TAPT 0.8128 (as recorded) |
 | `run16_funnel.log` | Task A Run 16: the funnel, stage 1 | epochs10 +0.028, large +0.021, external arms dead (as recorded) |
 | `run17_final_submission_transductive.log` | Task A Run 17 (2026-09-20): full-corpus TAPT, 10 epochs, 3 seeds, **transductive**, SVM blend | completed; `task_a_final.zip` (validation phase, never scored; uses cross-task derived labels, so excluded from the final) |
+| `run37_tapt_rdrop_full.log` | Task A Run 37: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch full fits, commit `360c131` | completed in 7.5 h; `RECOMMENDED_a37_gemma_tapt_rdrop.zip` (51.5% Hate); unvalidated until Run 36 |
+| `run38_tapt_bag_full_t1.log` | Task A Run 38, bag session 1 (`TAPT_SEED` 1, seeds 42/43), full data | completed in 4.7 h; `RECOMMENDED_a38_bag_t1.zip` (51.9% Hate) |
+| `run39_tapt_bag_holdout_t1.log` | Task A Run 39, bag session 1, holdout | singles 0.8535 / 0.8610, **pair 0.8675** |
