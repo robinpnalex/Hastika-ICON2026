@@ -31,6 +31,8 @@ probabilities are reused when attached, and they stop at 11 h. They are generate
 | `33_gemma_final_recipe.ipynb` | 33 | **the final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | run last | ~5-8.5 h |
 | `34_final_holdout_check.ipynb` | 34 | holdout twin of the Task A final (Run 28 + Run 33): four-model combination vs Run 28's recipe | ready | ~5.6 h (~3.2 h with Run 28 attached) |
 | `35_tapt_final_holdout_twin.ipynb` | 35 | exact holdout twin of the TAPT submission (Run 33) | ready | ~8 h |
+| `36_tapt_rdrop_holdout_twin.ipynb` | 36 | TAPT + R-Drop vs TAPT on the holdout (twin of Run 37) | ready | ~8.5 h |
+| `37_tapt_rdrop_final.ipynb` | 37 | full data: TAPT + R-Drop, 2 seeds | ready | ~7 h |
 
 Runs 29-32 are independent of one another. Run 33's defaults (Run 28's recipe) are
 already a safe final submission.

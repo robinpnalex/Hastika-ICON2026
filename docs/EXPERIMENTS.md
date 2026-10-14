@@ -65,9 +65,11 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 30 | ready; standalone | `30_gemma_definitions_prompt.ipynb` | the organisers' Hate/Non-hate definitions in the prompt | holdout bootstrap vs base; flag for Run 33 (~6 h) |
 | Task A 31 | ready; standalone | `31_gemma_tapt.ipynb` | TAPT: LoRA next-token pretraining on training text + external corpus, then classification | holdout bootstrap vs base; flag for Run 33 (~6.5 h) |
 | Task A 32 | ready; standalone | `32_gemma_lr.ipynb` | learning rate 2e-4 vs 1e-4 | holdout bootstrap vs base; flag for Run 33 (~5 h) |
-| Task A 33 | ready; standalone | `33_gemma_final_recipe.ipynb` | **final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | `RECOMMENDED_a33_gemma.zip` (~5-8.5 h) |
+| Task A 33 | 2026-10-07/14, completed twice; now regenerated | `33_gemma_final_recipe.ipynb` | full-data fit, four 3-epoch seeds on all 7,193 rows | run without TAPT (`a99bd69`, 5.6 h) and with TAPT (`de2fc07`, 7.6 h): **`RECOMMENDED_a33_gemma.zip` (TAPT) is the Task A candidate backed by the 0.8702 holdout**; regenerated from `final_tapt()` (TAPT 1 epoch, 4 seeds) |
 | Task A 34 | 2026-10-06, completed | `34_final_holdout_check.ipynb` | holdout twin of Run 28 (3 epochs x2) + Run 33 at 4 epochs (seeds 44/45) | **3 epochs x2 0.8610**; 4 epochs x2 0.8313; all four 0.8563, -0.005 vs 3 epochs x2 (CI [-0.016, +0.007], P 0.20) -> **4 epochs rejected for Task A; Run 28's recipe confirmed** |
-| Task A 35 | ready; standalone | `35_tapt_final_holdout_twin.ipynb` | **exact holdout twin of Task A Run 33 (TAPT)**: TAPT on training-split text + external corpus, four 3-epoch classifiers from the adapter, plus Run 28's recipe x2 | verdict: TAPT x2 vs Run 28 recipe x2 (fair); TAPT x4 = the submission's expected level (~8 h, ~6.5 h with Run 28 attached) |
+| Task A 35 | 2026-10-14, completed (modified copy); now regenerated | `35_tapt_final_holdout_twin.ipynb` | holdout twin of the TAPT submission | a modified 4 base + 4 TAPT run: **TAPT x4 0.8702** vs base x3 0.8582; regenerated so its holdout models also predict the test set |
+| Task A 36 | ready; standalone | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT + R-Drop 0.5 vs TAPT, seeds 42/43, same adapter, on the holdout (twin of Run 37) | verdict TAPT + R-Drop x2 vs TAPT x2 (~8.5 h, ~6.5 h with Run 35 attached) |
+| Task A 37 | ready; standalone | `37_tapt_rdrop_final.ipynb` | full data: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch seeds on all 7,193 rows | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` (~7 h) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -92,7 +94,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 22 | 2026-10-05, completed | `22_package_run21.ipynb` | Run 21's 2-seed Gemma-4-12B submission, standalone (nothing attached, so both full fits retrained) | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` written; predicted shares match the prior (Violence 7.6% vs 7.0%, Geo 8.8% vs 5.9%); final-submission candidate (3 epochs, 2 seeds) |
 | Task B 23 | 2026-10-06, completed | `23_gemma_epochs_seeds_final.ipynb` | 4 vs 3 epochs on the holdout, then four 4-epoch full fits | 4 epochs **0.6872** vs 3 epochs 0.6792 (2 seeds each, +0.008, unpaired); Violence 0.410 -> 0.483; **`RECOMMENDED_b23_gemma.zip`, 4 models: the current best Task B submission** |
 | Task B 24 | 2026-10-05, completed; TAPT arm failed | `24_gemma_muril_lessons.ipynb` | MuRIL's lessons on Gemma-4-12B, 2 seeds each on the 530-row holdout | base **0.6753** (reproduces Run 21's 0.6792); **R-Drop 0.6734, -0.002, CI [-0.027, +0.023]: inconclusive, left off (2x cost)**; TAPT OOM in the 262k-vocabulary logits, unmeasured (fixed since) |
-| Task B 25 | ready; standalone | `25_gemma_final_recipe.ipynb` | final Gemma recipe on all 3,532 rows, four seeds; `EPOCHS`/`TAPT`/`RDROP` flags set from Runs 23-24 (defaults: Run 21's recipe) | `RECOMMENDED_b25_gemma.zip`, CodaBench pending |
+| Task B 25 | ready; regenerated 2026-10-14 | `25_gemma_final_recipe.ipynb` | **TAPT final**: TAPT **2 epochs**, then four 4-epoch fits on all 3,532 rows | `RECOMMENDED_b25_gemma_tapt.zip` (~7 h) |
 | Task B 26 | ready (Robin) | `26_gemma_lora_capacity_ablation.ipynb` | LoRA rank 8/16/32 x attention-only vs attention + MLP, 2 seeds each, on the holdout | sets `--r` / `--lora-targets` for Run 25 |
 | Task B 27 | ready (Robin); standalone since 2026-10-05 | `27_gemma_tapt_holdout.ipynb` | TAPT then classification vs no TAPT on the holdout | sets `TAPT` for Run 25 |
 | Task B 28 | definitions prompt measured in Run 30; lr arm pending | `28_gemma_prompt_lr.ipynb` | the organisers' category definitions in the prompt; lr 2e-4 | definitions prompt alone was effectively tied; Run 30 evaluates the prompt ensemble |
@@ -102,7 +104,9 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 32 | ready; full-data prediction | `32_gemma_prompt_ensemble_full.ipynb` | reproduce the Run 30 four-model prompt ensemble on all 3,532 labelled rows and infer the 396-row released test file | `RECOMMENDED_b32_gemma_prompt_ensemble.zip`; no local score because test labels are unavailable |
 | Task B 33 | ready; standalone | `33_final_holdout_check.ipynb` | holdout twin of the Task B final: Run 23's four 4-epoch seeds + Run 32's prompt ensemble (standard and definitions, seeds 42/43); eight-model combination vs Run 23's recipe | paired bootstrap verdict on the 530-row holdout (~6.3 h, ~3 h with Runs 23 and 30 attached) |
 | Task B 34 | ready; standalone | `34_gemma_tapt_4ep_holdout.ipynb` | TAPT on top of the current best recipe (4 epochs) vs that recipe, 2 seeds, on the holdout | sets `TAPT` for Run 25 (~5 h, ~3 h with Run 23 attached) |
-| Task B 35 | ready; standalone | `35_tapt_final_holdout_twin.ipynb` | **exact holdout twin of Task B Run 25 (TAPT)**: TAPT on training-split text + external corpus, four 4-epoch classifiers from the adapter, plus Run 23's recipe x2 | verdict: TAPT x2 vs Run 23 recipe x2 (fair); TAPT x4 = the submission's expected level (~5.5 h, ~4 h with Run 23 attached) |
+| Task B 35 | ready; regenerated 2026-10-14 | `35_tapt_final_holdout_twin.ipynb` | holdout twin of Run 25: TAPT (2 epochs) x4 + Run 23's recipe x2 | verdict TAPT x2 vs Run 23 x2; holdout models also predict the test set (~8 h, ~6 h with Run 23 attached) |
+| Task B 36 | ready; standalone | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT (2 epochs) + R-Drop 0.5 vs TAPT, seeds 42/43 (twin of Run 37) | verdict TAPT + R-Drop x2 vs TAPT x2 (~8 h, ~6.5 h with Run 35 attached) |
+| Task B 37 | ready; standalone | `37_tapt_rdrop_final.ipynb` | full data: TAPT (2 epochs) + R-Drop 0.5, two 4-epoch seeds on all 3,532 rows | `RECOMMENDED_b37_gemma_tapt_rdrop.zip` (~6.5 h) |
 
 ## Ordered next steps
 
@@ -1458,4 +1462,49 @@ scored on the 1,079-row holdout (`815110ff24`). It ran on commit `de2fc07`, in 5
   runs). It exited with code 4 and was rerun as seed 1043, which trained normally to
   0.8573. Without the guard, the 3-epoch pair would have been one healthy model plus a
   broken one.
+
+### TAPT works on Gemma, and gives the best Task A holdout: 0.8702 (2026-10-14)
+
+Three Task A runs, each archived under `results/task_a/logs/`:
+
+| run | what | result |
+|---|---|---|
+| Run 35, a modified copy (4 base + 4 TAPT seeds, `d138f23`) | TAPT 1 epoch on the 6,114 training comments + `offenseval_kn`, then 3-epoch classifiers; holdout 1,079 rows | **TAPT x4 0.8702**; base x3 0.8582. Base seed 43 collapsed, was auto-rerun, then cut by the 11 h stop |
+| Run 33 with TAPT (`de2fc07`) | TAPT on all 7,193 comments + external, then four 3-epoch full fits | completed in 7.6 h; TAPT took 125 min, peak **10.4 / 14.6 GB**; ZIP 50.2% Hate |
+| Run 33 without TAPT (`a99bd69`) | four 3-epoch full fits | completed in 5.6 h; ZIP 51.5% Hate |
+
+| holdout, per seed (epoch 3) | 42 | 43 | 44 | 45 | mean |
+|---|---|---|---|---|---|
+| TAPT | 0.8480 | 0.8498 | 0.8526 | 0.8573 | 0.8519 |
+| base | 0.8563 | (cut) | 0.8508 | 0.8378 | 0.8483 |
+
+- **TAPT finally ran end to end,** after three fixes: chunked logits, one decoder backward
+  per batch, and micro-batch 1 with 128 tokens. Its LM loss fell from 7.5 to 5.6 within the
+  epoch, and peak memory was 10.4 of 14.6 GB, so the T4 fits comfortably.
+- **TAPT's gain is in the ensemble, not in single models.** Single TAPT seeds are level
+  with single base seeds (means 0.852 and 0.848). Four TAPT models average to **0.8702**,
+  against 0.8582-0.8610 for every no-TAPT ensemble so far. The TAPT models disagree more
+  usefully, so averaging gains more. The seed counts differ (4 vs 3) and there is no paired
+  interval, so the size of the gain is uncertain, but its direction matches every run.
+- **Consequence:** the TAPT Run 33 ZIP (four TAPT full fits, `de2fc07`) replaces Run 28's
+  as the best-supported Task A submission.
+
+**The 8-notebook TAPT line, regenerated 2026-10-14:**
+
+| | holdout twin (85% split) | full data |
+|---|---|---|
+| A, TAPT | Run 35 | Run 33 (TAPT 1 epoch, 4 seeds) |
+| A, TAPT + R-Drop | Run 36 | Run 37 (2 seeds) |
+| B, TAPT | Run 35 | Run 25 (TAPT **2 epochs**, 4 seeds) |
+| B, TAPT + R-Drop | Run 36 | Run 37 (2 seeds) |
+
+Changes made to improve on the evidence:
+- **Every holdout twin now also predicts the test set.** Averaging is where TAPT gains, so
+  the twin's 85%-data models become extra ensemble members. Combine them with
+  `combine_probs`.
+- **Task B TAPT runs 2 epochs.** Task A's LM loss was still falling at the end of one epoch,
+  and Task B's corpus is half the size. Task A stays at 1 epoch, because 2 would not fit 11 h
+  with four seeds.
+- **R-Drop variants run two seeds,** since R-Drop doubles each fit. They are meant to be
+  averaged with the TAPT-only fits.
 

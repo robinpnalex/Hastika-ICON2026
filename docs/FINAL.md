@@ -18,6 +18,25 @@ All notebooks below run standalone on Kaggle: **GPU T4 x2, Internet on, nothing 
 attach, no token.** Each clones the latest `task-b` and stops at 11 h, so it always saves
 its outputs.
 
+## Latest (2026-10-14): TAPT works
+
+**Task A best-supported ZIP:** `RECOMMENDED_a33_gemma.zip` from the **TAPT** Run 33 (commit
+`de2fc07`): four full-data TAPT models. Its holdout twin measured **0.8702**, against
+0.8582-0.8610 for every no-TAPT ensemble.
+
+**The TAPT line, eight notebooks.** Run each holdout twin beside its full-data fit:
+
+| | holdout twin | full data | ZIP |
+|---|---|---|---|
+| A, TAPT | `task_a/35_tapt_final_holdout_twin` | `task_a/33_gemma_final_recipe` | `RECOMMENDED_a33_gemma_tapt.zip` |
+| A, TAPT + R-Drop | `task_a/36_tapt_rdrop_holdout_twin` | `task_a/37_tapt_rdrop_final` | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` |
+| B, TAPT (2 epochs) | `task_b/35_tapt_final_holdout_twin` | `task_b/25_gemma_final_recipe` | `RECOMMENDED_b25_gemma_tapt.zip` |
+| B, TAPT + R-Drop | `task_b/36_tapt_rdrop_holdout_twin` | `task_b/37_tapt_rdrop_final` | `RECOMMENDED_b37_gemma_tapt_rdrop.zip` |
+
+Every twin also writes `<run>_holdout_models_test_probs.npy`. Average those with the
+full-data probabilities using `python -m hastika.common.combine_probs` to get more models.
+All eight are TAPT-only: if TAPT fails, they stop and write nothing.
+
 ## Where things stand (2026-10-06)
 
 | | Task B | Task A |

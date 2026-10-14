@@ -34,3 +34,7 @@ it is not one of the two full-data models above.
 seeds, scored **0.8610** on the holdout. That is the best Task A result, ahead of the 4-epoch
 variant (0.8313) and of a 3 + 4-epoch mix (0.8563).
 
+**Newer candidate (2026-10-14):** the TAPT Run 33 ZIP, four full-data TAPT models
+(`results/task_a/logs/run33_tapt_full.log`). Its recipe scored **0.8702** on the holdout,
+above this file's 0.8610. If a later submission is allowed, use that ZIP.
+

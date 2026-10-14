@@ -205,11 +205,11 @@ def llm_job(name, train, predict, seed, evalf="", extra=""):
                     f"--out {RUNS / name} --seed {seed} --cache {HF_CACHE} {extra}")}
 
 
-def tapt_job(name, texts):
+def tapt_job(name, texts, extra=""):
     """Gemma TAPT: LoRA next-token training on unlabelled comments (the MuRIL +2.9 lesson)."""
     return {"name": name, "log": str(LOGS / f"{name}.log"),
             "cmd": (f"{LLM_PY} -u -m hastika.task_b.llm_tapt --model {MODEL} "
-                    f"--texts {' '.join(map(str, texts))} --out {RUNS / name} --cache {HF_CACHE}")}
+                    f"--texts {' '.join(map(str, texts))} --out {RUNS / name} --cache {HF_CACHE} {extra}")}
 
 
 def load_probs(run_dir, csv):
@@ -503,79 +503,7 @@ json.dump({"commit": head, "holdout_scores": scores, "bootstrap": boots, "use": 
 ''')]
 
 # ---------------------------------------------------------------------------- B25
-b25 = [("markdown", r'''
-# Task B Run 25 -- TAPT Gemma-4-12B, final submission on all 3,532 rows
-
-**This is the TAPT recipe, and it runs TAPT only.**
-
-1. **TAPT.** One epoch of LoRA next-token pretraining on the text of all 3,532 labelled
-   comments plus the external Kannada corpus (`offenseval_kn`). Test text is never read.
-2. **Classifier.** Four Gemma-4-12B QLoRA classifiers (seeds 42-45, 4 epochs) continue
-   from that TAPT adapter, trained on all 3,532 labelled rows, two per GPU round.
-3. **Output.** Their test probabilities are averaged into `RECOMMENDED_b25_gemma.zip`.
-
-**If TAPT fails, the notebook stops with an error and writes no ZIP.** A non-TAPT model is
-never substituted.
-
-TAPT is memory-safe on a T4: micro-batch 1 x 16 accumulation, 128 tokens, chunked logits,
-expandable CUDA segments, and one retry at 64 tokens. The log prints peak GPU memory after
-the first TAPT step.
-
-**Does it work?** Run `task_b/34_gemma_tapt_4ep_holdout` at the same time. It runs the
-same TAPT + 4-epoch recipe on the 85% split, scores it against Run 23's recipe on the
-holdout (0.6872, `RECOMMENDED_b23_gemma.zip`), and prints `tapt: True` if TAPT wins.
-
-| setting | value |
-|---|---|
-| `TAPT` | **True** |
-| `EPOCHS` | 4: Run 23 measured 0.6872 vs 0.6792 for 3 |
-| `RDROP` | 0.0: inconclusive in Run 24 and doubles the time |
-| `PROMPT`, `LR` | `"short"`, 1e-4 |
-| `SEEDS` | 42-45 |
-
-**Time:** about 5 h (TAPT about 50 min, then two rounds of two 4-epoch fits).
-
-''' + SETTINGS), ("code", setup("b", "b25_outputs")), ("code", LLM_ENV), ("code", r'''
-EPOCHS = 4          # Run 23: 4 epochs 0.6872 vs 3 epochs 0.6792
-TAPT = True         # TAPT-only final: TAPT on the labelled text + external corpus first
-RDROP = 0.0         # 0.5 if Run 24 printed rdrop: True (it did not: inconclusive)
-PROMPT = "short"    # "defs" if Run 28 printed defs: True
-LR = 1e-4           # 2e-4 if Run 28 printed lr2e-4: True
-SEEDS = [42, 43, 44, 45]
-
-extra = (f"--epochs {EPOCHS} --prompt {PROMPT} --lr {LR}"
-         + (f" --rdrop {RDROP}" if RDROP else ""))
-full_jobs = lambda init: [llm_job(f"full_s{s}", SPLIT / "all.csv", [TEST_CSV], s,
-                                  extra=extra + (f" --init-adapter {RUNS / 'tapt_all'}" if init else ""))
-                          for s in SEEDS]
-state = {"tapt_ok": False}
-
-
-def on_done(name, code):
-    if name == "tapt_all":
-        state["tapt_ok"] = code == 0
-        if code:
-            # TAPT-only: no silent switch to non-TAPT models
-            print(f"TAPT FAILED (exit {code}) -- no models are trained; see {LOGS / 'tapt_all.log'}")
-            return []
-        return full_jobs(True)
-    return []
-
-
-jobs = [tapt_job("tapt_all", [SPLIT / "all.csv", EXTERNAL])] if TAPT else full_jobs(False)
-codes = run_jobs(jobs, on_done)
-members = {s: load_probs(RUNS / f"full_s{s}", TEST_CSV) for s in SEEDS}
-members = {s: p for s, p in members.items() if p is not None}
-if TAPT and not state["tapt_ok"]:
-    raise SystemExit("TAPT did not complete -- no ZIP written (TAPT-only run). See the TAPT log above.")
-assert members, "no full fit finished -- see the logs"
-print("averaging seeds", list(members))
-write_zip("b25_gemma", np.mean(list(members.values()), 0), recommended=True)
-json.dump({"commit": head, "epochs": EPOCHS, "tapt": TAPT and state["tapt_ok"], "rdrop": RDROP,
-           "prompt": PROMPT, "lr": LR,
-           "seeds": list(members), "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
-print(f"{(time.time() - T_START) / 3600:.1f} h")
-''')]
+# b25 is defined by final_tapt() in the TAPT line below.
 
 # ---------------------------------------------------------------------------- A28
 a28 = [("markdown", r'''
@@ -874,86 +802,7 @@ a32 = ablation(32, "learning rate 2e-4", {
               "improving at its last epoch at 1e-4"},
     {"lr2e-4": "--lr 2e-4"}, minutes="about 5 h standalone, about 2.5 h with a base attached")
 
-A33_MD = ("""# Task A Run 33 -- TAPT Gemma-4-12B, final submission on all 7,193 rows
-
-**This is the TAPT recipe, and it runs TAPT only.**
-
-1. **TAPT.** One epoch of LoRA next-token pretraining on the text of all 7,193 labelled
-   comments plus the external Kannada corpus (`offenseval_kn`). Test text is never read.
-2. **Classifier.** Four Gemma-4-12B QLoRA classifiers (seeds 42-45, 3 epochs, Run 28's
-   recipe) continue from that TAPT adapter, trained on all 7,193 labelled rows, two per
-   GPU round.
-3. **Output.** Their test probabilities are averaged into `RECOMMENDED_a33_gemma.zip`, for
-   `hastika_binary_test.csv` (806 rows).
-
-**If TAPT fails, the notebook stops with an error and writes no ZIP.** A non-TAPT model is
-never substituted.
-
-TAPT is memory-safe on a T4: micro-batch 1 x 16 accumulation, 128 tokens, chunked logits,
-expandable CUDA segments, and one retry at 64 tokens. The log prints peak GPU memory after
-the first TAPT step.
-
-**Does it work?** Run `task_a/31_gemma_tapt` at the same time. It runs the same TAPT +
-3-epoch recipe on the 85% split, scores it against Run 28's recipe on the holdout
-(0.8563, `RECOMMENDED_a28_gemma.zip`), and prints `tapt: True` if TAPT wins.
-
-| setting | value |
-|---|---|
-| `TAPT` | **True** |
-| `EPOCHS` | 3: Run 28's measured recipe |
-| `PROMPT`, `LR` | `"short"`, 1e-4 |
-| `SEEDS` | 42-45 |
-
-The SVM blend is left out: on the holdout it was 0.007 below Gemma alone.
-
-**Time:** about 6.5-7 h (TAPT about 1-1.5 h, then two rounds of two 3-epoch fits, about
-2.5 h each). If the 11 h stop cuts the second round, the TAPT models that finished are
-averaged and packaged.
-
-""" + SETTINGS)
-
-A33_CODE = r'''
-EPOCHS = 3          # 4 if Run 29 printed ep4: True
-PROMPT = "short"    # "defs" if Run 30 printed defs: True
-TAPT = True         # TAPT-only final: TAPT on the labelled text + external corpus first
-LR = 1e-4           # 2e-4 if Run 32 printed lr2e-4: True
-SEEDS = [42, 43, 44, 45]
-
-extra = f"--epochs {EPOCHS} --prompt {PROMPT} --lr {LR}"
-full_jobs = lambda init: [llm_job(f"full_s{s}", SPLIT / "all.csv", [TEST_CSV], s,
-                                  extra=extra + (f" --init-adapter {RUNS / 'tapt_all'}" if init else ""))
-                          for s in SEEDS]
-state = {"tapt_ok": False}
-
-
-def on_done(name, code):
-    if name == "tapt_all":
-        state["tapt_ok"] = code == 0
-        if code:
-            # TAPT-only: no silent switch to non-TAPT models
-            print(f"TAPT FAILED (exit {code}) -- no models are trained; see {LOGS / 'tapt_all.log'}")
-            return []
-        return full_jobs(True)
-    return []
-
-
-jobs = [tapt_job("tapt_all", [SPLIT / "all.csv", EXTERNAL])] if TAPT else full_jobs(False)
-codes = run_jobs(jobs, on_done)
-members = {s: load_probs(RUNS / f"full_s{s}", TEST_CSV) for s in SEEDS}
-members = {s: p for s, p in members.items() if p is not None}
-if TAPT and not state["tapt_ok"]:
-    raise SystemExit("TAPT did not complete -- no ZIP written (TAPT-only run). See the TAPT log above.")
-assert members, "no full fit finished -- see the logs"
-print("averaging seeds", list(members))
-write_zip("a33_gemma", np.mean(list(members.values()), 0), recommended=True)
-json.dump({"commit": head, "epochs": EPOCHS, "prompt": PROMPT, "tapt": TAPT and state["tapt_ok"],
-           "lr": LR, "seeds": list(members), "exit_codes": codes},
-          open(OUT / "result.json", "w"), indent=2)
-print(f"{(time.time() - T_START) / 3600:.1f} h")
-'''
-
-a33 = [("markdown", A33_MD), ("code", setup("a", "a33_outputs")), ("code", LLM_ENV),
-       ("code", A33_CODE)]
+# a33 is defined by final_tapt() in the TAPT line below.
 
 # ---------------------------------------------------------------------------- holdout twins
 TWIN_CODE = r'''
@@ -963,7 +812,9 @@ MEMBERS = __MEMBERS__
 GROUPS = __GROUPS__            # group name -> member keys "<tag>_s<seed>"
 FINAL, REFERENCE = __FINAL__, __REFERENCE__
 VERDICT = __VERDICT__          # (candidate, baseline) groups that decide the verdict
-HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv"], evalf=SPLIT / "holdout.csv")
+# holdout models also predict the test set: extra members for the final average
+HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv", TEST_CSV], evalf=SPLIT / "holdout.csv")
+TAPT_EXTRA = __TAPT_EXTRA__      # e.g. "--epochs 2"
 
 probs, jobs, after_tapt = {}, [], []
 TAPT_DIR = RUNS / "tapt_train"
@@ -983,7 +834,7 @@ for tag, seed, extra, reuse in MEMBERS:
             jobs.append(llm_job(key, seed=seed, extra=extra, **HO))
 state = {"tapt_ok": not after_tapt}
 if after_tapt:   # TAPT on training-split text + external corpus only, never holdout or test
-    jobs.insert(0, tapt_job("tapt_train", [SPLIT / "train.csv", EXTERNAL]))
+    jobs.insert(0, tapt_job("tapt_train", [SPLIT / "train.csv", EXTERNAL], extra=TAPT_EXTRA))
 
 
 def on_done(name, code):
@@ -1029,13 +880,20 @@ if f"{VERDICT[0]} - {VERDICT[1]}" in boots:
     print(f"\nverdict ({VERDICT[0]} vs {VERDICT[1]}): {verdict} (P(better) {b['p_better']:.2f})")
 if not state["tapt_ok"]:
     raise SystemExit("TAPT did not complete -- no TAPT result. See the tapt_train log above.")
+# the FINAL group's holdout models were also asked to predict the test set
+test_members = {k: load_probs(RUNS / k, TEST_CSV) for k in GROUPS[FINAL]}
+test_members = {k: v for k, v in test_members.items() if v is not None}
+if test_members:
+    print(f"\n{len(test_members)} holdout models predicted the test set -- extra members for the final average:")
+    write_zip(f"{OUT.name.replace('_outputs', '')}_holdout_models", np.mean(list(test_members.values()), 0))
 json.dump({"commit": head, "holdout_fingerprint": HOLDOUT_FP, "scores": scores,
-           "bootstrap": boots, "members": sorted(probs), "exit_codes": codes},
-          open(OUT / "result.json", "w"), indent=2)
+           "bootstrap": boots, "members": sorted(probs), "test_members": sorted(test_members),
+           "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
 '''
 
 
-def holdout_twin(task, run, title, intro, members, groups, final, reference, minutes, verdict=None):
+def holdout_twin(task, run, title, intro, members, groups, final, reference, minutes, verdict=None,
+                 tapt_extra=""):
     md = (f"# Task {task.upper()} Run {run} -- holdout check: {title}\n\n" + intro + """
 
 **How it works.** Every member of the full-data ensemble is trained with the same flags
@@ -1053,7 +911,8 @@ change them here too.
     code = (TWIN_CODE.replace("__MEMBERS__", "[\n" + "".join(f"    {m!r},\n" for m in members) + "]")
             .replace("__GROUPS__", "{\n" + "".join(f"    {k!r}: {v!r},\n" for k, v in groups.items()) + "}")
             .replace("__FINAL__", repr(final)).replace("__REFERENCE__", repr(reference))
-            .replace("__VERDICT__", repr(verdict or (final, reference))))
+            .replace("__VERDICT__", repr(verdict or (final, reference)))
+            .replace("__TAPT_EXTRA__", repr(tapt_extra)))
     return [("markdown", md), ("code", setup(task, f"{task}{run}_outputs")), ("code", LLM_ENV),
             ("code", code), ("code", TWIN_REPORT)]
 
@@ -1132,66 +991,210 @@ b34 = ablation(34, "TAPT on the current best recipe (4 epochs)", {
     final_run="Task B Run 25", n_train="3,002",
     minutes="about 5 h standalone, about 3 h with Run 23's output attached")
 
+
+# ---------------------------------------------------------------------------- TAPT line (8 notebooks)
+# Generic full-data TAPT fit: TAPT once, then N classifier seeds from the adapter, averaged.
+FINAL_TAPT_CODE = r'''
+EPOCHS = __EPOCHS__          # classifier epochs (the task's best measured recipe)
+TAPT_EPOCHS = __TAPT_EPOCHS__     # LoRA next-token pretraining epochs before classification
+RDROP = __RDROP__           # R-Drop weight; 0 = off. Doubles the cost of each step
+SEEDS = __SEEDS__
+PROMPT, LR = "short", 1e-4
+
+extra = f"--epochs {EPOCHS} --prompt {PROMPT} --lr {LR}" + (f" --rdrop {RDROP}" if RDROP else "")
+full_jobs = [llm_job(f"full_s{s}", SPLIT / "all.csv", [TEST_CSV], s,
+                     extra=f"{extra} --init-adapter {RUNS / 'tapt_all'}") for s in SEEDS]
+state = {"tapt_ok": False}
+
+
+def on_done(name, code):
+    if name == "tapt_all":
+        state["tapt_ok"] = code == 0
+        if code:   # TAPT-only: never a silent switch to non-TAPT models
+            print(f"TAPT FAILED (exit {code}) -- no models are trained; see {LOGS / 'tapt_all.log'}")
+            return []
+        return full_jobs
+    return []
+
+
+# TAPT reads the text of every labelled row plus the external corpus -- never the test text
+codes = run_jobs([tapt_job("tapt_all", [SPLIT / "all.csv", EXTERNAL], extra=f"--epochs {TAPT_EPOCHS}")],
+                 on_done)
+if not state["tapt_ok"]:
+    raise SystemExit("TAPT did not complete -- no ZIP written (TAPT-only run). See the TAPT log above.")
+members = {s: load_probs(RUNS / f"full_s{s}", TEST_CSV) for s in SEEDS}
+members = {s: p for s, p in members.items() if p is not None}
+assert members, "no full fit finished -- see the logs"
+print("averaging seeds", list(members))
+write_zip("__ZIP__", np.mean(list(members.values()), 0), recommended=True)
+json.dump({"commit": head, "epochs": EPOCHS, "tapt_epochs": TAPT_EPOCHS, "rdrop": RDROP,
+           "seeds": list(members), "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
+print(f"{(time.time() - T_START) / 3600:.1f} h")
+'''
+
+
+def final_tapt(task, run, epochs, tapt_epochs, rdrop, seeds, twin, evidence, minutes):
+    n = {"a": "7,193", "b": "3,532"}[task]
+    test = {"a": "hastika_binary_test.csv (806 rows)", "b": "hastika_multiclass_test.csv (396 rows)"}[task]
+    zip_name = f"{task}{run}_gemma_tapt" + ("_rdrop" if rdrop else "")
+    recipe = "TAPT + R-Drop" if rdrop else "TAPT"
+    md = (f"# Task {task.upper()} Run {run} -- {recipe} Gemma-4-12B, final submission on all {n} rows\n\n"
+          f"**This runs the {recipe} recipe only.**\n\n"
+          f"1. **TAPT.** {tapt_epochs} epoch{'s' if tapt_epochs > 1 else ''} of LoRA next-token "
+          f"pretraining on the text of all {n} labelled comments plus the external Kannada corpus. "
+          "Test text is never read.\n"
+          f"2. **Classifiers.** {len(seeds)} Gemma-4-12B QLoRA classifiers (seeds "
+          f"{', '.join(map(str, seeds))}; {epochs} epochs"
+          + (f"; R-Drop {rdrop}" if rdrop else "") +
+          f") continue from that adapter, trained on all {n} labelled rows, two per GPU round.\n"
+          f"3. **Output.** Their test probabilities are averaged into `RECOMMENDED_{zip_name}.zip` "
+          f"for `{test}`.\n\n"
+          "**If TAPT fails, the notebook stops with an error and writes no ZIP.** A non-TAPT model "
+          "is never substituted.\n\n"
+          f"**Its holdout check is `task_{task}/{twin}`.** It runs the same recipe on the 85% "
+          "split, so run it at the same time.\n\n" + evidence +
+          "\n\nTAPT is memory-safe on a T4: micro-batch 1 x 16 accumulation, 128 tokens, chunked "
+          "logits, expandable CUDA segments, and one retry at 64 tokens. It measured a peak of 10.4 "
+          "of 14.6 GB in Task A.\n\n"
+          f"**Time:** {minutes}. The 11 h stop packages whichever seeds finished.\n\n" + SETTINGS)
+    code = (FINAL_TAPT_CODE.replace("__EPOCHS__", str(epochs)).replace("__TAPT_EPOCHS__", str(tapt_epochs))
+            .replace("__RDROP__", str(rdrop)).replace("__SEEDS__", repr(list(seeds)))
+            .replace("__ZIP__", zip_name))
+    return [("markdown", md), ("code", setup(task, f"{task}{run}_outputs")), ("code", LLM_ENV),
+            ("code", code)]
+
+
+A_TAPT_EVIDENCE = """**Evidence** (Task A holdout, 1,079 rows, `815110ff24`):
+
+| ensemble | macro-F1 |
+|---|---|
+| TAPT, 1 epoch + 3-epoch classifiers, 4 seeds | **0.8702**, the best Task A holdout so far |
+| no-TAPT ensembles | 0.8582 (3 seeds) to 0.8610 (2 seeds) |
+
+Single TAPT seeds score 0.848-0.857, about level with single base seeds. TAPT's gain comes
+through averaging: its models disagree more usefully."""
+
+B_TAPT_EVIDENCE = """**Evidence:** the current best Task B recipe is Gemma-4-12B, 4 epochs, which scored
+0.6872 on the 530-row holdout (Run 23). TAPT gave Task A its best holdout result (0.8702).
+For Task B, TAPT now runs **2 epochs**: the corpus is small enough to afford it, the Task A
+LM loss was still falling at the end of epoch 1, and MuRIL's TAPT used 8 epochs."""
+
+a33 = final_tapt("a", 33, 3, 1, 0.0, [42, 43, 44, 45], "35_tapt_final_holdout_twin", A_TAPT_EVIDENCE,
+                 "about 7.5 h (TAPT about 2 h, then two rounds of two 3-epoch fits)")
+a37 = final_tapt("a", 37, 3, 1, 0.5, [42, 43], "36_tapt_rdrop_holdout_twin", A_TAPT_EVIDENCE + """
+
+**R-Drop** (two dropout passes tied by a symmetric KL) was in MuRIL's best Task B recipe.
+On Gemma Task B without TAPT, it improved every single seed (+2 points) but not their
+average. Two seeds keep this inside 11 h, since R-Drop doubles each fit's cost. To average
+more models, combine its `a37_gemma_tapt_rdrop_test_probs.npy` with Run 33's four TAPT
+models using `python -m hastika.common.combine_probs`.""",
+                 "about 7 h (TAPT about 2 h, then two 3-epoch R-Drop fits in parallel)")
+b25 = final_tapt("b", 25, 4, 2, 0.0, [42, 43, 44, 45], "35_tapt_final_holdout_twin", B_TAPT_EVIDENCE,
+                 "about 7 h (TAPT 2 epochs about 3 h, then two rounds of two 4-epoch fits)")
+b37 = final_tapt("b", 37, 4, 2, 0.5, [42, 43], "36_tapt_rdrop_holdout_twin", B_TAPT_EVIDENCE + """
+
+**R-Drop** was in MuRIL's best Task B recipe (0.6410). On Gemma without TAPT it improved both
+single seeds by about 2 points, but not their average. Two seeds keep this inside 11 h. Combine
+its `b37_gemma_tapt_rdrop_test_probs.npy` with Run 25's four TAPT models using
+`python -m hastika.common.combine_probs` to average more models.""",
+                 "about 6.5 h (TAPT 2 epochs about 3 h, then two 4-epoch R-Drop fits in parallel)")
+
+A_TAPT_REUSE = ["*/runs/tapt_s{seed}/holdout_probs.npy"]
 a35 = holdout_twin(
     "a", 35, "exact twin of the TAPT submission (Task A Run 33)",
-    """Task A Run 33, the TAPT submission, does three things:
+    """Task A Run 33 does three things: TAPT (1 epoch) on comment text plus the external corpus,
+then four 3-epoch Gemma-4-12B classifiers (seeds 42-45) from that adapter, then averages
+them. **This runs the same recipe on the 85% split:** TAPT reads only the 6,114 training
+comments, and everything is scored on the 1,079-row holdout.
 
-1. TAPT on the comments' text plus the external Kannada corpus.
-2. Four Gemma-4-12B classifiers (seeds 42-45, 3 epochs) continue from that adapter.
-3. Their probabilities are averaged.
+**What it reports:**
 
-**This notebook runs exactly that recipe, on the 85% split.** TAPT reads only the 6,114
-training comments plus the external corpus, and the four classifiers train on the same
-6,114 rows. Everything is scored on the 1,079-row holdout. The one difference from Run 33
-is that holdout rows are kept out of everything.
+| line | what it is |
+|---|---|
+| verdict | a fair test: TAPT x2 vs Run 28's no-TAPT recipe x2 |
+| TAPT x4 | the expected level of the submission. A modified run of this notebook measured **0.8702** |
 
-**Two numbers come out of it:**
-
-| number | groups compared | what it tells you |
-|---|---|---|
-| the verdict, a fair test of TAPT | TAPT at 2 seeds vs Run 28's recipe (no TAPT) at the same 2 seeds | whether TAPT helps, with seed count held equal |
-| the expected submission level | TAPT at 4 seeds, exactly what Run 33 submits | what to expect from the submission |
-
-Run 28's seed-42 holdout probabilities are reused when attached. Its seed 43 collapsed,
-so it is retrained here.""",
-    [("tapt", s, "{tapt}", []) for s in (42, 43, 44, 45)]
+**New: every holdout model also predicts the test set.** The four TAPT models are written
+as `a35_holdout_models_test_probs.npy` plus a ZIP. They are trained on 85% of the rows, so
+each is slightly weaker than a full fit. Averaging is what made TAPT win, so combine them
+with Run 33's four full-data models using `python -m hastika.common.combine_probs`.""",
+    [("tapt", s, "{tapt}", A_TAPT_REUSE) for s in (42, 43, 44, 45)]
     + [("base", s, "", A_REUSE_3EP) for s in (42, 43)],
     {"current best: Run 28 recipe x2": ["base_s42", "base_s43"],
      "TAPT x2": ["tapt_s42", "tapt_s43"],
      "FINAL: TAPT x4 (= Run 33)": [f"tapt_s{s}" for s in (42, 43, 44, 45)]},
     "FINAL: TAPT x4 (= Run 33)", "current best: Run 28 recipe x2",
-    "about 8 h standalone (TAPT, then six 3-epoch fits two at a time), about 6.5 h with Run 28 attached",
+    "about 9 h standalone (TAPT, then six 3-epoch fits two at a time), about 6.5 h with Run 28 attached",
     verdict=("TAPT x2", "current best: Run 28 recipe x2"))
+a36 = holdout_twin(
+    "a", 36, "TAPT + R-Drop vs TAPT (twin of Task A Run 37)",
+    """Task A Run 37 is TAPT (1 epoch) plus R-Drop 0.5, with 3-epoch classifiers. **This runs the
+same recipe on the 85% split.** It compares TAPT + R-Drop with TAPT alone, Run 33's recipe and
+the current best at 0.8702, both at seeds 42 and 43 from the same TAPT adapter. The test is
+whether R-Drop adds anything on top of TAPT.
 
+| line | what it is |
+|---|---|
+| verdict | TAPT + R-Drop x2 vs TAPT x2 |
+| all four | the two recipes averaged together, as the combined submission would be |
+
+The TAPT-only control is reused from an attached Run 35 output when available. The holdout
+models also predict the test set, so they can be added to the final average.""",
+    [("tapt", s, "{tapt}", A_TAPT_REUSE) for s in (42, 43)]
+    + [("tapt_rdrop", s, "--rdrop 0.5 {tapt}", []) for s in (42, 43)],
+    {"TAPT x2 (Run 33 recipe)": ["tapt_s42", "tapt_s43"],
+     "TAPT + R-Drop x2": ["tapt_rdrop_s42", "tapt_rdrop_s43"],
+     "FINAL: all four": ["tapt_s42", "tapt_s43", "tapt_rdrop_s42", "tapt_rdrop_s43"]},
+    "FINAL: all four", "TAPT x2 (Run 33 recipe)",
+    "about 8.5 h standalone, about 6.5 h with Run 35 attached",
+    verdict=("TAPT + R-Drop x2", "TAPT x2 (Run 33 recipe)"))
+
+B_TAPT_REUSE = ["*/runs/tapt_s{seed}/holdout_probs.npy"]
 b35 = holdout_twin(
     "b", 35, "exact twin of the TAPT submission (Task B Run 25)",
-    """Task B Run 25, the TAPT submission, does three things:
+    """Task B Run 25 does three things: TAPT (**2 epochs**) on comment text plus the external
+corpus, then four 4-epoch Gemma-4-12B classifiers (seeds 42-45) from that adapter, then
+averages them. **This runs the same recipe on the 85% split:** TAPT reads only the 3,002
+training comments, and everything is scored on the 530-row holdout.
 
-1. TAPT on the comments' text plus the external Kannada corpus.
-2. Four Gemma-4-12B classifiers (seeds 42-45, 4 epochs) continue from that adapter.
-3. Their probabilities are averaged.
+| line | what it is |
+|---|---|
+| verdict | a fair test: TAPT x2 vs Run 23's recipe (4 epochs, no TAPT) x2 |
+| TAPT x4 | the expected level of the submission |
 
-**This notebook runs exactly that recipe, on the 85% split.** TAPT reads only the 3,002
-training comments plus the external corpus, and the four classifiers train on the same
-3,002 rows. Everything is scored on the 530-row holdout. The one difference from Run 25 is
-that holdout rows are kept out of everything.
-
-**Two numbers come out of it:**
-
-| number | groups compared | what it tells you |
-|---|---|---|
-| the verdict, a fair test of TAPT | TAPT at 2 seeds vs Run 23's recipe (4 epochs, no TAPT) at the same 2 seeds | whether TAPT helps, with seed count held equal |
-| the expected submission level | TAPT at 4 seeds, exactly what Run 25 submits | what to expect from the submission |
-
-Run 23's 4-epoch holdout probabilities (seeds 42 and 43) are reused when attached.""",
+Run 23's 4-epoch holdout probabilities are reused when attached. **New: every holdout model
+also predicts the test set** (`b35_holdout_models_test_probs.npy` plus a ZIP), as extra
+members to average with Run 25.""",
     [("tapt", s, "--epochs 4 {tapt}", []) for s in (42, 43, 44, 45)]
     + [("base", s, "--epochs 4", B_REUSE_EP4) for s in (42, 43)],
     {"current best: Run 23 recipe x2": ["base_s42", "base_s43"],
      "TAPT x2": ["tapt_s42", "tapt_s43"],
      "FINAL: TAPT x4 (= Run 25)": [f"tapt_s{s}" for s in (42, 43, 44, 45)]},
     "FINAL: TAPT x4 (= Run 25)", "current best: Run 23 recipe x2",
-    "about 5.5 h standalone, about 4 h with Run 23 attached",
-    verdict=("TAPT x2", "current best: Run 23 recipe x2"))
+    "about 8 h standalone (TAPT 2 epochs, then six 4-epoch fits two at a time), about 6 h with Run 23 attached",
+    verdict=("TAPT x2", "current best: Run 23 recipe x2"), tapt_extra="--epochs 2")
+b36 = holdout_twin(
+    "b", 36, "TAPT + R-Drop vs TAPT (twin of Task B Run 37)",
+    """Task B Run 37 is TAPT (2 epochs) plus R-Drop 0.5, with 4-epoch classifiers. **This runs the
+same recipe on the 85% split.** It compares TAPT + R-Drop with TAPT alone (Run 25's recipe),
+both at seeds 42 and 43 from the same TAPT adapter.
+
+| line | what it is |
+|---|---|
+| verdict | TAPT + R-Drop x2 vs TAPT x2 |
+| all four | the two recipes averaged together |
+
+R-Drop was in MuRIL's best Task B recipe. On Gemma without TAPT it improved single seeds but
+not their average. The TAPT-only control is reused from an attached Run 35 output when
+available. The holdout models also predict the test set.""",
+    [("tapt", s, "--epochs 4 {tapt}", B_TAPT_REUSE) for s in (42, 43)]
+    + [("tapt_rdrop", s, "--epochs 4 --rdrop 0.5 {tapt}", []) for s in (42, 43)],
+    {"TAPT x2 (Run 25 recipe)": ["tapt_s42", "tapt_s43"],
+     "TAPT + R-Drop x2": ["tapt_rdrop_s42", "tapt_rdrop_s43"],
+     "FINAL: all four": ["tapt_s42", "tapt_s43", "tapt_rdrop_s42", "tapt_rdrop_s43"]},
+    "FINAL: all four", "TAPT x2 (Run 25 recipe)",
+    "about 8 h standalone, about 6.5 h with Run 35 attached",
+    verdict=("TAPT + R-Drop x2", "TAPT x2 (Run 25 recipe)"), tapt_extra="--epochs 2")
 
 if __name__ == "__main__":
     notebook(b22, "notebooks/task_b/22_package_run21.ipynb")
@@ -1210,3 +1213,7 @@ if __name__ == "__main__":
     notebook(b34, "notebooks/task_b/34_gemma_tapt_4ep_holdout.ipynb")
     notebook(a35, "notebooks/task_a/35_tapt_final_holdout_twin.ipynb")
     notebook(b35, "notebooks/task_b/35_tapt_final_holdout_twin.ipynb")
+    notebook(a36, "notebooks/task_a/36_tapt_rdrop_holdout_twin.ipynb")
+    notebook(a37, "notebooks/task_a/37_tapt_rdrop_final.ipynb")
+    notebook(b36, "notebooks/task_b/36_tapt_rdrop_holdout_twin.ipynb")
+    notebook(b37, "notebooks/task_b/37_tapt_rdrop_final.ipynb")

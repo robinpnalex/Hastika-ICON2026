@@ -19,3 +19,6 @@ depending on the original upload filenames.
 | `run26_transductive_derivable_labels_oof.log` | Task A Run 26: derivable-label diagnostic, OOF | see `docs/EXPERIMENTS.md` |
 | `run27_run25_validation_and_test.log` | Task A Run 27: Run 25 recipe, validation and test predictions | see `docs/EXPERIMENTS.md` |
 | `run34_final_holdout_check.log` | Task A Run 34: holdout twin of Run 28 + a 4-epoch Run 33 | 3 epochs x2 **0.8610** (best Task A holdout); 4 epochs x2 0.8313; all four 0.8563 (-0.005 vs 3 epochs x2); seed 43 collapsed, auto-rerun as 1043, 0.8573 |
+| `run35_tapt_holdout_4x4_modified.log` | Task A Run 35, a modified copy (4 base + 4 TAPT seeds), commit `d138f23` | **TAPT x4 0.8702**; base x3 0.8582 (base seed 43 cut at the 11 h stop); TAPT single seeds 0.848-0.857 |
+| `run33_tapt_full.log` | Task A Run 33, TAPT (1 epoch) + four 3-epoch full fits, commit `de2fc07` | completed in 7.6 h; TAPT peak 10.4 GB; `RECOMMENDED_a33_gemma.zip` (TAPT), 50.2% Hate |
+| `run33_notapt_4seed_full.log` | Task A Run 33, no TAPT, four 3-epoch full fits, commit `a99bd69` | completed in 5.6 h; `RECOMMENDED_a33_gemma.zip` (no TAPT), 51.5% Hate |
