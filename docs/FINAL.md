@@ -57,8 +57,8 @@ the minimum needed to confirm each recipe once.
 
 | task | done | running | still to run |
 |---|---|---|---|
-| A | Runs 33 (TAPT x4), 35, **36**, 37, 38 t1, 39 t1 | -- | **bag sessions t2-t3 (Run 38, full data only)** |
-| B | Runs 36, 37, 38 t1 (logs to archive) | -- | **Run 39 t1** (after A36), then **bag sessions t2-t3 (Run 38, full data only)** |
+| A | Runs 33 (TAPT x4), 35, **36**, 37, 38 t1, 39 t1 | -- | **bag sessions t2-t3: `task_a/38_tapt_bag_full_session2`, `_session3` (settings pre-filled)** |
+| B | Runs 36, 37, 38 t1 (logs to archive) | -- | **Run 39 t1**, and **bag sessions t2-t3: `task_b/38_tapt_bag_full_session2`, `_session3` (settings pre-filled)** |
 
 **Why no more holdout bag sessions.** Task A's bag holdout (Run 39 t1, 0.8675) already
 confirms that an independent TAPT run reproduces the gain. Task B gets exactly one, Run 39

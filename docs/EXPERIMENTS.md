@@ -71,6 +71,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 36 | 2026-10-15, completed | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT + R-Drop 0.5 vs TAPT, seeds 42/43, same adapter | TAPT x2 0.8619, TAPT + R-Drop x2 0.8647 (+0.003, P 0.64); **all four 0.8721** (+0.010 vs TAPT x2, CI [0.000, +0.020], P 0.98) -> R-Drop models **join the average** as extra members |
 | Task A 37 | 2026-10-15, completed | `37_tapt_rdrop_final.ipynb` | full data: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch seeds | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` written (7.5 h); **unvalidated: Run 36 measures it** |
 | Task A 38 | session 1 completed 2026-10-15; **sessions t2-t3 still to run** | `38_tapt_bag_full.ipynb` | TAPT bag, full data | t1: `RECOMMENDED_a38_bag_t1.zip` (2 models, 4.7 h) |
+| Task A 38 s2/s3 | ready; settings pre-filled | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3: TAPT seed 2 (classifiers 44/45) and TAPT seed 3 (46/47), full data | nothing to edit; one account each |
 | Task A 39 | session 1 completed 2026-10-15; **no further sessions planned** | `39_tapt_bag_holdout.ipynb` | TAPT bag, holdout | t1: singles 0.8535 / 0.8610, **pair 0.8675** |
 | Task A 40 | ready; standalone | `40_qwen_second_family_holdout.ipynb` | **second model family:** Qwen3-8B-Base with Gemma's recipe, 2 seeds; Gemma + Qwen (equal weight per model) vs the best attached Gemma ensemble (Run 36's 0.8721) | paired-bootstrap verdict; full-data Qwen only if significant (~2.5 h with Run 36 attached) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
@@ -111,6 +112,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 36 | run 2026-10-15; log not yet archived | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT (2 epochs) + R-Drop vs TAPT, seeds 42/43 (twin of Run 37) | its TAPT x2 control is also the first Task B TAPT holdout evidence |
 | Task B 37 | run 2026-10-15; log not yet archived | `37_tapt_rdrop_final.ipynb` | full data: TAPT (2 epochs) + R-Drop 0.5, two 4-epoch seeds | `RECOMMENDED_b37_gemma_tapt_rdrop.zip`; joins the average only if Run 36 shows R-Drop helps |
 | Task B 38 | session 1 run 2026-10-15 (log not yet archived); later sessions pending | `38_tapt_bag_full.ipynb` | TAPT bag, full data: own TAPT (2 epochs) per session + two 4-epoch classifiers | t1 done; t2-t3 still to run |
+| Task B 38 s2/s3 | ready; settings pre-filled | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3: TAPT seed 2 (classifiers 44/45) and TAPT seed 3 (46/47), full data | nothing to edit; one account each |
 | Task B 39 | next: after Task A Run 36 finishes | `39_tapt_bag_holdout.ipynb` | TAPT bag holdout, session 1 (`TAPT_SEED` 1) | the one Task B bag holdout check |
 
 ## Ordered next steps

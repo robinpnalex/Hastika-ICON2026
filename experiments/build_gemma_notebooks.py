@@ -1199,8 +1199,8 @@ available. The holdout models also predict the test set.""",
 # ---------------------------------------------------------------------------- TAPT bag
 BAG_CODE = r'''
 # ---- set these two per session (see the table above); keep holdout and full sessions paired
-TAPT_SEED = 1          # 1, 2, 3, 4 ... a different TAPT run in every session
-SEEDS = [42, 43]       # this session's two classifier seeds
+TAPT_SEED = __TAPT_SEED__          # 1, 2, 3, 4 ... a different TAPT run in every session
+SEEDS = __CLS_SEEDS__       # this session's two classifier seeds
 # ------------------------------------------------------------------------------------------
 TAPT_EPOCHS, EPOCHS, HOLDOUT = __TAPT_EPOCHS__, __EPOCHS__, __HOLDOUT__
 train_csv = SPLIT / ("train.csv" if HOLDOUT else "all.csv")
@@ -1252,7 +1252,7 @@ json.dump({"commit": head, "tapt_seed": TAPT_SEED, "seeds": list(test_p), "holdo
 '''
 
 
-def bag_member(task, run, holdout, tapt_epochs, epochs, twin_run, minutes):
+def bag_member(task, run, holdout, tapt_epochs, epochs, twin_run, minutes, session=None):
     n = {"a": ("6,114", "7,193"), "b": ("3,002", "3,532")}[task][0 if holdout else 1]
     kind = "holdout" if holdout else "full data"
     name = f"{task}{run}_bag"
@@ -1284,7 +1284,14 @@ def bag_member(task, run, holdout, tapt_epochs, epochs, twin_run, minutes):
              "(weight 2 each). Run 33's four TAPT models can join with weight 4.\n\n")
           + f"**Time:** {minutes}. TAPT-only: if TAPT fails, the session stops and writes nothing.\n\n"
           + SETTINGS)
-    code = (BAG_CODE.replace("__TAPT_EPOCHS__", str(tapt_epochs)).replace("__EPOCHS__", str(epochs))
+    k = session or 1
+    if session:   # a ready-to-run copy: settings filled in, nothing to edit
+        md = md.replace(f"# Task {task.upper()} Run {run} -- TAPT bag, one session ({kind})",
+                        f"# Task {task.upper()} Run {run} -- TAPT bag, **session {k}** ({kind}), ready to run\n\n"
+                        f"**Nothing to edit:** `TAPT_SEED = {k}` and `SEEDS = [{40 + 2 * k}, {41 + 2 * k}]` are "
+                        "already set. Upload, choose GPU T4 x2 with Internet on, then Save & Run All.")
+    code = (BAG_CODE.replace("__TAPT_SEED__", str(k)).replace("__CLS_SEEDS__", repr([40 + 2 * k, 41 + 2 * k]))
+            .replace("__TAPT_EPOCHS__", str(tapt_epochs)).replace("__EPOCHS__", str(epochs))
             .replace("__HOLDOUT__", str(holdout)).replace("__NAME__", name))
     return [("markdown", md), ("code", setup(task, f"{task}{run}_outputs")), ("code", LLM_ENV),
             ("code", code)]
@@ -1294,6 +1301,10 @@ a38 = bag_member("a", 38, False, 1, 3, "39_tapt_bag_holdout", "about 4.7 h (TAPT
 a39 = bag_member("a", 39, True, 1, 3, "38_tapt_bag_full", "about 4.3 h")
 b38 = bag_member("b", 38, False, 2, 4, "39_tapt_bag_holdout", "about 4.7 h (TAPT 2 epochs about 2.8 h, then two 4-epoch fits)")
 b39 = bag_member("b", 39, True, 2, 4, "38_tapt_bag_full", "about 4.4 h")
+a38_s2 = bag_member("a", 38, False, 1, 3, "39_tapt_bag_holdout", "about 4.7 h", session=2)
+a38_s3 = bag_member("a", 38, False, 1, 3, "39_tapt_bag_holdout", "about 4.7 h", session=3)
+b38_s2 = bag_member("b", 38, False, 2, 4, "39_tapt_bag_holdout", "about 4.7 h", session=2)
+b38_s3 = bag_member("b", 38, False, 2, 4, "39_tapt_bag_holdout", "about 4.7 h", session=3)
 
 # ---------------------------------------------------------------------------- second model family
 QWEN_CODE = r'''
@@ -1429,3 +1440,7 @@ if __name__ == "__main__":
     notebook(b38, "notebooks/task_b/38_tapt_bag_full.ipynb")
     notebook(b39, "notebooks/task_b/39_tapt_bag_holdout.ipynb")
     notebook(a40, "notebooks/task_a/40_qwen_second_family_holdout.ipynb")
+    notebook(a38_s2, "notebooks/task_a/38_tapt_bag_full_session2.ipynb")
+    notebook(a38_s3, "notebooks/task_a/38_tapt_bag_full_session3.ipynb")
+    notebook(b38_s2, "notebooks/task_b/38_tapt_bag_full_session2.ipynb")
+    notebook(b38_s3, "notebooks/task_b/38_tapt_bag_full_session3.ipynb")
