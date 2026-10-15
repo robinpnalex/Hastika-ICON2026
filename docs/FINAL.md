@@ -51,7 +51,7 @@ The `combine_probs` commands are at the end of `EXPERIMENTS.md`. Every member ha
 only the combination step is left.
 
 **One experiment still to run: Task A Run 40** (Qwen3-8B as a second model family, holdout
-only; attach Run 36's output). Only if its verdict is SIGNIFICANT is a full-data Qwen fit
+only). It is self-contained: it trains its own Gemma TAPT x2 reference, about 6 h. Only if its verdict is SIGNIFICANT is a full-data Qwen fit
 added to the Task A ensemble, with a Task B version built the same way. Otherwise the
 recipes above are final. The review of what else could be tried, and why each is closed,
 is at the end of `EXPERIMENTS.md`.

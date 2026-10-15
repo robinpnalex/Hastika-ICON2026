@@ -36,7 +36,7 @@ probabilities are reused when attached, and they stop at 11 h. They are generate
 | `38_tapt_bag_full.ipynb` | 38 | TAPT bag, full data: own TAPT + 2 classifiers per session | ready | ~4.7 h per session |
 | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | 38 | bag sessions 2 and 3, settings pre-filled | ready | ~4.7 h each |
 | `39_tapt_bag_holdout.ipynb` | 39 | TAPT bag, holdout counterpart | ready | ~4.3 h per session |
-| `40_qwen_second_family_holdout.ipynb` | 40 | Qwen3-8B-Base as a second family; Gemma + Qwen vs Gemma on the holdout | ready | ~2.5 h with Run 36 attached |
+| `40_qwen_second_family_holdout.ipynb` | 40 | Qwen3-8B-Base as a second family; trains Gemma TAPT x2 + Qwen x2 itself; Gemma + Qwen vs Gemma on the holdout | ready | ~6 h |
 
 Runs 29-32 are independent of one another. Run 33's defaults (Run 28's recipe) are
 already a safe final submission.

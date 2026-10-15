@@ -1311,71 +1311,70 @@ QWEN_CODE = r'''
 QWEN = "Qwen/Qwen3-8B-Base"     # second-best reader of Kanglish in Run 20's screen (3.19 bits/char)
 GEMMA = MODEL
 SEEDS = [42, 43]
-
-# The Gemma reference: the best Gemma holdout ensemble among the attached outputs, in order of
-# preference (Run 36's 0.8721 first). Nothing attached: Gemma x2 without TAPT is trained here.
-CANDIDATES = [
-    ("Run 36: TAPT x2 + TAPT/R-Drop x2 (0.8721)", "a36_outputs",
-     ["tapt_s42", "tapt_s43", "tapt_rdrop_s42", "tapt_rdrop_s43"]),
-    ("Run 35: TAPT x4 (0.8702)", "a35_outputs", ["tapt_s42", "tapt_s43", "tapt_s44", "tapt_s45"]),
-    ("Run 39 t1: TAPT x2 (0.8675)", "a39_outputs", ["t1_s42", "t1_s43"]),
-]
-ref, ref_name = {}, None
-for name, out_dir, members in CANDIDATES:
-    got = {}
-    for m in members:
-        hits = find_prior(f"*/{out_dir}/runs/{m}/holdout_probs.npy")
-        p = load_probs(hits[0].parent, SPLIT / "holdout.csv") if hits else None
-        if p is not None:
-            got[m] = p
-    if len(got) == len(members):
-        ref, ref_name = got, name
-        break
-print("Gemma reference:", ref_name or "none attached -- training Gemma x2 (no TAPT) here")
-
 HO = dict(train=SPLIT / "train.csv", predict=[SPLIT / "holdout.csv", TEST_CSV], evalf=SPLIT / "holdout.csv")
+TAPT_DIR = RUNS / "tapt_train"
+
+# Everything is trained here; nothing needs attaching.
+#   reference: Gemma TAPT x2 -- the final recipe (TAPT 1 epoch on the training split + external
+#              corpus, then 3-epoch classifiers from that adapter)
+#   candidate: the same two Gemma models + two Qwen3-8B models, equal weight per model
 download(QWEN)
 MODEL = QWEN                                   # llm_job reads MODEL when each job is built
-jobs = [llm_job(f"qwen_s{s}", seed=s, **HO) for s in SEEDS]
-if not ref:
-    download(GEMMA)
-    MODEL = GEMMA
-    jobs += [llm_job(f"gemma_s{s}", seed=s, **HO) for s in SEEDS]
-    ref_name = "Gemma x2, no TAPT (trained here)"
-codes = run_jobs(jobs)
+qwen_jobs = [llm_job(f"qwen_s{s}", seed=s, **HO) for s in SEEDS]
+MODEL = GEMMA
+gemma_jobs = [llm_job(f"gemma_tapt_s{s}", seed=s, extra=f"--init-adapter {TAPT_DIR}", **HO) for s in SEEDS]
+state = {"tapt_ok": False}
+
+
+def on_done(name, code):
+    if name == "tapt_train":
+        state["tapt_ok"] = code == 0
+        if code:
+            print(f"TAPT FAILED (exit {code}) -- the Gemma reference cannot be trained; see {LOGS / 'tapt_train.log'}")
+            return []
+        return gemma_jobs
+    return []
+
+
+# GPU 0: TAPT, then a Gemma classifier; GPU 1: both Qwen fits, then the other Gemma classifier
+jobs = [tapt_job("tapt_train", [SPLIT / "train.csv", EXTERNAL])] + qwen_jobs
+codes = run_jobs(jobs, on_done)
+if not state["tapt_ok"]:
+    raise SystemExit("TAPT did not complete -- no Gemma reference, so no comparison. See the TAPT log above.")
 print("exit codes:", codes, f"| {(time.time() - T_START) / 3600:.1f} h")
 '''
 
 QWEN_REPORT = r'''
 qwen = {s: load_probs(RUNS / f"qwen_s{s}", SPLIT / "holdout.csv") for s in SEEDS}
 qwen = {s: p for s, p in qwen.items() if p is not None}
-if not ref:
-    ref = {s: load_probs(RUNS / f"gemma_s{s}", SPLIT / "holdout.csv") for s in SEEDS}
-    ref = {s: p for s, p in ref.items() if p is not None}
+ref = {s: load_probs(RUNS / f"gemma_tapt_s{s}", SPLIT / "holdout.csv") for s in SEEDS}
+ref = {s: p for s, p in ref.items() if p is not None}
 assert qwen and ref, "missing Qwen or Gemma holdout probabilities -- see the logs"
 for s, p in qwen.items():
     report(y_ho, p, f"Qwen seed {s}")
+for s, p in ref.items():
+    report(y_ho, p, f"Gemma TAPT seed {s}")
 q = np.mean(list(qwen.values()), 0)
 g = np.mean(list(ref.values()), 0)
 # pre-registered: equal weight per model, exactly as combine_probs builds the final
 both = np.mean(list(ref.values()) + list(qwen.values()), 0)
 scores = {"qwen": report(y_ho, q, f"Qwen x{len(qwen)}"),
-          "gemma": report(y_ho, g, f"Gemma ref x{len(ref)}"),
-          "gemma+qwen": report(y_ho, both, f"Gemma + Qwen, {len(ref) + len(qwen)} models")}
+          "gemma_tapt": report(y_ho, g, f"Gemma TAPT x{len(ref)}"),
+          "gemma+qwen": report(y_ho, both, f"Gemma TAPT + Qwen, {len(ref) + len(qwen)} models")}
+print("for context, recorded earlier on these rows: Gemma TAPT x2 0.8619-0.8675, Run 36's 4-model mix 0.8721")
 dis = float((q.argmax(1) != g.argmax(1)).mean())
 print(f"\nQwen and Gemma disagree on {dis:.1%} of holdout rows")
 b = boot_line("Gemma+Qwen - Gemma", both, g)
 verdict = ("SIGNIFICANT gain -- build the full-data Qwen fit" if b["ci95"][0] > 0 else
            "probable gain, but inside the noise -- optional" if b["p_better"] >= 0.7 else
            "no gain -- stop here, keep Gemma only")
-print(f"\nreference: {ref_name}\nverdict: {verdict} (P(better) {b['p_better']:.2f})")
+print(f"\nverdict: {verdict} (P(better) {b['p_better']:.2f})")
 test_q = [load_probs(RUNS / f"qwen_s{s}", TEST_CSV) for s in SEEDS]
 test_q = [p for p in test_q if p is not None]
 if test_q:
     write_zip("a40_qwen_holdout_models", np.mean(test_q, 0))
-json.dump({"commit": head, "reference": ref_name, "scores": scores, "disagreement": dis,
-           "bootstrap": b, "verdict": verdict, "exit_codes": codes},
-          open(OUT / "result.json", "w"), indent=2)
+json.dump({"commit": head, "scores": scores, "disagreement": dis, "bootstrap": b,
+           "verdict": verdict, "exit_codes": codes}, open(OUT / "result.json", "w"), indent=2)
 '''
 
 a40 = [("markdown", """# Task A Run 40 -- does a second model family improve the Gemma ensemble?
@@ -1385,31 +1384,25 @@ make *different* mistakes. Seeds, TAPT runs and R-Drop all vary the same Gemma-4
 members share its blind spots. A different architecture, with its own tokenizer and
 pretraining data, is the standard source of more diverse errors.
 
-**This run** trains **Qwen3-8B-Base** with Gemma's exact classifier recipe (4-bit QLoRA,
-3 epochs, lr 1e-4, LoRA r16, short prompt, balanced class weights), seeds 42 and 43, on the
-6,114-row training split. It scores everything on the 1,079-row holdout (`815110ff24`).
-Qwen read Kanglish second-best among the 8B+ models in Run 20's screen: 3.19 bits per
-character against Gemma's 3.01. No TAPT is used for Qwen; this is the minimal test.
+**Everything is trained in this notebook; nothing to attach, nothing to edit.** All models
+train on the 6,114-row split and are scored on the 1,079-row holdout (`815110ff24`):
 
-**Compared, pre-registered:**
-
-| line | what |
+| arm | what |
 |---|---|
-| Qwen x2 | Qwen alone |
-| Gemma reference | the best attached Gemma holdout ensemble: Run 36 (0.8721), else Run 35 (0.8702), else Run 39 t1 (0.8675). If none is attached, Gemma x2 without TAPT is trained here |
-| **Gemma + Qwen** | all models averaged with **equal weight per model**, exactly as `combine_probs` would build the final. No weight is tuned on the holdout |
+| **reference: Gemma TAPT x2** | the final recipe: TAPT (1 epoch, training-split text + external corpus), then two 3-epoch Gemma-4-12B classifiers (seeds 42, 43) from that adapter |
+| **Qwen x2** | Qwen3-8B-Base with Gemma's classifier recipe (4-bit QLoRA, 3 epochs, lr 1e-4, LoRA r16, short prompt), seeds 42, 43. Second-best reader of Kanglish in Run 20's screen (3.19 bits per character against Gemma's 3.01) |
+| **candidate: Gemma TAPT + Qwen** | all four models averaged with **equal weight per model**, as `combine_probs` builds the final. No weight is tuned on the holdout |
 
-**Verdict.** A paired bootstrap of Gemma + Qwen against Gemma alone.
+**Verdict.** A paired bootstrap of the candidate against the reference.
 
 | result | meaning |
 |---|---|
-| CI lower bound above 0 | significant: build a full-data Qwen fit |
+| CI lower bound above 0 | **significant**: build a full-data Qwen fit and a Task B version |
 | P(better) >= 0.7 | a probable gain, but inside the noise; optional |
 | otherwise | stop and keep Gemma only |
 
-**Attach Run 36's output** (Add Input -> Notebook Output) to compare against the current
-best. **Time:** about 2.5 h with Run 36 attached (two Qwen fits in parallel); about 5 h
-standalone. The Qwen holdout models also predict the test set.
+**Time:** about 6 h. GPU 0 runs TAPT and then one Gemma classifier; GPU 1 runs both Qwen
+fits and then the other Gemma classifier. The Qwen holdout models also predict the test set.
 
 """ + SETTINGS), ("code", setup("a", "a40_outputs")), ("code", LLM_ENV), ("code", QWEN_CODE),
        ("code", QWEN_REPORT)]
