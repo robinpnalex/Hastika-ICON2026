@@ -22,6 +22,10 @@ These are the captured Kaggle logs for the completed Task B experiments:
 | `run01_baseline_sweep_holdout_arms.log` | Run 1 (2026-09-12): holdout arms of the overnight sweep | b_base 0.5948, b_abusive 0.5718 (as recorded) |
 | `run15_muril_large_full.log` | Run 15 (2026-09-20): MuRIL-large full fit on all 3,159 rows | completed; `b_muril_large_full.zip` (validation phase, never scored) |
 | `run16_rdrop_augmented_full.log` | Run 16 (2026-09-20): R-Drop recipe on 3,159 gold + 779 multiclass-labelled binary rows | completed; `b_reinit1_rdrop_augmented_full.zip` (validation phase, never scored; uses cross-task labels) |
+| `run36_tapt_rdrop_holdout.log` | Run 36: TAPT (2 epochs) + R-Drop vs TAPT, one adapter, seeds 42/43 | TAPT x2 0.6741; TAPT + R-Drop x2 **0.7026**; all four 0.6966 |
+| `run37_tapt_rdrop_full.log` | Run 37: TAPT + R-Drop, two 4-epoch full fits | completed in 6.5 h; `RECOMMENDED_b37_gemma_tapt_rdrop.zip` |
+| `run38_tapt_bag_full_t1.log` | Run 38, bag session 1, full data | completed in 4.3 h; `RECOMMENDED_b38_bag_t1.zip` |
+| `run39_tapt_bag_holdout_t1.log` | Run 39, bag session 1, holdout | pair **0.7056**; seed 43 collapsed (all Violence) and its rerun as 1043 trained normally |
 
 The logs are retained as raw captured output. The corresponding experiment descriptions
 and results are recorded in `docs/EXPERIMENTS.md`.

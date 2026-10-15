@@ -109,11 +109,11 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 33 | ready; standalone | `33_final_holdout_check.ipynb` | holdout twin of the Task B final: Run 23's four 4-epoch seeds + Run 32's prompt ensemble (standard and definitions, seeds 42/43); eight-model combination vs Run 23's recipe | paired bootstrap verdict on the 530-row holdout (~6.3 h, ~3 h with Runs 23 and 30 attached) |
 | Task B 34 | ready; standalone | `34_gemma_tapt_4ep_holdout.ipynb` | TAPT on top of the current best recipe (4 epochs) vs that recipe, 2 seeds, on the holdout | sets `TAPT` for Run 25 (~5 h, ~3 h with Run 23 attached) |
 | Task B 35 | ready; regenerated 2026-10-14 | `35_tapt_final_holdout_twin.ipynb` | holdout twin of Run 25: TAPT (2 epochs) x4 + Run 23's recipe x2 | verdict TAPT x2 vs Run 23 x2; holdout models also predict the test set (~8 h, ~6 h with Run 23 attached) |
-| Task B 36 | run 2026-10-15; log not yet archived | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT (2 epochs) + R-Drop vs TAPT, seeds 42/43 (twin of Run 37) | its TAPT x2 control is also the first Task B TAPT holdout evidence |
-| Task B 37 | run 2026-10-15; log not yet archived | `37_tapt_rdrop_final.ipynb` | full data: TAPT (2 epochs) + R-Drop 0.5, two 4-epoch seeds | `RECOMMENDED_b37_gemma_tapt_rdrop.zip`; joins the average only if Run 36 shows R-Drop helps |
-| Task B 38 | session 1 run 2026-10-15 (log not yet archived); later sessions pending | `38_tapt_bag_full.ipynb` | TAPT bag, full data: own TAPT (2 epochs) per session + two 4-epoch classifiers | t1 done; t2-t3 still to run |
+| Task B 36 | 2026-10-15, completed | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT (2 epochs) + R-Drop vs TAPT, one adapter, seeds 42/43 | TAPT x2 0.6741; TAPT + R-Drop x2 **0.7026** (+0.029, P 0.96); all four 0.6966 (+0.023 vs TAPT x2, CI [+0.004, +0.042]) |
+| Task B 37 | 2026-10-15, completed | `37_tapt_rdrop_final.ipynb` | full data: TAPT (2 epochs) + R-Drop, two 4-epoch seeds | `RECOMMENDED_b37_gemma_tapt_rdrop.zip` (6.5 h); **joins the final average** |
+| Task B 38 | session 1 completed 2026-10-15; sessions 2-3 pending (pre-filled notebooks) | `38_tapt_bag_full.ipynb` | TAPT bag, full data | t1: `RECOMMENDED_b38_bag_t1.zip` (2 models, 4.3 h) |
 | Task B 38 s2/s3 | ready; settings pre-filled | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3: TAPT seed 2 (classifiers 44/45) and TAPT seed 3 (46/47), full data | nothing to edit; one account each |
-| Task B 39 | next: after Task A Run 36 finishes | `39_tapt_bag_holdout.ipynb` | TAPT bag holdout, session 1 (`TAPT_SEED` 1) | the one Task B bag holdout check |
+| Task B 39 | session 1 completed 2026-10-15 | `39_tapt_bag_holdout.ipynb` | TAPT bag holdout, `TAPT_SEED` 1 | pair **0.7056**, the best Task B holdout pair; seed 43 collapsed and was rerun |
 
 ## Ordered next steps
 
@@ -1612,4 +1612,44 @@ R-Drop 0.5, all 3 epochs and all from the same adapter. Run on commit `360c131`,
   equal weight. Run 36's four holdout models also predicted the test set
   (`a36_holdout_models_test_probs.npy`). They trained on 85% of the rows and are optional
   extra members.
+
+### Task B TAPT results, 2026-10-15 -- TAPT and R-Drop lift Task B past 0.70
+
+Runs 36-39 used commits `360c131` and `5668d8e`. TAPT ran 2 epochs (134-148 min) and
+peaked at 8.6-9.9 GB of 14.6 GB.
+
+| holdout ensemble (530 rows) | macro-F1 | Gender | Geo-pol | Others | Political | Religion | Violence |
+|---|---|---|---|---|---|---|---|
+| no TAPT, 4 epochs x2 (Run 23) | 0.6872 | 0.785 | 0.667 | 0.569 | 0.822 | 0.797 | 0.483 |
+| TAPT x2, TAPT seed 42 (Run 36) | 0.6741 | 0.801 | 0.656 | 0.514 | 0.823 | 0.772 | 0.479 |
+| **TAPT x2, TAPT seed 1 (Run 39 t1)** | **0.7056** | 0.821 | 0.716 | 0.559 | 0.824 | 0.782 | 0.532 |
+| **TAPT + R-Drop x2 (Run 36)** | **0.7026** | 0.810 | 0.730 | 0.583 | 0.836 | 0.806 | 0.451 |
+| TAPT + TAPT/R-Drop, 4 models (Run 36) | 0.6966 | 0.817 | 0.677 | 0.581 | 0.839 | 0.794 | 0.472 |
+
+| paired bootstrap (Run 36) | difference | 95% CI | P(better) |
+|---|---|---|---|
+| TAPT + R-Drop x2 - TAPT x2 | +0.0285 | [-0.0043, +0.0622] | 0.96 |
+| all four - TAPT x2 | +0.0225 | [+0.0039, +0.0419] | 0.99 |
+
+- **Task B now clears 0.70.** Both the second TAPT run (0.7056) and TAPT + R-Drop (0.7026)
+  beat every earlier Task B result: 0.6872 for Run 23, 0.6882 for the Run 30 prompt
+  ensemble, and 0.6151 for MuRIL.
+- **Two TAPT runs that differ only in their seed scored 0.6741 and 0.7056.** That 3-point
+  gap is seed-to-seed variance on 530 rows, with about 30 rows each in Geo-political and
+  Violence. Any single configuration's score is therefore uncertain to about +-3 points,
+  and picking the best one would be chasing noise. What does hold consistently is that
+  averaging across TAPT runs and recipes never falls below the TAPT x2 baseline (+0.023,
+  CI above 0 in Run 36).
+- **R-Drop helps more on Task B than on Task A** (+0.029 here, +0.003 on Task A). On both
+  tasks, its models are useful ensemble members.
+- **Seed 43 collapsed again**, this time onto Violence, and was rerun automatically.
+
+**Decision: the most general recipe is the largest equal-weight average of independently
+trained TAPT models,** including the TAPT + R-Drop models, with nothing chosen on the
+holdout:
+
+| task | final members | models |
+|---|---|---|
+| B | Run 38 t1, t2, t3 (2 each) + Run 37 (2) | **8, from 4 TAPT runs** |
+| A | Run 33 (4) + Run 37 (2) + Run 38 t1, t2, t3 (2 each) | **12, from 5 TAPT runs** |
 
