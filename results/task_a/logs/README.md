@@ -30,3 +30,5 @@ depending on the original upload filenames.
 | `run38_tapt_bag_full_t1.log` | Task A Run 38, bag session 1 (`TAPT_SEED` 1, seeds 42/43), full data | completed in 4.7 h; `RECOMMENDED_a38_bag_t1.zip` (51.9% Hate) |
 | `run39_tapt_bag_holdout_t1.log` | Task A Run 39, bag session 1, holdout | singles 0.8535 / 0.8610, **pair 0.8675** |
 | `run36_tapt_rdrop_holdout.log` | Task A Run 36: TAPT + R-Drop vs TAPT, one adapter, seeds 42/43 | TAPT x2 0.8619; TAPT + R-Drop x2 0.8647 (+0.003, P 0.64); **all four 0.8721**, the best Task A holdout |
+| `run38_tapt_bag_full_t2.log` | Task A Run 38, bag session 2 (TAPT seed 2, seeds 44/45), full data | completed in 4.4 h; `RECOMMENDED_a38_bag_t2.zip` (49.8% Hate) |
+| `run38_tapt_bag_full_t3.log` | Task A Run 38, bag session 3 (TAPT seed 3, seeds 46/47), full data | completed in 4.8 h; `RECOMMENDED_a38_bag_t3.zip` (52.5% Hate) |

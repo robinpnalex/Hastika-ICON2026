@@ -37,6 +37,19 @@ Every twin also writes `<run>_holdout_models_test_probs.npy`. Average those with
 full-data probabilities using `python -m hastika.common.combine_probs` to get more models.
 All eight are TAPT-only: if TAPT fails, they stop and write nothing.
 
+## FINAL RECIPES (2026-10-16): all runs complete
+
+| | Task A | Task B |
+|---|---|---|
+| base | Gemma-4-12B, 4-bit QLoRA, last-token classification head | same |
+| TAPT | 1 epoch, LoRA next-token, on labelled comment text + `offenseval_kn` | 2 epochs |
+| classifier | 3 epochs, lr 1e-4, balanced class weights, short prompt | 4 epochs |
+| ensemble | **12 models** (Run 33 x4, Run 37 x2 R-Drop, Run 38 t1-t3 x2), equal weight | **8 models** (Run 38 t1-t3 x2, Run 37 x2 R-Drop), equal weight |
+| holdout evidence | 0.8721 (vs 0.8610 without TAPT) | 0.7026-0.7056 (vs 0.6872 without TAPT) |
+
+The `combine_probs` commands are at the end of `EXPERIMENTS.md`. Every member has run;
+only the combination step is left.
+
 ## Remaining plan: as few runs as possible (2026-10-15)
 
 **Principle.** Generalise, do not tune to the holdout. Every recipe is already fixed:
@@ -57,8 +70,8 @@ the minimum needed to confirm each recipe once.
 
 | task | done | running | still to run |
 |---|---|---|---|
-| A | Runs 33 (TAPT x4), 35, **36**, 37, 38 t1, 39 t1 | -- | **bag sessions t2-t3: `task_a/38_tapt_bag_full_session2`, `_session3` (settings pre-filled)** |
-| B | Runs 36, 37, 38 t1, 39 t1 | -- | **bag sessions t2-t3: `task_b/38_tapt_bag_full_session2`, `_session3` (settings pre-filled)** |
+| A | Runs 33, 35, 36, 37, 38 t1-t3, 39 t1 | -- | nothing: all done |
+| B | Runs 36, 37, 38 t1-t3, 39 t1 | -- | nothing: all done |
 
 **Why no more holdout bag sessions.** Task A's bag holdout (Run 39 t1, 0.8675) already
 confirms that an independent TAPT run reproduces the gain. Task B gets exactly one, Run 39

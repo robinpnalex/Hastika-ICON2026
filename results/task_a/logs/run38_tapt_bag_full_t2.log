@@ -1,0 +1,442 @@
+8.6s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.6s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.6s 3 0.00s - to python to disable frozen modules.
+8.6s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+9.3s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+9.3s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+9.3s 7 0.00s - to python to disable frozen modules.
+9.3s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+12.7s 9 repo at 10069c0 feat: ready-to-run bag sessions 2 and 3 for Task A and Task B (settings pre-filled)
+15.0s 10 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 1.7 MB/s eta 0:00:00
+15.2s 11 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 1.7 MB/s eta 0:00:00
+27.5s 12 gpus: ['Tesla T4', 'Tesla T4']
+27.6s 13 task A: train 6114, holdout 1079 (815110ff24), all 7193, test 806
+27.6s 14 attached inputs:
+27.6s 15 input/  (0 files)
+29.5s 16 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.1/43.1 MB 44.1 MB/s eta 0:00:00
+29.7s 17 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.1/43.1 MB 44.1 MB/s eta 0:00:00
+58.5s 18 LLM env: transformers 5.16.1 | peft 0.20.0
+58.7s 19 LLM env: transformers 5.16.1 | peft 0.20.0
+63.4s 20 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+63.4s 21 
+63.4s 22 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+165.1s 23 [   0.0 min] start tapt_t2 on GPU 0
+225.1s 24 [   1.0 min] tapt_t2                  Loading weights:   7%|▋         | 48/677 [00:32<01:29,  7.02it/s]
+285.1s 25 [   2.0 min] tapt_t2                  Loading weights:  84%|████████▍ | 568/677 [01:32<00:13,  8.35it/s]
+345.1s 26 [   3.0 min] tapt_t2                  first step done; peak GPU memory 9.9 GB of 14.6 GB
+405.1s 27 [   4.0 min] tapt_t2                  first step done; peak GPU memory 9.9 GB of 14.6 GB
+465.1s 28 [   5.0 min] tapt_t2                  first step done; peak GPU memory 9.9 GB of 14.6 GB
+525.1s 29 [   6.0 min] tapt_t2                  first step done; peak GPU memory 9.9 GB of 14.6 GB
+585.2s 30 [   7.0 min] tapt_t2                  epoch 1 step 25/649 lm loss 7.4672 4.5 min, eta 111 min, peak 10.4 GB
+645.1s 31 [   8.0 min] tapt_t2                  epoch 1 step 25/649 lm loss 7.4672 4.5 min, eta 111 min, peak 10.4 GB
+705.2s 32 [   9.0 min] tapt_t2                  epoch 1 step 25/649 lm loss 7.4672 4.5 min, eta 111 min, peak 10.4 GB
+765.2s 33 [  10.0 min] tapt_t2                  epoch 1 step 25/649 lm loss 7.4672 4.5 min, eta 111 min, peak 10.4 GB
+825.2s 34 [  11.0 min] tapt_t2                  epoch 1 step 25/649 lm loss 7.4672 4.5 min, eta 111 min, peak 10.4 GB
+885.2s 35 [  12.0 min] tapt_t2                  epoch 1 step 50/649 lm loss 6.7926 8.9 min, eta 106 min, peak 10.4 GB
+945.2s 36 [  13.0 min] tapt_t2                  epoch 1 step 50/649 lm loss 6.7926 8.9 min, eta 106 min, peak 10.4 GB
+1005.2s 37 [  14.0 min] tapt_t2                  epoch 1 step 50/649 lm loss 6.7926 8.9 min, eta 106 min, peak 10.4 GB
+1065.2s 38 [  15.0 min] tapt_t2                  epoch 1 step 50/649 lm loss 6.7926 8.9 min, eta 106 min, peak 10.4 GB
+1125.2s 39 [  16.0 min] tapt_t2                  epoch 1 step 75/649 lm loss 6.4909 13.2 min, eta 101 min, peak 10.4 GB
+1185.2s 40 [  17.0 min] tapt_t2                  epoch 1 step 75/649 lm loss 6.4909 13.2 min, eta 101 min, peak 10.4 GB
+1245.2s 41 [  18.0 min] tapt_t2                  epoch 1 step 75/649 lm loss 6.4909 13.2 min, eta 101 min, peak 10.4 GB
+1305.2s 42 [  19.0 min] tapt_t2                  epoch 1 step 75/649 lm loss 6.4909 13.2 min, eta 101 min, peak 10.4 GB
+1365.2s 43 [  20.0 min] tapt_t2                  epoch 1 step 100/649 lm loss 6.2788 17.5 min, eta 96 min, peak 10.4 GB
+1425.2s 44 [  21.0 min] tapt_t2                  epoch 1 step 100/649 lm loss 6.2788 17.5 min, eta 96 min, peak 10.4 GB
+1485.2s 45 [  22.0 min] tapt_t2                  epoch 1 step 100/649 lm loss 6.2788 17.5 min, eta 96 min, peak 10.4 GB
+1545.2s 46 [  23.0 min] tapt_t2                  epoch 1 step 100/649 lm loss 6.2788 17.5 min, eta 96 min, peak 10.4 GB
+1605.2s 47 [  24.0 min] tapt_t2                  epoch 1 step 100/649 lm loss 6.2788 17.5 min, eta 96 min, peak 10.4 GB
+1665.2s 48 [  25.0 min] tapt_t2                  epoch 1 step 125/649 lm loss 6.1275 21.9 min, eta 92 min, peak 10.4 GB
+1725.2s 49 [  26.0 min] tapt_t2                  epoch 1 step 125/649 lm loss 6.1275 21.9 min, eta 92 min, peak 10.4 GB
+1785.2s 50 [  27.0 min] tapt_t2                  epoch 1 step 125/649 lm loss 6.1275 21.9 min, eta 92 min, peak 10.4 GB
+1845.2s 51 [  28.0 min] tapt_t2                  epoch 1 step 125/649 lm loss 6.1275 21.9 min, eta 92 min, peak 10.4 GB
+1905.2s 52 [  29.0 min] tapt_t2                  epoch 1 step 150/649 lm loss 6.0207 26.3 min, eta 87 min, peak 10.4 GB
+1965.2s 53 [  30.0 min] tapt_t2                  epoch 1 step 150/649 lm loss 6.0207 26.3 min, eta 87 min, peak 10.4 GB
+2025.2s 54 [  31.0 min] tapt_t2                  epoch 1 step 150/649 lm loss 6.0207 26.3 min, eta 87 min, peak 10.4 GB
+2085.2s 55 [  32.0 min] tapt_t2                  epoch 1 step 150/649 lm loss 6.0207 26.3 min, eta 87 min, peak 10.4 GB
+2145.2s 56 [  33.0 min] tapt_t2                  epoch 1 step 175/649 lm loss 5.9134 30.7 min, eta 83 min, peak 10.4 GB
+2205.2s 57 [  34.0 min] tapt_t2                  epoch 1 step 175/649 lm loss 5.9134 30.7 min, eta 83 min, peak 10.4 GB
+2265.2s 58 [  35.0 min] tapt_t2                  epoch 1 step 175/649 lm loss 5.9134 30.7 min, eta 83 min, peak 10.4 GB
+2325.2s 59 [  36.0 min] tapt_t2                  epoch 1 step 175/649 lm loss 5.9134 30.7 min, eta 83 min, peak 10.4 GB
+2385.2s 60 [  37.0 min] tapt_t2                  epoch 1 step 175/649 lm loss 5.9134 30.7 min, eta 83 min, peak 10.4 GB
+2445.2s 61 [  38.0 min] tapt_t2                  epoch 1 step 200/649 lm loss 5.8364 35.1 min, eta 79 min, peak 10.4 GB
+2505.2s 62 [  39.0 min] tapt_t2                  epoch 1 step 200/649 lm loss 5.8364 35.1 min, eta 79 min, peak 10.4 GB
+2565.2s 63 [  40.0 min] tapt_t2                  epoch 1 step 200/649 lm loss 5.8364 35.1 min, eta 79 min, peak 10.4 GB
+2625.2s 64 [  41.0 min] tapt_t2                  epoch 1 step 200/649 lm loss 5.8364 35.1 min, eta 79 min, peak 10.4 GB
+2685.2s 65 [  42.0 min] tapt_t2                  epoch 1 step 225/649 lm loss 5.7874 39.4 min, eta 74 min, peak 10.4 GB
+2745.2s 66 [  43.0 min] tapt_t2                  epoch 1 step 225/649 lm loss 5.7874 39.4 min, eta 74 min, peak 10.4 GB
+2805.2s 67 [  44.0 min] tapt_t2                  epoch 1 step 225/649 lm loss 5.7874 39.4 min, eta 74 min, peak 10.4 GB
+2865.2s 68 [  45.0 min] tapt_t2                  epoch 1 step 225/649 lm loss 5.7874 39.4 min, eta 74 min, peak 10.4 GB
+2925.2s 69 [  46.0 min] tapt_t2                  epoch 1 step 225/649 lm loss 5.7874 39.4 min, eta 74 min, peak 10.4 GB
+2985.2s 70 [  47.0 min] tapt_t2                  epoch 1 step 250/649 lm loss 5.7450 43.7 min, eta 70 min, peak 10.4 GB
+3045.2s 71 [  48.0 min] tapt_t2                  epoch 1 step 250/649 lm loss 5.7450 43.7 min, eta 70 min, peak 10.4 GB
+3105.2s 72 [  49.0 min] tapt_t2                  epoch 1 step 250/649 lm loss 5.7450 43.7 min, eta 70 min, peak 10.4 GB
+3165.2s 73 [  50.0 min] tapt_t2                  epoch 1 step 250/649 lm loss 5.7450 43.7 min, eta 70 min, peak 10.4 GB
+3225.2s 74 [  51.0 min] tapt_t2                  epoch 1 step 275/649 lm loss 5.7016 48.1 min, eta 65 min, peak 10.4 GB
+3285.2s 75 [  52.0 min] tapt_t2                  epoch 1 step 275/649 lm loss 5.7016 48.1 min, eta 65 min, peak 10.4 GB
+3345.2s 76 [  53.0 min] tapt_t2                  epoch 1 step 275/649 lm loss 5.7016 48.1 min, eta 65 min, peak 10.4 GB
+3405.2s 77 [  54.0 min] tapt_t2                  epoch 1 step 275/649 lm loss 5.7016 48.1 min, eta 65 min, peak 10.4 GB
+3465.2s 78 [  55.0 min] tapt_t2                  epoch 1 step 300/649 lm loss 5.6670 52.5 min, eta 61 min, peak 10.4 GB
+3525.2s 79 [  56.0 min] tapt_t2                  epoch 1 step 300/649 lm loss 5.6670 52.5 min, eta 61 min, peak 10.4 GB
+3585.2s 80 [  57.0 min] tapt_t2                  epoch 1 step 300/649 lm loss 5.6670 52.5 min, eta 61 min, peak 10.4 GB
+3645.2s 81 [  58.0 min] tapt_t2                  epoch 1 step 300/649 lm loss 5.6670 52.5 min, eta 61 min, peak 10.4 GB
+3705.2s 82 [  59.0 min] tapt_t2                  epoch 1 step 300/649 lm loss 5.6670 52.5 min, eta 61 min, peak 10.4 GB
+3765.2s 83 [  60.0 min] tapt_t2                  epoch 1 step 325/649 lm loss 5.6374 56.9 min, eta 57 min, peak 10.4 GB
+3825.2s 84 [  61.0 min] tapt_t2                  epoch 1 step 325/649 lm loss 5.6374 56.9 min, eta 57 min, peak 10.4 GB
+3885.2s 85 [  62.0 min] tapt_t2                  epoch 1 step 325/649 lm loss 5.6374 56.9 min, eta 57 min, peak 10.4 GB
+3945.2s 86 [  63.0 min] tapt_t2                  epoch 1 step 325/649 lm loss 5.6374 56.9 min, eta 57 min, peak 10.4 GB
+4005.2s 87 [  64.0 min] tapt_t2                  epoch 1 step 350/649 lm loss 5.6052 61.3 min, eta 52 min, peak 10.4 GB
+4065.2s 88 [  65.0 min] tapt_t2                  epoch 1 step 350/649 lm loss 5.6052 61.3 min, eta 52 min, peak 10.4 GB
+4125.2s 89 [  66.0 min] tapt_t2                  epoch 1 step 350/649 lm loss 5.6052 61.3 min, eta 52 min, peak 10.4 GB
+4185.2s 90 [  67.0 min] tapt_t2                  epoch 1 step 350/649 lm loss 5.6052 61.3 min, eta 52 min, peak 10.4 GB
+4245.2s 91 [  68.0 min] tapt_t2                  epoch 1 step 375/649 lm loss 5.5711 65.7 min, eta 48 min, peak 10.4 GB
+4305.2s 92 [  69.0 min] tapt_t2                  epoch 1 step 375/649 lm loss 5.5711 65.7 min, eta 48 min, peak 10.4 GB
+4365.2s 93 [  70.0 min] tapt_t2                  epoch 1 step 375/649 lm loss 5.5711 65.7 min, eta 48 min, peak 10.4 GB
+4425.2s 94 [  71.0 min] tapt_t2                  epoch 1 step 375/649 lm loss 5.5711 65.7 min, eta 48 min, peak 10.4 GB
+4485.2s 95 [  72.0 min] tapt_t2                  epoch 1 step 375/649 lm loss 5.5711 65.7 min, eta 48 min, peak 10.4 GB
+4545.2s 96 [  73.0 min] tapt_t2                  epoch 1 step 400/649 lm loss 5.5454 70.1 min, eta 44 min, peak 10.4 GB
+4605.2s 97 [  74.0 min] tapt_t2                  epoch 1 step 400/649 lm loss 5.5454 70.1 min, eta 44 min, peak 10.4 GB
+4665.2s 98 [  75.0 min] tapt_t2                  epoch 1 step 400/649 lm loss 5.5454 70.1 min, eta 44 min, peak 10.4 GB
+4725.2s 99 [  76.0 min] tapt_t2                  epoch 1 step 400/649 lm loss 5.5454 70.1 min, eta 44 min, peak 10.4 GB
+4785.2s 100 [  77.0 min] tapt_t2                  epoch 1 step 425/649 lm loss 5.5178 74.5 min, eta 39 min, peak 10.4 GB
+4845.2s 101 [  78.0 min] tapt_t2                  epoch 1 step 425/649 lm loss 5.5178 74.5 min, eta 39 min, peak 10.4 GB
+4905.2s 102 [  79.0 min] tapt_t2                  epoch 1 step 425/649 lm loss 5.5178 74.5 min, eta 39 min, peak 10.4 GB
+4965.2s 103 [  80.0 min] tapt_t2                  epoch 1 step 425/649 lm loss 5.5178 74.5 min, eta 39 min, peak 10.4 GB
+5025.2s 104 [  81.0 min] tapt_t2                  epoch 1 step 425/649 lm loss 5.5178 74.5 min, eta 39 min, peak 10.4 GB
+5085.2s 105 [  82.0 min] tapt_t2                  epoch 1 step 450/649 lm loss 5.4899 78.9 min, eta 35 min, peak 10.4 GB
+5145.2s 106 [  83.0 min] tapt_t2                  epoch 1 step 450/649 lm loss 5.4899 78.9 min, eta 35 min, peak 10.4 GB
+5205.3s 107 [  84.0 min] tapt_t2                  epoch 1 step 450/649 lm loss 5.4899 78.9 min, eta 35 min, peak 10.4 GB
+5265.3s 108 [  85.0 min] tapt_t2                  epoch 1 step 450/649 lm loss 5.4899 78.9 min, eta 35 min, peak 10.4 GB
+5325.3s 109 [  86.0 min] tapt_t2                  epoch 1 step 475/649 lm loss 5.4672 83.2 min, eta 30 min, peak 10.4 GB
+5385.3s 110 [  87.0 min] tapt_t2                  epoch 1 step 475/649 lm loss 5.4672 83.2 min, eta 30 min, peak 10.4 GB
+5445.3s 111 [  88.0 min] tapt_t2                  epoch 1 step 475/649 lm loss 5.4672 83.2 min, eta 30 min, peak 10.4 GB
+5505.3s 112 [  89.0 min] tapt_t2                  epoch 1 step 475/649 lm loss 5.4672 83.2 min, eta 30 min, peak 10.4 GB
+5565.3s 113 [  90.0 min] tapt_t2                  epoch 1 step 500/649 lm loss 5.4497 87.5 min, eta 26 min, peak 10.4 GB
+5625.3s 114 [  91.0 min] tapt_t2                  epoch 1 step 500/649 lm loss 5.4497 87.5 min, eta 26 min, peak 10.4 GB
+5685.3s 115 [  92.0 min] tapt_t2                  epoch 1 step 500/649 lm loss 5.4497 87.5 min, eta 26 min, peak 10.4 GB
+5745.3s 116 [  93.0 min] tapt_t2                  epoch 1 step 500/649 lm loss 5.4497 87.5 min, eta 26 min, peak 10.4 GB
+5805.3s 117 [  94.0 min] tapt_t2                  epoch 1 step 500/649 lm loss 5.4497 87.5 min, eta 26 min, peak 10.4 GB
+5865.3s 118 [  95.0 min] tapt_t2                  epoch 1 step 525/649 lm loss 5.4294 91.9 min, eta 22 min, peak 10.4 GB
+5925.3s 119 [  96.0 min] tapt_t2                  epoch 1 step 525/649 lm loss 5.4294 91.9 min, eta 22 min, peak 10.4 GB
+5985.3s 120 [  97.0 min] tapt_t2                  epoch 1 step 525/649 lm loss 5.4294 91.9 min, eta 22 min, peak 10.4 GB
+6045.3s 121 [  98.0 min] tapt_t2                  epoch 1 step 525/649 lm loss 5.4294 91.9 min, eta 22 min, peak 10.4 GB
+6105.3s 122 [  99.0 min] tapt_t2                  epoch 1 step 550/649 lm loss 5.4069 96.3 min, eta 17 min, peak 10.4 GB
+6165.3s 123 [ 100.0 min] tapt_t2                  epoch 1 step 550/649 lm loss 5.4069 96.3 min, eta 17 min, peak 10.4 GB
+6225.3s 124 [ 101.0 min] tapt_t2                  epoch 1 step 550/649 lm loss 5.4069 96.3 min, eta 17 min, peak 10.4 GB
+6285.3s 125 [ 102.0 min] tapt_t2                  epoch 1 step 550/649 lm loss 5.4069 96.3 min, eta 17 min, peak 10.4 GB
+6345.3s 126 [ 103.0 min] tapt_t2                  epoch 1 step 575/649 lm loss 5.3842 100.7 min, eta 13 min, peak 10.4 GB
+6405.3s 127 [ 104.0 min] tapt_t2                  epoch 1 step 575/649 lm loss 5.3842 100.7 min, eta 13 min, peak 10.4 GB
+6465.3s 128 [ 105.0 min] tapt_t2                  epoch 1 step 575/649 lm loss 5.3842 100.7 min, eta 13 min, peak 10.4 GB
+6525.3s 129 [ 106.0 min] tapt_t2                  epoch 1 step 575/649 lm loss 5.3842 100.7 min, eta 13 min, peak 10.4 GB
+6585.3s 130 [ 107.0 min] tapt_t2                  epoch 1 step 575/649 lm loss 5.3842 100.7 min, eta 13 min, peak 10.4 GB
+6645.3s 131 [ 108.0 min] tapt_t2                  epoch 1 step 600/649 lm loss 5.3676 105.1 min, eta 9 min, peak 10.4 GB
+6705.3s 132 [ 109.0 min] tapt_t2                  epoch 1 step 600/649 lm loss 5.3676 105.1 min, eta 9 min, peak 10.4 GB
+6765.3s 133 [ 110.0 min] tapt_t2                  epoch 1 step 600/649 lm loss 5.3676 105.1 min, eta 9 min, peak 10.4 GB
+6825.3s 134 [ 111.0 min] tapt_t2                  epoch 1 step 600/649 lm loss 5.3676 105.1 min, eta 9 min, peak 10.4 GB
+6885.3s 135 [ 112.0 min] tapt_t2                  epoch 1 step 625/649 lm loss 5.3510 109.5 min, eta 4 min, peak 10.4 GB
+6945.3s 136 [ 113.0 min] tapt_t2                  epoch 1 step 625/649 lm loss 5.3510 109.5 min, eta 4 min, peak 10.4 GB
+7005.3s 137 [ 114.0 min] tapt_t2                  epoch 1 step 625/649 lm loss 5.3510 109.5 min, eta 4 min, peak 10.4 GB
+7065.3s 138 [ 115.0 min] tapt_t2                  epoch 1 step 625/649 lm loss 5.3510 109.5 min, eta 4 min, peak 10.4 GB
+7125.3s 139 [ 116.0 min] done tapt_t2; log /kaggle/working/a38_outputs/logs/tapt_t2.log
+7125.3s 140 [ 116.0 min] queued t2_s44
+7125.3s 141 [ 116.0 min] queued t2_s45
+7125.3s 142 [ 116.0 min] start t2_s44 on GPU 1
+7125.3s 143 [ 116.0 min] start t2_s45 on GPU 0
+7185.3s 144 [ 117.0 min] t2_s44                   Loading weights:  35%|███▌      | 238/677 [00:41<00:45,  9.65it/s]
+7185.3s 145 [ 117.0 min] t2_s45                   Loading weights:  35%|███▌      | 238/677 [00:41<00:45,  9.61it/s]
+7245.3s 146 [ 118.0 min] t2_s44                   Loading weights: 100%|██████████| 677/677 [01:40<00:00,  6.72it/s]
+7245.3s 147 [ 118.0 min] t2_s45                   Loading weights: 100%|██████████| 677/677 [01:40<00:00,  6.72it/s]
+7305.3s 148 [ 119.0 min] t2_s44                     sched.step()
+7305.3s 149 [ 119.0 min] t2_s45                     sched.step()
+7365.3s 150 [ 120.0 min] t2_s44                     sched.step()
+7365.3s 151 [ 120.0 min] t2_s45                     sched.step()
+7425.3s 152 [ 121.0 min] t2_s44                   epoch 1 step 25/1350 loss 0.9630 2.2 min, eta 117 min, peak 9.1 GB
+7425.3s 153 [ 121.0 min] t2_s45                   epoch 1 step 25/1350 loss 0.7208 2.3 min, eta 121 min, peak 8.8 GB
+7485.3s 154 [ 122.0 min] t2_s44                   epoch 1 step 25/1350 loss 0.9630 2.2 min, eta 117 min, peak 9.1 GB
+7485.3s 155 [ 122.0 min] t2_s45                   epoch 1 step 25/1350 loss 0.7208 2.3 min, eta 121 min, peak 8.8 GB
+7545.3s 156 [ 123.0 min] t2_s44                   epoch 1 step 50/1350 loss 0.8048 4.7 min, eta 122 min, peak 9.6 GB
+7545.3s 157 [ 123.0 min] t2_s45                   epoch 1 step 50/1350 loss 0.6815 4.7 min, eta 123 min, peak 9.4 GB
+7605.3s 158 [ 124.0 min] t2_s44                   epoch 1 step 50/1350 loss 0.8048 4.7 min, eta 122 min, peak 9.6 GB
+7605.3s 159 [ 124.0 min] t2_s45                   epoch 1 step 50/1350 loss 0.6815 4.7 min, eta 123 min, peak 9.4 GB
+7665.3s 160 [ 125.0 min] t2_s44                   epoch 1 step 50/1350 loss 0.8048 4.7 min, eta 122 min, peak 9.6 GB
+7665.3s 161 [ 125.0 min] t2_s45                   epoch 1 step 50/1350 loss 0.6815 4.7 min, eta 123 min, peak 9.4 GB
+7725.3s 162 [ 126.0 min] t2_s44                   epoch 1 step 75/1350 loss 0.8000 7.3 min, eta 125 min, peak 9.8 GB
+7725.3s 163 [ 126.0 min] t2_s45                   epoch 1 step 75/1350 loss 0.6660 7.6 min, eta 129 min, peak 9.9 GB
+7785.3s 164 [ 127.0 min] t2_s44                   epoch 1 step 75/1350 loss 0.8000 7.3 min, eta 125 min, peak 9.8 GB
+7785.3s 165 [ 127.0 min] t2_s45                   epoch 1 step 75/1350 loss 0.6660 7.6 min, eta 129 min, peak 9.9 GB
+7845.3s 166 [ 128.0 min] t2_s44                   epoch 1 step 100/1350 loss 0.7264 9.9 min, eta 123 min, peak 9.8 GB
+7845.3s 167 [ 128.0 min] t2_s45                   epoch 1 step 100/1350 loss 0.6374 9.9 min, eta 123 min, peak 9.9 GB
+7905.4s 168 [ 129.0 min] t2_s44                   epoch 1 step 100/1350 loss 0.7264 9.9 min, eta 123 min, peak 9.8 GB
+7905.4s 169 [ 129.0 min] t2_s45                   epoch 1 step 100/1350 loss 0.6374 9.9 min, eta 123 min, peak 9.9 GB
+7965.4s 170 [ 130.0 min] t2_s44                   epoch 1 step 100/1350 loss 0.7264 9.9 min, eta 123 min, peak 9.8 GB
+7965.4s 171 [ 130.0 min] t2_s45                   epoch 1 step 100/1350 loss 0.6374 9.9 min, eta 123 min, peak 9.9 GB
+8025.4s 172 [ 131.0 min] t2_s44                   epoch 1 step 125/1350 loss 0.6950 12.3 min, eta 121 min, peak 9.8 GB
+8025.4s 173 [ 131.0 min] t2_s45                   epoch 1 step 125/1350 loss 0.6234 12.4 min, eta 122 min, peak 9.9 GB
+8085.4s 174 [ 132.0 min] t2_s44                   epoch 1 step 125/1350 loss 0.6950 12.3 min, eta 121 min, peak 9.8 GB
+8085.4s 175 [ 132.0 min] t2_s45                   epoch 1 step 125/1350 loss 0.6234 12.4 min, eta 122 min, peak 9.9 GB
+8145.4s 176 [ 133.0 min] t2_s44                   epoch 1 step 150/1350 loss 0.6734 14.6 min, eta 117 min, peak 9.8 GB
+8145.4s 177 [ 133.0 min] t2_s45                   epoch 1 step 125/1350 loss 0.6234 12.4 min, eta 122 min, peak 9.9 GB
+8205.4s 178 [ 134.0 min] t2_s44                   epoch 1 step 150/1350 loss 0.6734 14.6 min, eta 117 min, peak 9.8 GB
+8205.4s 179 [ 134.0 min] t2_s45                   epoch 1 step 150/1350 loss 0.6172 15.4 min, eta 123 min, peak 10.0 GB
+8265.4s 180 [ 135.0 min] t2_s44                   epoch 1 step 150/1350 loss 0.6734 14.6 min, eta 117 min, peak 9.8 GB
+8265.4s 181 [ 135.0 min] t2_s45                   epoch 1 step 150/1350 loss 0.6172 15.4 min, eta 123 min, peak 10.0 GB
+8325.4s 182 [ 136.0 min] t2_s44                   epoch 1 step 175/1350 loss 0.6482 17.2 min, eta 115 min, peak 9.8 GB
+8325.4s 183 [ 136.0 min] t2_s45                   epoch 1 step 175/1350 loss 0.6144 17.8 min, eta 119 min, peak 10.0 GB
+8385.4s 184 [ 137.0 min] t2_s44                   epoch 1 step 175/1350 loss 0.6482 17.2 min, eta 115 min, peak 9.8 GB
+8385.4s 185 [ 137.0 min] t2_s45                   epoch 1 step 175/1350 loss 0.6144 17.8 min, eta 119 min, peak 10.0 GB
+8445.4s 186 [ 138.0 min] t2_s44                   epoch 1 step 175/1350 loss 0.6482 17.2 min, eta 115 min, peak 9.8 GB
+8445.4s 187 [ 138.0 min] t2_s45                   epoch 1 step 175/1350 loss 0.6144 17.8 min, eta 119 min, peak 10.0 GB
+8505.4s 188 [ 139.0 min] t2_s44                   epoch 1 step 200/1350 loss 0.6314 20.2 min, eta 116 min, peak 9.8 GB
+8505.4s 189 [ 139.0 min] t2_s45                   epoch 1 step 200/1350 loss 0.5985 20.4 min, eta 118 min, peak 10.0 GB
+8565.4s 190 [ 140.0 min] t2_s44                   epoch 1 step 200/1350 loss 0.6314 20.2 min, eta 116 min, peak 9.8 GB
+8565.4s 191 [ 140.0 min] t2_s45                   epoch 1 step 200/1350 loss 0.5985 20.4 min, eta 118 min, peak 10.0 GB
+8625.4s 192 [ 141.0 min] t2_s44                   epoch 1 step 200/1350 loss 0.6314 20.2 min, eta 116 min, peak 9.8 GB
+8625.4s 193 [ 141.0 min] t2_s45                   epoch 1 step 225/1350 loss 0.5881 22.9 min, eta 114 min, peak 10.0 GB
+8685.4s 194 [ 142.0 min] t2_s44                   epoch 1 step 225/1350 loss 0.6105 23.1 min, eta 116 min, peak 9.9 GB
+8685.4s 195 [ 142.0 min] t2_s45                   epoch 1 step 225/1350 loss 0.5881 22.9 min, eta 114 min, peak 10.0 GB
+8745.4s 196 [ 143.0 min] t2_s44                   epoch 1 step 225/1350 loss 0.6105 23.1 min, eta 116 min, peak 9.9 GB
+8745.4s 197 [ 143.0 min] t2_s45                   epoch 1 step 225/1350 loss 0.5881 22.9 min, eta 114 min, peak 10.0 GB
+8805.4s 198 [ 144.0 min] t2_s44                   epoch 1 step 250/1350 loss 0.5944 25.4 min, eta 112 min, peak 9.9 GB
+8805.4s 199 [ 144.0 min] t2_s45                   epoch 1 step 250/1350 loss 0.5757 25.3 min, eta 111 min, peak 10.0 GB
+8865.4s 200 [ 145.0 min] t2_s44                   epoch 1 step 250/1350 loss 0.5944 25.4 min, eta 112 min, peak 9.9 GB
+8865.4s 201 [ 145.0 min] t2_s45                   epoch 1 step 250/1350 loss 0.5757 25.3 min, eta 111 min, peak 10.0 GB
+8925.4s 202 [ 146.0 min] t2_s44                   epoch 1 step 250/1350 loss 0.5944 25.4 min, eta 112 min, peak 9.9 GB
+8925.4s 203 [ 146.0 min] t2_s45                   epoch 1 step 250/1350 loss 0.5757 25.3 min, eta 111 min, peak 10.0 GB
+8985.4s 204 [ 147.0 min] t2_s44                   epoch 1 step 275/1350 loss 0.5889 28.1 min, eta 110 min, peak 9.9 GB
+8985.4s 205 [ 147.0 min] t2_s45                   epoch 1 step 275/1350 loss 0.5677 28.0 min, eta 110 min, peak 10.0 GB
+9045.4s 206 [ 148.0 min] t2_s44                   epoch 1 step 275/1350 loss 0.5889 28.1 min, eta 110 min, peak 9.9 GB
+9045.4s 207 [ 148.0 min] t2_s45                   epoch 1 step 275/1350 loss 0.5677 28.0 min, eta 110 min, peak 10.0 GB
+9105.4s 208 [ 149.0 min] t2_s44                   epoch 1 step 300/1350 loss 0.5833 30.6 min, eta 107 min, peak 9.9 GB
+9105.4s 209 [ 149.0 min] t2_s45                   epoch 1 step 300/1350 loss 0.5544 30.4 min, eta 107 min, peak 10.0 GB
+9165.4s 210 [ 150.0 min] t2_s44                   epoch 1 step 300/1350 loss 0.5833 30.6 min, eta 107 min, peak 9.9 GB
+9165.4s 211 [ 150.0 min] t2_s45                   epoch 1 step 300/1350 loss 0.5544 30.4 min, eta 107 min, peak 10.0 GB
+9225.4s 212 [ 151.0 min] t2_s44                   epoch 1 step 300/1350 loss 0.5833 30.6 min, eta 107 min, peak 9.9 GB
+9225.4s 213 [ 151.0 min] t2_s45                   epoch 1 step 300/1350 loss 0.5544 30.4 min, eta 107 min, peak 10.0 GB
+9285.4s 214 [ 152.0 min] t2_s44                   epoch 1 step 325/1350 loss 0.5734 33.6 min, eta 106 min, peak 9.9 GB
+9285.4s 215 [ 152.0 min] t2_s45                   epoch 1 step 325/1350 loss 0.5514 33.6 min, eta 106 min, peak 10.0 GB
+9345.4s 216 [ 153.0 min] t2_s44                   epoch 1 step 325/1350 loss 0.5734 33.6 min, eta 106 min, peak 9.9 GB
+9345.4s 217 [ 153.0 min] t2_s45                   epoch 1 step 325/1350 loss 0.5514 33.6 min, eta 106 min, peak 10.0 GB
+9405.4s 218 [ 154.0 min] t2_s44                   epoch 1 step 325/1350 loss 0.5734 33.6 min, eta 106 min, peak 9.9 GB
+9405.4s 219 [ 154.0 min] t2_s45                   epoch 1 step 325/1350 loss 0.5514 33.6 min, eta 106 min, peak 10.0 GB
+9465.4s 220 [ 155.0 min] t2_s44                   epoch 1 step 350/1350 loss 0.5663 36.2 min, eta 103 min, peak 9.9 GB
+9465.4s 221 [ 155.0 min] t2_s45                   epoch 1 step 350/1350 loss 0.5546 36.5 min, eta 104 min, peak 10.0 GB
+9525.4s 222 [ 156.0 min] t2_s44                   epoch 1 step 350/1350 loss 0.5663 36.2 min, eta 103 min, peak 9.9 GB
+9525.4s 223 [ 156.0 min] t2_s45                   epoch 1 step 350/1350 loss 0.5546 36.5 min, eta 104 min, peak 10.0 GB
+9585.4s 224 [ 157.0 min] t2_s44                   epoch 1 step 350/1350 loss 0.5663 36.2 min, eta 103 min, peak 9.9 GB
+9585.4s 225 [ 157.0 min] t2_s45                   epoch 1 step 350/1350 loss 0.5546 36.5 min, eta 104 min, peak 10.0 GB
+9645.4s 226 [ 158.0 min] t2_s44                   epoch 1 step 375/1350 loss 0.5585 39.0 min, eta 101 min, peak 9.9 GB
+9645.4s 227 [ 158.0 min] t2_s45                   epoch 1 step 375/1350 loss 0.5473 39.1 min, eta 102 min, peak 10.0 GB
+9705.5s 228 [ 159.0 min] t2_s44                   epoch 1 step 375/1350 loss 0.5585 39.0 min, eta 101 min, peak 9.9 GB
+9705.5s 229 [ 159.0 min] t2_s45                   epoch 1 step 375/1350 loss 0.5473 39.1 min, eta 102 min, peak 10.0 GB
+9765.5s 230 [ 160.0 min] t2_s44                   epoch 1 step 400/1350 loss 0.5496 41.5 min, eta 99 min, peak 9.9 GB
+9765.5s 231 [ 160.0 min] t2_s45                   epoch 1 step 375/1350 loss 0.5473 39.1 min, eta 102 min, peak 10.0 GB
+9825.5s 232 [ 161.0 min] t2_s44                   epoch 1 step 400/1350 loss 0.5496 41.5 min, eta 99 min, peak 9.9 GB
+9825.5s 233 [ 161.0 min] t2_s45                   epoch 1 step 400/1350 loss 0.5396 42.0 min, eta 100 min, peak 10.0 GB
+9885.5s 234 [ 162.0 min] t2_s44                   epoch 1 step 400/1350 loss 0.5496 41.5 min, eta 99 min, peak 9.9 GB
+9885.5s 235 [ 162.0 min] t2_s45                   epoch 1 step 400/1350 loss 0.5396 42.0 min, eta 100 min, peak 10.0 GB
+9945.5s 236 [ 163.0 min] t2_s44                   epoch 1 step 425/1350 loss 0.5437 44.0 min, eta 96 min, peak 9.9 GB
+9945.5s 237 [ 163.0 min] t2_s45                   epoch 1 step 425/1350 loss 0.5339 44.7 min, eta 97 min, peak 10.0 GB
+10005.5s 238 [ 164.0 min] t2_s44                   epoch 1 step 425/1350 loss 0.5437 44.0 min, eta 96 min, peak 9.9 GB
+10005.5s 239 [ 164.0 min] t2_s45                   epoch 1 step 425/1350 loss 0.5339 44.7 min, eta 97 min, peak 10.0 GB
+10065.5s 240 [ 165.0 min] t2_s44                   epoch 1 step 450/1350 loss 0.5388 46.4 min, eta 93 min, peak 9.9 GB
+10065.5s 241 [ 165.0 min] t2_s45                   epoch 1 step 425/1350 loss 0.5339 44.7 min, eta 97 min, peak 10.0 GB
+10125.5s 242 [ 166.0 min] t2_s44                   epoch 1 step 450/1350 loss 0.5388 46.4 min, eta 93 min, peak 9.9 GB
+10125.5s 243 [ 166.0 min] t2_s45                   epoch 1 step 450/1350 loss 0.5293 47.7 min, eta 95 min, peak 10.0 GB
+10185.5s 244 [ 167.0 min] t2_s44                   epoch 1 step 450/1350 loss 0.5388 46.4 min, eta 93 min, peak 9.9 GB
+10185.5s 245 [ 167.0 min] t2_s45                   epoch 1 step 450/1350 loss 0.5293 47.7 min, eta 95 min, peak 10.0 GB
+10245.5s 246 [ 168.0 min] t2_s44                   epoch 2 step 475/1350 loss 0.3564 49.4 min, eta 91 min, peak 9.9 GB
+10245.5s 247 [ 168.0 min] t2_s45                   epoch 1 step 450/1350 loss 0.5293 47.7 min, eta 95 min, peak 10.0 GB
+10305.5s 248 [ 169.0 min] t2_s44                   epoch 2 step 475/1350 loss 0.3564 49.4 min, eta 91 min, peak 9.9 GB
+10305.5s 249 [ 169.0 min] t2_s45                   epoch 2 step 475/1350 loss 0.3283 50.8 min, eta 94 min, peak 10.0 GB
+10365.5s 250 [ 170.0 min] t2_s44                   epoch 2 step 475/1350 loss 0.3564 49.4 min, eta 91 min, peak 9.9 GB
+10365.5s 251 [ 170.0 min] t2_s45                   epoch 2 step 475/1350 loss 0.3283 50.8 min, eta 94 min, peak 10.0 GB
+10425.5s 252 [ 171.0 min] t2_s44                   epoch 2 step 500/1350 loss 0.3569 52.1 min, eta 89 min, peak 9.9 GB
+10425.5s 253 [ 171.0 min] t2_s45                   epoch 2 step 475/1350 loss 0.3283 50.8 min, eta 94 min, peak 10.0 GB
+10485.5s 254 [ 172.0 min] t2_s44                   epoch 2 step 500/1350 loss 0.3569 52.1 min, eta 89 min, peak 9.9 GB
+10485.5s 255 [ 172.0 min] t2_s45                   epoch 2 step 500/1350 loss 0.3418 53.2 min, eta 90 min, peak 10.0 GB
+10545.5s 256 [ 173.0 min] t2_s44                   epoch 2 step 500/1350 loss 0.3569 52.1 min, eta 89 min, peak 9.9 GB
+10545.5s 257 [ 173.0 min] t2_s45                   epoch 2 step 500/1350 loss 0.3418 53.2 min, eta 90 min, peak 10.0 GB
+10605.5s 258 [ 174.0 min] t2_s44                   epoch 2 step 525/1350 loss 0.3602 55.1 min, eta 87 min, peak 9.9 GB
+10605.5s 259 [ 174.0 min] t2_s45                   epoch 2 step 525/1350 loss 0.3446 55.5 min, eta 87 min, peak 10.0 GB
+10665.5s 260 [ 175.0 min] t2_s44                   epoch 2 step 525/1350 loss 0.3602 55.1 min, eta 87 min, peak 9.9 GB
+10665.5s 261 [ 175.0 min] t2_s45                   epoch 2 step 525/1350 loss 0.3446 55.5 min, eta 87 min, peak 10.0 GB
+10725.5s 262 [ 176.0 min] t2_s44                   epoch 2 step 550/1350 loss 0.3599 57.6 min, eta 84 min, peak 9.9 GB
+10725.5s 263 [ 176.0 min] t2_s45                   epoch 2 step 550/1350 loss 0.3509 57.8 min, eta 84 min, peak 10.0 GB
+10785.5s 264 [ 177.0 min] t2_s44                   epoch 2 step 550/1350 loss 0.3599 57.6 min, eta 84 min, peak 9.9 GB
+10785.5s 265 [ 177.0 min] t2_s45                   epoch 2 step 550/1350 loss 0.3509 57.8 min, eta 84 min, peak 10.0 GB
+10845.5s 266 [ 178.0 min] t2_s44                   epoch 2 step 550/1350 loss 0.3599 57.6 min, eta 84 min, peak 9.9 GB
+10845.5s 267 [ 178.0 min] t2_s45                   epoch 2 step 550/1350 loss 0.3509 57.8 min, eta 84 min, peak 10.0 GB
+10905.5s 268 [ 179.0 min] t2_s44                   epoch 2 step 575/1350 loss 0.3712 60.2 min, eta 81 min, peak 9.9 GB
+10905.5s 269 [ 179.0 min] t2_s45                   epoch 2 step 575/1350 loss 0.3543 60.3 min, eta 81 min, peak 10.0 GB
+10965.5s 270 [ 180.0 min] t2_s44                   epoch 2 step 575/1350 loss 0.3712 60.2 min, eta 81 min, peak 9.9 GB
+10965.5s 271 [ 180.0 min] t2_s45                   epoch 2 step 575/1350 loss 0.3543 60.3 min, eta 81 min, peak 10.0 GB
+11025.5s 272 [ 181.0 min] t2_s44                   epoch 2 step 600/1350 loss 0.3663 62.8 min, eta 79 min, peak 9.9 GB
+11025.5s 273 [ 181.0 min] t2_s45                   epoch 2 step 600/1350 loss 0.3495 62.6 min, eta 78 min, peak 10.0 GB
+11085.5s 274 [ 182.0 min] t2_s44                   epoch 2 step 600/1350 loss 0.3663 62.8 min, eta 79 min, peak 9.9 GB
+11085.5s 275 [ 182.0 min] t2_s45                   epoch 2 step 600/1350 loss 0.3495 62.6 min, eta 78 min, peak 10.0 GB
+11145.5s 276 [ 183.0 min] t2_s44                   epoch 2 step 600/1350 loss 0.3663 62.8 min, eta 79 min, peak 9.9 GB
+11145.5s 277 [ 183.0 min] t2_s45                   epoch 2 step 600/1350 loss 0.3495 62.6 min, eta 78 min, peak 10.0 GB
+11205.5s 278 [ 184.0 min] t2_s44                   epoch 2 step 625/1350 loss 0.3649 65.9 min, eta 76 min, peak 9.9 GB
+11205.5s 279 [ 184.0 min] t2_s45                   epoch 2 step 625/1350 loss 0.3489 65.0 min, eta 75 min, peak 10.0 GB
+11265.5s 280 [ 185.0 min] t2_s44                   epoch 2 step 625/1350 loss 0.3649 65.9 min, eta 76 min, peak 9.9 GB
+11265.5s 281 [ 185.0 min] t2_s45                   epoch 2 step 625/1350 loss 0.3489 65.0 min, eta 75 min, peak 10.0 GB
+11325.5s 282 [ 186.0 min] t2_s44                   epoch 2 step 625/1350 loss 0.3649 65.9 min, eta 76 min, peak 9.9 GB
+11325.5s 283 [ 186.0 min] t2_s45                   epoch 2 step 650/1350 loss 0.3445 67.4 min, eta 73 min, peak 10.0 GB
+11385.5s 284 [ 187.0 min] t2_s44                   epoch 2 step 650/1350 loss 0.3595 68.6 min, eta 74 min, peak 9.9 GB
+11385.5s 285 [ 187.0 min] t2_s45                   epoch 2 step 650/1350 loss 0.3445 67.4 min, eta 73 min, peak 10.0 GB
+11445.5s 286 [ 188.0 min] t2_s44                   epoch 2 step 650/1350 loss 0.3595 68.6 min, eta 74 min, peak 9.9 GB
+11445.5s 287 [ 188.0 min] t2_s45                   epoch 2 step 675/1350 loss 0.3431 69.8 min, eta 70 min, peak 10.0 GB
+11505.5s 288 [ 189.0 min] t2_s44                   epoch 2 step 650/1350 loss 0.3595 68.6 min, eta 74 min, peak 9.9 GB
+11505.5s 289 [ 189.0 min] t2_s45                   epoch 2 step 675/1350 loss 0.3431 69.8 min, eta 70 min, peak 10.0 GB
+11565.5s 290 [ 190.0 min] t2_s44                   epoch 2 step 675/1350 loss 0.3569 71.1 min, eta 71 min, peak 9.9 GB
+11565.6s 291 [ 190.0 min] t2_s45                   epoch 2 step 700/1350 loss 0.3375 72.0 min, eta 67 min, peak 10.0 GB
+11625.6s 292 [ 191.0 min] t2_s44                   epoch 2 step 675/1350 loss 0.3569 71.1 min, eta 71 min, peak 9.9 GB
+11625.6s 293 [ 191.0 min] t2_s45                   epoch 2 step 700/1350 loss 0.3375 72.0 min, eta 67 min, peak 10.0 GB
+11685.6s 294 [ 192.0 min] t2_s44                   epoch 2 step 700/1350 loss 0.3582 73.8 min, eta 69 min, peak 9.9 GB
+11685.6s 295 [ 192.0 min] t2_s45                   epoch 2 step 700/1350 loss 0.3375 72.0 min, eta 67 min, peak 10.0 GB
+11745.6s 296 [ 193.0 min] t2_s44                   epoch 2 step 700/1350 loss 0.3582 73.8 min, eta 69 min, peak 9.9 GB
+11745.6s 297 [ 193.0 min] t2_s45                   epoch 2 step 725/1350 loss 0.3393 74.4 min, eta 64 min, peak 10.0 GB
+11805.6s 298 [ 194.0 min] t2_s44                   epoch 2 step 700/1350 loss 0.3582 73.8 min, eta 69 min, peak 9.9 GB
+11805.6s 299 [ 194.0 min] t2_s45                   epoch 2 step 725/1350 loss 0.3393 74.4 min, eta 64 min, peak 10.0 GB
+11865.6s 300 [ 195.0 min] t2_s44                   epoch 2 step 725/1350 loss 0.3577 76.2 min, eta 66 min, peak 9.9 GB
+11865.6s 301 [ 195.0 min] t2_s45                   epoch 2 step 750/1350 loss 0.3414 76.7 min, eta 61 min, peak 10.0 GB
+11925.6s 302 [ 196.0 min] t2_s44                   epoch 2 step 725/1350 loss 0.3577 76.2 min, eta 66 min, peak 9.9 GB
+11925.6s 303 [ 196.0 min] t2_s45                   epoch 2 step 750/1350 loss 0.3414 76.7 min, eta 61 min, peak 10.0 GB
+11985.6s 304 [ 197.0 min] t2_s44                   epoch 2 step 725/1350 loss 0.3577 76.2 min, eta 66 min, peak 9.9 GB
+11985.6s 305 [ 197.0 min] t2_s45                   epoch 2 step 750/1350 loss 0.3414 76.7 min, eta 61 min, peak 10.0 GB
+12045.6s 306 [ 198.0 min] t2_s44                   epoch 2 step 750/1350 loss 0.3589 79.0 min, eta 63 min, peak 9.9 GB
+12045.6s 307 [ 198.0 min] t2_s45                   epoch 2 step 775/1350 loss 0.3411 79.2 min, eta 59 min, peak 10.0 GB
+12105.6s 308 [ 199.0 min] t2_s44                   epoch 2 step 750/1350 loss 0.3589 79.0 min, eta 63 min, peak 9.9 GB
+12105.6s 309 [ 199.0 min] t2_s45                   epoch 2 step 775/1350 loss 0.3411 79.2 min, eta 59 min, peak 10.0 GB
+12165.6s 310 [ 200.0 min] t2_s44                   epoch 2 step 775/1350 loss 0.3587 81.6 min, eta 61 min, peak 9.9 GB
+12165.6s 311 [ 200.0 min] t2_s45                   epoch 2 step 800/1350 loss 0.3430 81.5 min, eta 56 min, peak 10.0 GB
+12225.6s 312 [ 201.0 min] t2_s44                   epoch 2 step 775/1350 loss 0.3587 81.6 min, eta 61 min, peak 9.9 GB
+12225.6s 313 [ 201.0 min] t2_s45                   epoch 2 step 800/1350 loss 0.3430 81.5 min, eta 56 min, peak 10.0 GB
+12285.6s 314 [ 202.0 min] t2_s44                   epoch 2 step 775/1350 loss 0.3587 81.6 min, eta 61 min, peak 9.9 GB
+12285.6s 315 [ 202.0 min] t2_s45                   epoch 2 step 825/1350 loss 0.3425 83.9 min, eta 53 min, peak 10.0 GB
+12345.6s 316 [ 203.0 min] t2_s44                   epoch 2 step 800/1350 loss 0.3553 84.4 min, eta 58 min, peak 9.9 GB
+12345.6s 317 [ 203.0 min] t2_s45                   epoch 2 step 825/1350 loss 0.3425 83.9 min, eta 53 min, peak 10.0 GB
+12405.6s 318 [ 204.0 min] t2_s44                   epoch 2 step 800/1350 loss 0.3553 84.4 min, eta 58 min, peak 9.9 GB
+12405.6s 319 [ 204.0 min] t2_s45                   epoch 2 step 825/1350 loss 0.3425 83.9 min, eta 53 min, peak 10.0 GB
+12465.6s 320 [ 205.0 min] t2_s44                   epoch 2 step 800/1350 loss 0.3553 84.4 min, eta 58 min, peak 9.9 GB
+12465.6s 321 [ 205.0 min] t2_s45                   epoch 2 step 850/1350 loss 0.3413 86.5 min, eta 51 min, peak 10.0 GB
+12525.6s 322 [ 206.0 min] t2_s44                   epoch 2 step 825/1350 loss 0.3537 87.1 min, eta 55 min, peak 9.9 GB
+12525.6s 323 [ 206.0 min] t2_s45                   epoch 2 step 850/1350 loss 0.3413 86.5 min, eta 51 min, peak 10.0 GB
+12585.6s 324 [ 207.0 min] t2_s44                   epoch 2 step 825/1350 loss 0.3537 87.1 min, eta 55 min, peak 9.9 GB
+12585.6s 325 [ 207.0 min] t2_s45                   epoch 2 step 850/1350 loss 0.3413 86.5 min, eta 51 min, peak 10.0 GB
+12645.6s 326 [ 208.0 min] t2_s44                   epoch 2 step 850/1350 loss 0.3480 89.3 min, eta 53 min, peak 9.9 GB
+12645.6s 327 [ 208.0 min] t2_s45                   epoch 2 step 875/1350 loss 0.3406 89.0 min, eta 48 min, peak 10.0 GB
+12705.6s 328 [ 209.0 min] t2_s44                   epoch 2 step 850/1350 loss 0.3480 89.3 min, eta 53 min, peak 9.9 GB
+12705.6s 329 [ 209.0 min] t2_s45                   epoch 2 step 875/1350 loss 0.3406 89.0 min, eta 48 min, peak 10.0 GB
+12765.6s 330 [ 210.0 min] t2_s44                   epoch 2 step 850/1350 loss 0.3480 89.3 min, eta 53 min, peak 9.9 GB
+12765.6s 331 [ 210.0 min] t2_s45                   epoch 2 step 900/1350 loss 0.3395 91.7 min, eta 46 min, peak 10.0 GB
+12825.6s 332 [ 211.0 min] t2_s44                   epoch 2 step 875/1350 loss 0.3472 92.3 min, eta 50 min, peak 9.9 GB
+12825.6s 333 [ 211.0 min] t2_s45                   epoch 2 step 900/1350 loss 0.3395 91.7 min, eta 46 min, peak 10.0 GB
+12885.6s 334 [ 212.0 min] t2_s44                   epoch 2 step 875/1350 loss 0.3472 92.3 min, eta 50 min, peak 9.9 GB
+12885.6s 335 [ 212.0 min] t2_s45                   epoch 2 step 900/1350 loss 0.3395 91.7 min, eta 46 min, peak 10.0 GB
+12945.6s 336 [ 213.0 min] t2_s44                   epoch 2 step 875/1350 loss 0.3472 92.3 min, eta 50 min, peak 9.9 GB
+12945.6s 337 [ 213.0 min] t2_s45                   epoch 3 step 925/1350 loss 0.2015 94.1 min, eta 43 min, peak 10.0 GB
+13005.6s 338 [ 214.0 min] t2_s44                   epoch 2 step 900/1350 loss 0.3480 95.6 min, eta 48 min, peak 9.9 GB
+13005.6s 339 [ 214.0 min] t2_s45                   epoch 3 step 925/1350 loss 0.2015 94.1 min, eta 43 min, peak 10.0 GB
+13065.6s 340 [ 215.0 min] t2_s44                   epoch 2 step 900/1350 loss 0.3480 95.6 min, eta 48 min, peak 9.9 GB
+13065.6s 341 [ 215.0 min] t2_s45                   epoch 3 step 950/1350 loss 0.2092 96.4 min, eta 41 min, peak 10.0 GB
+13125.6s 342 [ 216.0 min] t2_s44                   epoch 3 step 925/1350 loss 0.2222 97.9 min, eta 45 min, peak 9.9 GB
+13125.6s 343 [ 216.0 min] t2_s45                   epoch 3 step 950/1350 loss 0.2092 96.4 min, eta 41 min, peak 10.0 GB
+13185.6s 344 [ 217.0 min] t2_s44                   epoch 3 step 925/1350 loss 0.2222 97.9 min, eta 45 min, peak 9.9 GB
+13185.6s 345 [ 217.0 min] t2_s45                   epoch 3 step 975/1350 loss 0.2022 98.8 min, eta 38 min, peak 10.0 GB
+13245.6s 346 [ 218.0 min] t2_s44                   epoch 3 step 925/1350 loss 0.2222 97.9 min, eta 45 min, peak 9.9 GB
+13245.6s 347 [ 218.0 min] t2_s45                   epoch 3 step 975/1350 loss 0.2022 98.8 min, eta 38 min, peak 10.0 GB
+13305.6s 348 [ 219.0 min] t2_s44                   epoch 3 step 950/1350 loss 0.2164 100.7 min, eta 42 min, peak 9.9 GB
+13305.6s 349 [ 219.0 min] t2_s45                   epoch 3 step 975/1350 loss 0.2022 98.8 min, eta 38 min, peak 10.0 GB
+13365.6s 350 [ 220.0 min] t2_s44                   epoch 3 step 950/1350 loss 0.2164 100.7 min, eta 42 min, peak 9.9 GB
+13365.6s 351 [ 220.0 min] t2_s45                   epoch 3 step 1000/1350 loss 0.2017 101.1 min, eta 35 min, peak 10.0 GB
+13425.6s 352 [ 221.0 min] t2_s44                   epoch 3 step 950/1350 loss 0.2164 100.7 min, eta 42 min, peak 9.9 GB
+13425.6s 353 [ 221.0 min] t2_s45                   epoch 3 step 1000/1350 loss 0.2017 101.1 min, eta 35 min, peak 10.0 GB
+13485.6s 354 [ 222.0 min] t2_s44                   epoch 3 step 975/1350 loss 0.2149 103.2 min, eta 40 min, peak 9.9 GB
+13485.6s 355 [ 222.0 min] t2_s45                   epoch 3 step 1025/1350 loss 0.1957 103.6 min, eta 33 min, peak 10.0 GB
+13545.6s 356 [ 223.0 min] t2_s44                   epoch 3 step 975/1350 loss 0.2149 103.2 min, eta 40 min, peak 9.9 GB
+13545.6s 357 [ 223.0 min] t2_s45                   epoch 3 step 1025/1350 loss 0.1957 103.6 min, eta 33 min, peak 10.0 GB
+13605.7s 358 [ 224.0 min] t2_s44                   epoch 3 step 1000/1350 loss 0.2142 105.8 min, eta 37 min, peak 9.9 GB
+13605.7s 359 [ 224.0 min] t2_s45                   epoch 3 step 1050/1350 loss 0.1970 105.9 min, eta 30 min, peak 10.0 GB
+13665.7s 360 [ 225.0 min] t2_s44                   epoch 3 step 1000/1350 loss 0.2142 105.8 min, eta 37 min, peak 9.9 GB
+13665.7s 361 [ 225.0 min] t2_s45                   epoch 3 step 1050/1350 loss 0.1970 105.9 min, eta 30 min, peak 10.0 GB
+13725.7s 362 [ 226.0 min] t2_s44                   epoch 3 step 1000/1350 loss 0.2142 105.8 min, eta 37 min, peak 9.9 GB
+13725.7s 363 [ 226.0 min] t2_s45                   epoch 3 step 1050/1350 loss 0.1970 105.9 min, eta 30 min, peak 10.0 GB
+13785.7s 364 [ 227.0 min] t2_s44                   epoch 3 step 1025/1350 loss 0.2141 108.3 min, eta 34 min, peak 9.9 GB
+13785.7s 365 [ 227.0 min] t2_s45                   epoch 3 step 1075/1350 loss 0.1950 108.4 min, eta 28 min, peak 10.0 GB
+13845.7s 366 [ 228.0 min] t2_s44                   epoch 3 step 1025/1350 loss 0.2141 108.3 min, eta 34 min, peak 9.9 GB
+13845.7s 367 [ 228.0 min] t2_s45                   epoch 3 step 1075/1350 loss 0.1950 108.4 min, eta 28 min, peak 10.0 GB
+13905.7s 368 [ 229.0 min] t2_s44                   epoch 3 step 1050/1350 loss 0.2158 110.7 min, eta 32 min, peak 9.9 GB
+13905.7s 369 [ 229.0 min] t2_s45                   epoch 3 step 1100/1350 loss 0.1937 110.9 min, eta 25 min, peak 10.0 GB
+13965.7s 370 [ 230.0 min] t2_s44                   epoch 3 step 1050/1350 loss 0.2158 110.7 min, eta 32 min, peak 9.9 GB
+13965.7s 371 [ 230.0 min] t2_s45                   epoch 3 step 1100/1350 loss 0.1937 110.9 min, eta 25 min, peak 10.0 GB
+14025.7s 372 [ 231.0 min] t2_s44                   epoch 3 step 1050/1350 loss 0.2158 110.7 min, eta 32 min, peak 9.9 GB
+14025.7s 373 [ 231.0 min] t2_s45                   epoch 3 step 1100/1350 loss 0.1937 110.9 min, eta 25 min, peak 10.0 GB
+14085.7s 374 [ 232.0 min] t2_s44                   epoch 3 step 1075/1350 loss 0.2157 113.4 min, eta 29 min, peak 9.9 GB
+14085.7s 375 [ 232.0 min] t2_s45                   epoch 3 step 1125/1350 loss 0.1928 113.2 min, eta 23 min, peak 10.0 GB
+14145.7s 376 [ 233.0 min] t2_s44                   epoch 3 step 1075/1350 loss 0.2157 113.4 min, eta 29 min, peak 9.9 GB
+14145.7s 377 [ 233.0 min] t2_s45                   epoch 3 step 1125/1350 loss 0.1928 113.2 min, eta 23 min, peak 10.0 GB
+14205.7s 378 [ 234.0 min] t2_s44                   epoch 3 step 1075/1350 loss 0.2157 113.4 min, eta 29 min, peak 9.9 GB
+14205.7s 379 [ 234.0 min] t2_s45                   epoch 3 step 1150/1350 loss 0.1939 115.7 min, eta 20 min, peak 10.0 GB
+14265.7s 380 [ 235.0 min] t2_s44                   epoch 3 step 1100/1350 loss 0.2187 116.0 min, eta 26 min, peak 9.9 GB
+14265.7s 381 [ 235.0 min] t2_s45                   epoch 3 step 1150/1350 loss 0.1939 115.7 min, eta 20 min, peak 10.0 GB
+14325.7s 382 [ 236.0 min] t2_s44                   epoch 3 step 1100/1350 loss 0.2187 116.0 min, eta 26 min, peak 9.9 GB
+14325.7s 383 [ 236.0 min] t2_s45                   epoch 3 step 1150/1350 loss 0.1939 115.7 min, eta 20 min, peak 10.0 GB
+14385.7s 384 [ 237.0 min] t2_s44                   epoch 3 step 1125/1350 loss 0.2152 118.5 min, eta 24 min, peak 9.9 GB
+14385.7s 385 [ 237.0 min] t2_s45                   epoch 3 step 1175/1350 loss 0.1934 118.2 min, eta 18 min, peak 10.0 GB
+14445.7s 386 [ 238.0 min] t2_s44                   epoch 3 step 1125/1350 loss 0.2152 118.5 min, eta 24 min, peak 9.9 GB
+14445.7s 387 [ 238.0 min] t2_s45                   epoch 3 step 1175/1350 loss 0.1934 118.2 min, eta 18 min, peak 10.0 GB
+14505.7s 388 [ 239.0 min] t2_s44                   epoch 3 step 1125/1350 loss 0.2152 118.5 min, eta 24 min, peak 9.9 GB
+14505.7s 389 [ 239.0 min] t2_s45                   epoch 3 step 1200/1350 loss 0.1955 120.5 min, eta 15 min, peak 10.0 GB
+14565.7s 390 [ 240.0 min] t2_s44                   epoch 3 step 1150/1350 loss 0.2142 121.2 min, eta 21 min, peak 9.9 GB
+14565.7s 391 [ 240.0 min] t2_s45                   epoch 3 step 1200/1350 loss 0.1955 120.5 min, eta 15 min, peak 10.0 GB
+14625.7s 392 [ 241.0 min] t2_s44                   epoch 3 step 1150/1350 loss 0.2142 121.2 min, eta 21 min, peak 9.9 GB
+14625.7s 393 [ 241.0 min] t2_s45                   epoch 3 step 1225/1350 loss 0.1937 123.0 min, eta 13 min, peak 10.0 GB
+14685.7s 394 [ 242.0 min] t2_s44                   epoch 3 step 1175/1350 loss 0.2122 123.9 min, eta 18 min, peak 9.9 GB
+14685.7s 395 [ 242.0 min] t2_s45                   epoch 3 step 1225/1350 loss 0.1937 123.0 min, eta 13 min, peak 10.0 GB
+14745.7s 396 [ 243.0 min] t2_s44                   epoch 3 step 1175/1350 loss 0.2122 123.9 min, eta 18 min, peak 9.9 GB
+14745.7s 397 [ 243.0 min] t2_s45                   epoch 3 step 1225/1350 loss 0.1937 123.0 min, eta 13 min, peak 10.0 GB
+14805.7s 398 [ 244.0 min] t2_s44                   epoch 3 step 1175/1350 loss 0.2122 123.9 min, eta 18 min, peak 9.9 GB
+14805.7s 399 [ 244.0 min] t2_s45                   epoch 3 step 1250/1350 loss 0.1933 125.3 min, eta 10 min, peak 10.0 GB
+14865.7s 400 [ 245.0 min] t2_s44                   epoch 3 step 1200/1350 loss 0.2145 126.7 min, eta 16 min, peak 9.9 GB
+14865.7s 401 [ 245.0 min] t2_s45                   epoch 3 step 1250/1350 loss 0.1933 125.3 min, eta 10 min, peak 10.0 GB
+14925.7s 402 [ 246.0 min] t2_s44                   epoch 3 step 1200/1350 loss 0.2145 126.7 min, eta 16 min, peak 9.9 GB
+14925.7s 403 [ 246.0 min] t2_s45                   epoch 3 step 1275/1350 loss 0.1928 127.7 min, eta 8 min, peak 10.0 GB
+14985.7s 404 [ 247.0 min] t2_s44                   epoch 3 step 1200/1350 loss 0.2145 126.7 min, eta 16 min, peak 9.9 GB
+14985.7s 405 [ 247.0 min] t2_s45                   epoch 3 step 1275/1350 loss 0.1928 127.7 min, eta 8 min, peak 10.0 GB
+15045.7s 406 [ 248.0 min] t2_s44                   epoch 3 step 1225/1350 loss 0.2124 129.1 min, eta 13 min, peak 9.9 GB
+15045.7s 407 [ 248.0 min] t2_s45                   epoch 3 step 1275/1350 loss 0.1928 127.7 min, eta 8 min, peak 10.0 GB
+15105.7s 408 [ 249.0 min] t2_s44                   epoch 3 step 1225/1350 loss 0.2124 129.1 min, eta 13 min, peak 9.9 GB
+15105.7s 409 [ 249.0 min] t2_s45                   epoch 3 step 1300/1350 loss 0.1928 130.2 min, eta 5 min, peak 10.0 GB
+15165.7s 410 [ 250.0 min] t2_s44                   epoch 3 step 1225/1350 loss 0.2124 129.1 min, eta 13 min, peak 9.9 GB
+15165.7s 411 [ 250.0 min] t2_s45                   epoch 3 step 1300/1350 loss 0.1928 130.2 min, eta 5 min, peak 10.0 GB
+15225.7s 412 [ 251.0 min] t2_s44                   epoch 3 step 1250/1350 loss 0.2128 132.2 min, eta 11 min, peak 9.9 GB
+15225.7s 413 [ 251.0 min] t2_s45                   epoch 3 step 1325/1350 loss 0.1923 132.9 min, eta 3 min, peak 10.0 GB
+15285.7s 414 [ 252.0 min] t2_s44                   epoch 3 step 1250/1350 loss 0.2128 132.2 min, eta 11 min, peak 9.9 GB
+15285.7s 415 [ 252.0 min] t2_s45                   epoch 3 step 1325/1350 loss 0.1923 132.9 min, eta 3 min, peak 10.0 GB
+15345.7s 416 [ 253.0 min] t2_s44                   epoch 3 step 1275/1350 loss 0.2102 134.9 min, eta 8 min, peak 9.9 GB
+15345.7s 417 [ 253.0 min] t2_s45                   epoch 3 step 1325/1350 loss 0.1923 132.9 min, eta 3 min, peak 10.0 GB
+15405.7s 418 [ 254.0 min] t2_s44                   epoch 3 step 1275/1350 loss 0.2102 134.9 min, eta 8 min, peak 9.9 GB
+15405.7s 419 [ 254.0 min] t2_s45                   epoch 3 step 1350/1350 loss 0.1898 135.4 min, eta 0 min, peak 10.0 GB
+15465.7s 420 [ 255.0 min] t2_s44                   epoch 3 step 1275/1350 loss 0.2102 134.9 min, eta 8 min, peak 9.9 GB
+15465.7s 421 [ 255.0 min] done t2_s45; log /kaggle/working/a38_outputs/logs/t2_s45.log
+15525.7s 422 [ 256.0 min] t2_s44                   epoch 3 step 1300/1350 loss 0.2087 137.6 min, eta 5 min, peak 9.9 GB
+15585.7s 423 [ 257.0 min] t2_s44                   epoch 3 step 1300/1350 loss 0.2087 137.6 min, eta 5 min, peak 9.9 GB
+15645.7s 424 [ 258.0 min] t2_s44                   epoch 3 step 1300/1350 loss 0.2087 137.6 min, eta 5 min, peak 9.9 GB
+15705.7s 425 [ 259.0 min] t2_s44                   epoch 3 step 1325/1350 loss 0.2062 140.2 min, eta 3 min, peak 9.9 GB
+15765.7s 426 [ 260.0 min] t2_s44                   epoch 3 step 1325/1350 loss 0.2062 140.2 min, eta 3 min, peak 9.9 GB
+15825.7s 427 [ 261.0 min] t2_s44                   epoch 3 step 1325/1350 loss 0.2062 140.2 min, eta 3 min, peak 9.9 GB
+15885.7s 428 [ 262.0 min] t2_s44                   epoch 3 step 1350/1350 loss 0.2051 143.3 min, eta 0 min, peak 10.0 GB
+15945.7s 429 [ 263.0 min] done t2_s44; log /kaggle/working/a38_outputs/logs/t2_s44.log
+15945.8s 430 exit codes: {'tapt_t2': 0, 't2_s45': 0, 't2_s44': 0} | 4.4 h
+15945.8s 431 RECOMMENDED_a38_bag_t2.zip  predicted/prior: Non-H 50.2%/50.9%  Hate 49.8%/49.1%
+15945.8s 432 
+15945.8s 433 combine all sessions' test probabilities locally:
+15945.8s 434 python -m hastika.common.combine_probs --task a --probs <dir1>/submissions/a38_bag_t1_test_probs.npy:2 ...
+15950.3s 435 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+15950.3s 436 cells[i][c] = re.sub('\\\\\|', '|', cell)
+15950.7s 437 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+15950.7s 438 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+15952.5s 439 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+15952.7s 440 [NbConvertApp] Writing 104448 bytes to __notebook__.ipynb
+15955.3s 441 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+15956.2s 442 [NbConvertApp] Writing 421334 bytes to __results__.html

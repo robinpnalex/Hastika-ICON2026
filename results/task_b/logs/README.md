@@ -26,6 +26,8 @@ These are the captured Kaggle logs for the completed Task B experiments:
 | `run37_tapt_rdrop_full.log` | Run 37: TAPT + R-Drop, two 4-epoch full fits | completed in 6.5 h; `RECOMMENDED_b37_gemma_tapt_rdrop.zip` |
 | `run38_tapt_bag_full_t1.log` | Run 38, bag session 1, full data | completed in 4.3 h; `RECOMMENDED_b38_bag_t1.zip` |
 | `run39_tapt_bag_holdout_t1.log` | Run 39, bag session 1, holdout | pair **0.7056**; seed 43 collapsed (all Violence) and its rerun as 1043 trained normally |
+| `run38_tapt_bag_full_t2.log` | Run 38, bag session 2 (TAPT seed 2, seeds 44/45), full data | completed in 4.4 h; `RECOMMENDED_b38_bag_t2.zip` |
+| `run38_tapt_bag_full_t3.log` | Run 38, bag session 3 (TAPT seed 3, seeds 46/47), full data | completed in 4.5 h; `RECOMMENDED_b38_bag_t3.zip` |
 
 The logs are retained as raw captured output. The corresponding experiment descriptions
 and results are recorded in `docs/EXPERIMENTS.md`.

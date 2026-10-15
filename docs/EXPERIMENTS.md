@@ -70,8 +70,8 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 35 | 2026-10-14, completed (modified copy); now regenerated | `35_tapt_final_holdout_twin.ipynb` | holdout twin of the TAPT submission | a modified 4 base + 4 TAPT run: **TAPT x4 0.8702** vs base x3 0.8582; regenerated so its holdout models also predict the test set |
 | Task A 36 | 2026-10-15, completed | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT + R-Drop 0.5 vs TAPT, seeds 42/43, same adapter | TAPT x2 0.8619, TAPT + R-Drop x2 0.8647 (+0.003, P 0.64); **all four 0.8721** (+0.010 vs TAPT x2, CI [0.000, +0.020], P 0.98) -> R-Drop models **join the average** as extra members |
 | Task A 37 | 2026-10-15, completed | `37_tapt_rdrop_final.ipynb` | full data: TAPT (1 epoch) + R-Drop 0.5, two 3-epoch seeds | `RECOMMENDED_a37_gemma_tapt_rdrop.zip` written (7.5 h); **unvalidated: Run 36 measures it** |
-| Task A 38 | session 1 completed 2026-10-15; **sessions t2-t3 still to run** | `38_tapt_bag_full.ipynb` | TAPT bag, full data | t1: `RECOMMENDED_a38_bag_t1.zip` (2 models, 4.7 h) |
-| Task A 38 s2/s3 | ready; settings pre-filled | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3: TAPT seed 2 (classifiers 44/45) and TAPT seed 3 (46/47), full data | nothing to edit; one account each |
+| Task A 38 | **completed** (sessions t1-t3, 2026-10-15/16) | `38_tapt_bag_full.ipynb` (+ `_session2`, `_session3`) | TAPT bag, full data: 3 TAPT runs x 2 classifiers | `RECOMMENDED_a38_bag_t1/t2/t3.zip`, 6 models |
+| Task A 38 s2/s3 | **completed** 2026-10-16 | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3 | 4.4 h and 4.8 h, no collapses |
 | Task A 39 | session 1 completed 2026-10-15; **no further sessions planned** | `39_tapt_bag_holdout.ipynb` | TAPT bag, holdout | t1: singles 0.8535 / 0.8610, **pair 0.8675** |
 | Task A 40 | ready; standalone | `40_qwen_second_family_holdout.ipynb` | **second model family:** Qwen3-8B-Base with Gemma's recipe, 2 seeds; Gemma + Qwen (equal weight per model) vs the best attached Gemma ensemble (Run 36's 0.8721) | paired-bootstrap verdict; full-data Qwen only if significant (~2.5 h with Run 36 attached) |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
@@ -111,8 +111,8 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task B 35 | ready; regenerated 2026-10-14 | `35_tapt_final_holdout_twin.ipynb` | holdout twin of Run 25: TAPT (2 epochs) x4 + Run 23's recipe x2 | verdict TAPT x2 vs Run 23 x2; holdout models also predict the test set (~8 h, ~6 h with Run 23 attached) |
 | Task B 36 | 2026-10-15, completed | `36_tapt_rdrop_holdout_twin.ipynb` | TAPT (2 epochs) + R-Drop vs TAPT, one adapter, seeds 42/43 | TAPT x2 0.6741; TAPT + R-Drop x2 **0.7026** (+0.029, P 0.96); all four 0.6966 (+0.023 vs TAPT x2, CI [+0.004, +0.042]) |
 | Task B 37 | 2026-10-15, completed | `37_tapt_rdrop_final.ipynb` | full data: TAPT (2 epochs) + R-Drop, two 4-epoch seeds | `RECOMMENDED_b37_gemma_tapt_rdrop.zip` (6.5 h); **joins the final average** |
-| Task B 38 | session 1 completed 2026-10-15; sessions 2-3 pending (pre-filled notebooks) | `38_tapt_bag_full.ipynb` | TAPT bag, full data | t1: `RECOMMENDED_b38_bag_t1.zip` (2 models, 4.3 h) |
-| Task B 38 s2/s3 | ready; settings pre-filled | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3: TAPT seed 2 (classifiers 44/45) and TAPT seed 3 (46/47), full data | nothing to edit; one account each |
+| Task B 38 | **completed** (sessions t1-t3, 2026-10-15/16) | `38_tapt_bag_full.ipynb` (+ `_session2`, `_session3`) | TAPT bag, full data: 3 TAPT runs (2 epochs) x 2 classifiers | `RECOMMENDED_b38_bag_t1/t2/t3.zip`, 6 models |
+| Task B 38 s2/s3 | **completed** 2026-10-16 | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3 | 4.4 h and 4.5 h, no collapses |
 | Task B 39 | session 1 completed 2026-10-15 | `39_tapt_bag_holdout.ipynb` | TAPT bag holdout, `TAPT_SEED` 1 | pair **0.7056**, the best Task B holdout pair; seed 43 collapsed and was rerun |
 
 ## Ordered next steps
@@ -1652,4 +1652,31 @@ holdout:
 |---|---|---|
 | B | Run 38 t1, t2, t3 (2 each) + Run 37 (2) | **8, from 4 TAPT runs** |
 | A | Run 33 (4) + Run 37 (2) + Run 38 t1, t2, t3 (2 each) | **12, from 5 TAPT runs** |
+
+### All runs complete (2026-10-16): the final recipes
+
+Bag sessions 2 and 3 completed for both tasks (commit `10069c0`) with no collapses. Every
+full-data member of both final ensembles now exists. Runs not recorded here are closed and
+not pursued.
+
+| | Task A | Task B |
+|---|---|---|
+| model | Gemma-4-12B, 4-bit NF4 QLoRA (LoRA r16 on attention + MLP), last-token classification head | same |
+| TAPT | LoRA next-token pretraining, **1 epoch**, on all labelled comment text + `offenseval_kn` | same, **2 epochs** |
+| classifier | **3 epochs**, lr 1e-4 (head 5e-4), effective batch 16, balanced class weights, label smoothing 0.05, short prompt, fp16 on T4 | same, **4 epochs** |
+| members | Run 33 (4 TAPT) + Run 37 (2 TAPT + R-Drop 0.5) + Run 38 t1-t3 (2 each) = **12 models from 5 TAPT runs** | Run 38 t1-t3 (2 each) + Run 37 (2 TAPT + R-Drop 0.5) = **8 models from 4 TAPT runs** |
+| combination | equal weight per model; argmax; nothing tuned on the holdout | same |
+| best holdout evidence | **0.8721** (Run 36: TAPT + TAPT/R-Drop, 4 models); 0.8702 (Run 35, TAPT x4) | **0.7056** (Run 39 t1, TAPT x2); 0.7026 (Run 36, TAPT + R-Drop x2) |
+| previous best | 0.8610 Gemma without TAPT; 0.8155 MuRIL + SVM | 0.6872 Gemma without TAPT; 0.6151 MuRIL |
+
+Build each final ZIP from the downloaded `submissions/*_test_probs.npy`:
+
+```bash
+python -m hastika.common.combine_probs --task a --out submissions/task_a/final/final_task_a.zip --probs \
+    a33_gemma_test_probs.npy:4 a37_gemma_tapt_rdrop_test_probs.npy:2 \
+    a38_bag_t1_test_probs.npy:2 a38_bag_t2_test_probs.npy:2 a38_bag_t3_test_probs.npy:2
+python -m hastika.common.combine_probs --task b --out submissions/task_b/final/final_task_b.zip --probs \
+    b38_bag_t1_test_probs.npy:2 b38_bag_t2_test_probs.npy:2 b38_bag_t3_test_probs.npy:2 \
+    b37_gemma_tapt_rdrop_test_probs.npy:2
+```
 
