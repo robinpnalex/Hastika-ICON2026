@@ -73,7 +73,7 @@ For the concise ranked list of final-submission candidates and notebook/ZIP stat
 | Task A 38 | **completed** (sessions t1-t3, 2026-10-15/16) | `38_tapt_bag_full.ipynb` (+ `_session2`, `_session3`) | TAPT bag, full data: 3 TAPT runs x 2 classifiers | `RECOMMENDED_a38_bag_t1/t2/t3.zip`, 6 models |
 | Task A 38 s2/s3 | **completed** 2026-10-16 | `38_tapt_bag_full_session2.ipynb`, `38_tapt_bag_full_session3.ipynb` | bag sessions 2 and 3 | 4.4 h and 4.8 h, no collapses |
 | Task A 39 | session 1 completed 2026-10-15; **no further sessions planned** | `39_tapt_bag_holdout.ipynb` | TAPT bag, holdout | t1: singles 0.8535 / 0.8610, **pair 0.8675** |
-| Task A 40 | ready; standalone | `40_qwen_second_family_holdout.ipynb` | **second model family:** Qwen3-8B-Base with Gemma's recipe, 2 seeds; Gemma + Qwen (equal weight per model) vs the best attached Gemma ensemble (Run 36's 0.8721) | paired-bootstrap verdict; full-data Qwen only if significant (~2.5 h with Run 36 attached) |
+| Task A 40 | **pending: to be run next** | `40_qwen_second_family_holdout.ipynb` | second model family: Qwen3-8B-Base with Gemma's recipe, 2 seeds; Gemma + Qwen (equal weight) vs the best Gemma ensemble (attach Run 36) | the last open experiment. A full-data Qwen fit, and a Task B version, only if the verdict is SIGNIFICANT |
 | Task B 1 | 2026-09-12, completed | `01_baseline_sweep.ipynb` | which encoder/loss is useful? | TAPT MuRIL `0.6013` OOF; submitted `0.5922` |
 | Task B 2 | 2026-09-13, completed | `02_fullfit_sweep.ipynb` | full-data five-seed versions | `f_tapt` scored `0.6007` on CodaBench, inferred |
 | Task B 3 | 2026-09-13--14, completed | `03_factorial_grid.ipynb` | more TAPT text, vocabulary extension, auxiliary head | `D0_V0_noaux` remained best |
@@ -1679,4 +1679,23 @@ python -m hastika.common.combine_probs --task b --out submissions/task_b/final/f
     b38_bag_t1_test_probs.npy:2 b38_bag_t2_test_probs.npy:2 b38_bag_t3_test_probs.npy:2 \
     b37_gemma_tapt_rdrop_test_probs.npy:2
 ```
+
+### Is anything left that would significantly improve the models? (2026-10-16)
+
+"Absolutely sure" is not possible. What can be said is which remaining ideas could plausibly
+move the result by more than the holdout noise (about +-1 point on Task A, +-2.5 on
+Task B), judged by what has been measured:
+
+| idea | expected effect | decision |
+|---|---|---|
+| **second model family (Qwen3-8B) in the ensemble** | the one untested source of genuinely different errors; plausibly +0.5 to +1.5 (A), +1 to +2 (B); could also be zero | **Task A Run 40, pending.** Task B and full-data versions only if it is significant |
+| add the 85%-split holdout models (Runs 36, 39) as extra members | more members, each slightly weaker; well inside the noise at 12 and 8 models | not needed |
+| more bag sessions | averaging gains shrink as members are added; 12 (A) and 8 (B) models are already in hand | not needed |
+| bigger Gemma (26B, 31B) | -- | does not fit a 15 GB T4 in 4-bit |
+| more TAPT epochs or text | Task B already runs 2 epochs. Extra *other-language* text hurt MuRIL (-0.8 to -1.0); no comparable in-domain Kanglish corpus is available | not pursued |
+| lr 2e-4, definitions prompt, LoRA rank, class weights, threshold or decode tuning | inside the noise where measured: prompt tied, sqrt class weights -0.004, decode lost every nested check. Tuning on the holdout also risks overfitting | closed |
+| pseudo-labelling test text, cross-task labels | transductive or exploit-like | excluded by the rules adopted |
+
+**Conclusion.** Apart from Run 40, the recipes above are final. Every other remaining change
+is either within noise, does not fit the hardware, or overfits the holdout.
 

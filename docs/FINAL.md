@@ -50,6 +50,12 @@ All eight are TAPT-only: if TAPT fails, they stop and write nothing.
 The `combine_probs` commands are at the end of `EXPERIMENTS.md`. Every member has run;
 only the combination step is left.
 
+**One experiment still to run: Task A Run 40** (Qwen3-8B as a second model family, holdout
+only; attach Run 36's output). Only if its verdict is SIGNIFICANT is a full-data Qwen fit
+added to the Task A ensemble, with a Task B version built the same way. Otherwise the
+recipes above are final. The review of what else could be tried, and why each is closed,
+is at the end of `EXPERIMENTS.md`.
+
 ## Remaining plan: as few runs as possible (2026-10-15)
 
 **Principle.** Generalise, do not tune to the holdout. Every recipe is already fixed:
