@@ -1,12 +1,15 @@
 # Kaggle notebooks — Task B
 
-Upload one to Kaggle, set **Accelerator** to `GPU T4 x2` and **Internet** on, then
-**Save Version -> Save & Run All**. Each clones the `task-b` branch itself, so the
-notebook file is all you upload. Never run them interactively: the session dies with the
-browser tab, and they run for hours.
+Upload one to Kaggle, set **Accelerator** to `GPU T4 x2` and **Internet** on, add a
+Kaggle secret named `HF_TOKEN` with Gemma access, then **Save Version -> Save & Run All**.
+Each clones the `task-b` branch itself, so the notebook file is all you upload. Never run
+them interactively: the session dies with the browser tab, and they run for hours.
 
 What goes into the final submission, and which runs decide it, is in
 [`../FINAL.md`](../FINAL.md). Numbering rules for two people: [`../COLLABORATION.md`](../COLLABORATION.md).
+
+**Final artifact used:** Task B Run 23, [`submissions/task_b/final/Project-MANAS_taskB.csv`](../../submissions/task_b/final/Project-MANAS_taskB.csv).
+It is the four-seed, four-epoch Gemma full-data prediction file.
 
 ## Current line: Gemma-4-12B (Runs 20-32)
 
@@ -21,7 +24,7 @@ attached, and they stop at 11 h.
 | `22_package_run21.ipynb` | 22 | Aaryan | Run 21's recipe, two full fits, packaged | done: `RECOMMENDED_b22_gemma_3ep_2seeds.zip` | ~1.5 h |
 | `23_gemma_epochs_seeds_final.ipynb` | 23 | Aaryan | 4 vs 3 epochs, then four full-data models of the winner | done: 4 epochs **0.6872** vs 0.6792; `RECOMMENDED_b23_gemma.zip` (4 models), the best Task B ZIP | ~5.7 h |
 | `24_gemma_muril_lessons.ipynb` | 24 | Aaryan | TAPT and R-Drop vs base | done: base 0.6753, R-Drop 0.6734 (inconclusive); TAPT OOM | ~3.2 h |
-| `25_gemma_final_recipe.ipynb` | 25 | Aaryan | **the final Task B fit**: four seeds on all 3,532 rows, flags from Runs 23-31 | ready; use 4 epochs, balanced weights, short prompt by default | ~3-8.5 h |
+| `25_gemma_final_recipe.ipynb` | 25 | Aaryan | optional final recipe: four seeds on all 3,532 rows, flags from Runs 23-31 | ready; not used because Run 23's final CSV was selected | ~3-8.5 h |
 | `26_gemma_lora_capacity_ablation.ipynb` | 26 | Robin | LoRA rank 8/16/32 x attention-only vs attention + MLP | ready | long: 12 fits |
 | `27_gemma_tapt_holdout.ipynb` | 27 | Robin | TAPT (LoRA next-token) then classification vs no TAPT | ready; memory and speed fixed in `llm_tapt.py`; control trained if not attached | ~6-10 h |
 | `28_gemma_prompt_lr.ipynb` | 28 | Aaryan | the organisers' category definitions in the prompt; lr 2e-4 | definitions prompt measured in Run 30; lr arm pending | ~4.5 h |

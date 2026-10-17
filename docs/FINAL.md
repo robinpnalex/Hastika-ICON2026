@@ -14,9 +14,9 @@ No cross-task label derivation, and no test text in training, TAPT or screening.
 The ranked notebook and ZIP checklist is in
 [`FINAL_SUBMISSION_NOTEBOOKS.md`](FINAL_SUBMISSION_NOTEBOOKS.md).
 
-All notebooks below run standalone on Kaggle: **GPU T4 x2, Internet on, nothing to
-attach, no token.** Each clones the latest `task-b` and stops at 11 h, so it always saves
-its outputs.
+All notebooks below run standalone on Kaggle: **GPU T4 x2, Internet on, and a Kaggle
+Hugging Face token with access to Gemma for the Gemma notebooks.** Each clones the latest
+`task-b` and stops at 11 h, so it always saves its outputs.
 
 ## Latest (2026-10-14): TAPT works
 
@@ -135,13 +135,28 @@ session per `TAPT_SEED` (1, 2, 3, 4 ...):
 Score the holdout bag with `python -m hastika.common.ensemble_curve`, and combine the
 full-data sessions with `python -m hastika.common.combine_probs`.
 
-## Where things stand (2026-10-06)
+## Final artifacts actually used (2026-10-07)
+
+The final prediction CSVs used for submission are now fixed and stored in the repository:
+
+| task | selected run | artifact | training recipe | holdout evidence |
+|---|---|---|---|---|
+| A | Run 28 | [`submissions/task_a/final/Project-MANAS_taskA.csv`](../submissions/task_a/final/Project-MANAS_taskA.csv) | Gemma-4-12B, 3 epochs, two full-data fits, seeds 42 and 43, all 7,193 labelled rows | seed 42: 0.8563 macro-F1; the two-seed blend was the submitted full-data artifact |
+| B | Run 23 | [`submissions/task_b/final/Project-MANAS_taskB.csv`](../submissions/task_b/final/Project-MANAS_taskB.csv) | Gemma-4-12B, 4 epochs, four full-data fits, seeds 42--45, all 3,532 labelled rows | 0.6872 macro-F1 on the fixed 530-row holdout |
+
+Run 28's ZIP is retained at `submissions/task_a/final/RECOMMENDED_a28_gemma.zip`.
+Run 23 generated `RECOMMENDED_b23_gemma.zip` in Kaggle, but this checkout retains the
+CSV used for submission rather than that ZIP. The higher measured Task A Run 29 blend
+(0.8610) and Task B Run 30 prompt ensemble (0.6882) were not used as final artifacts.
+
+## Historical baseline status (2026-10-06)
 
 | | Task B | Task A |
 |---|---|---|
 | model | Gemma-4-12B, 4-bit QLoRA, last-token classification head | Gemma-4-12B, same recipe |
-| holdout evidence | **0.6882 / 0.7321** macro-F1/accuracy for the four-model prompt ensemble (Run 30); +0.0052 over the standard-prompt mean, but inconclusive (CI [-0.0176, +0.0273], P=.67). Four-epoch single-prompt Gemma scored **0.6872** (Run 23). | **0.8563** (Run 28, seed 42) vs char SVM 0.8117: +0.043, CI [+0.021, +0.067]; the MuRIL-era best was 0.8155; the Gemma + SVM blend is 0.007 *worse* |
-| best ZIP already built | **`RECOMMENDED_b23_gemma.zip`** (Run 23: 4 epochs, 4 seeds, all 3,532 rows) | `RECOMMENDED_a28_gemma.zip` (Run 28, two healthy full fits) |
+| holdout evidence | **0.6882 / 0.7321** macro-F1/accuracy for the four-model prompt ensemble (Run 30); +0.0052 over the standard-prompt mean, but inconclusive (CI [-0.0176, +0.0273], P=.67). Four-epoch single-prompt Gemma scored **0.6872** (Run 23). | **0.8610 / 0.8610** macro-F1/accuracy for the 3-epoch, two-seed Gemma blend (Run 29); 4 epochs fell to 0.8452. Run 28 seed 42 alone scored 0.8563. |
+| final artifact used | **Run 23 CSV**, `submissions/task_b/final/Project-MANAS_taskB.csv` | **Run 28 CSV**, `submissions/task_a/final/Project-MANAS_taskA.csv` |
+| retained ZIP | generated in Kaggle; not retained locally | `submissions/task_a/final/RECOMMENDED_a28_gemma.zip` |
 
 ## Open questions, each answered on the holdout before the final fit
 
@@ -158,8 +173,9 @@ full-data sessions with `python -m hastika.common.combine_probs`.
 | Gemma on Task A, alone or blended with the SVM? | `task_a/28_gemma_holdout_final` | Aaryan | **done**: Gemma alone, 0.8563 | Task A model |
 | Task A: 4 epochs or 3? | `task_a/34_final_holdout_check` | Aaryan | **done**: 3 epochs (0.8610) beats 4 (0.8313) | `EPOCHS = 3` |
 | Task A: definitions prompt? | `task_a/30_gemma_definitions_prompt` | Aaryan | ready | `PROMPT` |
-| Task A: TAPT? | `task_a/31_gemma_tapt` | Aaryan | ready | `TAPT` |
+| Task A: TAPT? | `task_a/31_gemma_tapt` | Aaryan | attempted: TAPT OOM; safer retry patched, rerun pending | `TAPT` |
 | Task A: lr 2e-4? | `task_a/32_gemma_lr` | Aaryan | ready | `LR` |
+| Task A: direct full-data Run 29 reproduction? | `task_a/36_gemma_3ep_2seed_full` | Robin | ready; packages the 3-epoch, seeds 42/43 test blend | `RECOMMENDED_a36_gemma_3ep_2seeds.zip` |
 
 These are independent and can run in parallel on separate accounts.
 
@@ -169,7 +185,10 @@ rows, and exits with code 4 if one class takes more than 95% of them. Every note
 reruns such a job once with seed + 1000, and skips collapsed probabilities when reusing
 earlier outputs.
 
-## Today's plan (2026-10-06): two runs, then combine
+## Historical plan (2026-10-06): two runs, then combine
+
+This plan predates the final CSV selection recorded above. It is retained to explain the
+Run 33 and Run 32 candidate notebooks; neither replaced the selected Run 28/Run 23 CSVs.
 
 The runs most likely to improve each submission use the most reliable measured gain: more
 models averaged.
@@ -242,11 +261,32 @@ current best ZIPs, `RECOMMENDED_a28_gemma.zip` and `RECOMMENDED_b23_gemma.zip`.
    Four seeds are trained on all 3,532 rows. It writes `RECOMMENDED_b25_gemma.zip`. If
    every other flag stays at its default, Run 25 reproduces Run 23's recipe, and
    `RECOMMENDED_b23_gemma.zip` remains the packaged single-prompt fallback.
-2. **Task A.** Open `task_a/33_gemma_final_recipe` and set `EPOCHS`, `PROMPT`, `TAPT` and
-   `LR` from Task A Runs 29-32. Each flag is printed `True` when the arm beats the base
+2. **Task A.** The fastest evidence-backed final fit is `task_a/36_gemma_3ep_2seed_full`.
+   It locks the best measured Run 29 settings: 3 epochs, the short prompt, no TAPT, and
+   seeds 42 and 43. It trains on all 7,193 labelled rows and writes
+   `RECOMMENDED_a36_gemma_3ep_2seeds.zip`. It has no local test score because test labels
+   are unavailable.
+
+   The broader four-seed alternative is `task_a/33_gemma_final_recipe`; set `EPOCHS`, `PROMPT`, `TAPT` and
+   `LR` from Task A Runs 29-32. Run 31's TAPT arm has not completed, so keep `TAPT=False`
+   unless its patched rerun succeeds. Each flag is printed `True` when the arm beats the base
    with P(better) >= 0.7. Four seeds are trained on all 7,193 rows. It writes
    `RECOMMENDED_a33_gemma.zip`. Its defaults are Run 28's recipe, so it is safe to run
    unchanged.
+
+   A separate `task_a/31_gemma_tapt_full` notebook is available for a direct full-data TAPT
+   submission. It writes `RECOMMENDED_a31_gemma_tapt.zip`, but should only be used if the
+   patched Run 31 holdout experiment first demonstrates that TAPT completes and improves
+   the base.
+
+   For a direct full-data fit of the strongest measured Task A holdout recipe, use
+   `task_a/36_gemma_3ep_2seed_full`. It reproduces Run 29's 3-epoch, short-prompt,
+   no-TAPT Gemma blend with seeds 42 and 43 and writes
+   `RECOMMENDED_a36_gemma_3ep_2seeds.zip`.
+
+   `task_a/35_gemma_tapt_final_holdout` is a separate TAPT diagnostic. It is not required
+   before running Run 36; use it only if deciding whether a TAPT-based Run 33 fit is worth
+   the additional compute.
 3. **Store both** under `submissions/task_a/final/` and `submissions/task_b/final/`, each
    with the ZIP, its `predictions.csv` and a README naming the notebook, the commit and
    the holdout evidence. Record them in `docs/EXPERIMENTS.md`.

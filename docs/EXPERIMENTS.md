@@ -9,7 +9,7 @@ unless explicitly marked as a holdout or full fit; full-data fits have no local 
 * **Task B** — six-way target classification: `Gender`, `Geo-political`, `Others`,
   `Political`, `Religion`, and `Violence`.
 
-## Current status — 2026-10-05
+## Current status — 2026-10-07
 
 There is no more CodaBench scoring. **One final submission is made for both tasks**,
 decided on the fixed 15% holdouts. The runbook is [`FINAL.md`](FINAL.md), and the rules for
@@ -17,15 +17,30 @@ two people working in parallel are in [`COLLABORATION.md`](COLLABORATION.md).
 
 | item | current state |
 |---|---|
-| Task B model | **Gemma-4-12B, 4-bit QLoRA**, four-model prompt ensemble: **0.6882 / 0.7321** holdout macro-F1/accuracy (Run 30), versus **0.6830** for the two-seed standard-prompt mean; the gain is promising but inconclusive (CI [-0.0176, +0.0273], P=.67) |
-| Task A model | **Gemma-4-12B**, same recipe: **0.8563** on the 1,079-row holdout (Run 28, seed 42) vs the char SVM's 0.8117 (+0.043, CI [+0.021, +0.067]) and SVM + MuRIL's 0.8155 |
+| Task B model | **Gemma-4-12B, 4-bit QLoRA**, four-model standard-prompt fit selected for final submission (Run 23: **0.6872** holdout macro-F1); Run 30's prompt ensemble measured 0.6882 / 0.7321 but was not used |
+| Task A model | **Gemma-4-12B**, three-epoch two-seed full-data fit selected for final submission (Run 28); seed 42 scored **0.8563** on the 1,079-row holdout vs the char SVM's 0.8117 (+0.043, CI [+0.021, +0.067]) |
 | Measured and rejected on Gemma | Task B R-Drop (inconclusive, -0.002, CI [-0.027, +0.023], 2x cost); Task B square-root class weights (-0.0042, P=.41); Task A Gemma + SVM blend (-0.007); translation to English (Task A Run 20, -5.3) |
-| Being measured | Task B: LoRA capacity (26), TAPT (27), frozen-head ablation (29). Task A: epochs (29), definitions prompt (30), TAPT (31), lr (32) |
-| Final fits | Task B Run 25 (single-prompt recipe) or Run 32 (Run 30 prompt ensemble), and Task A Run 33: four seeds on all labelled rows |
+| Being measured | Task B: LoRA capacity (26), TAPT (27), frozen-head ablation (29). Task A: definitions prompt (30), TAPT (31), lr (32); the epoch choice (29) is complete |
+| Final artifacts used | Task A Run 28 CSV and Task B Run 23 CSV; both were fitted on all labelled rows and are stored under `submissions/<task>/final/` |
 | Fallback ZIPs already built | Task B `RECOMMENDED_b23_gemma.zip` (Run 23, 4-epoch four-model fit) and `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22); Task A `RECOMMENDED_a28_gemma.zip` (Run 28) |
 | Known hazard | Gemma can collapse onto one class (Task A Run 28, seed 43). The classifier exits with code 4 after epoch 1 and the notebooks rerun the job with another seed |
 | Holdouts | Task B 530 rows `f85f4f049b`; Task A 1,079 rows `815110ff24` |
 | Branch | `task-b` |
+
+### Final submission record — 2026-10-07
+
+The files actually used for the final submission are fixed here so they are not confused
+with later candidate notebooks:
+
+| task | source run | artifact | rows | recipe |
+|---|---|---|---:|---|
+| A | Run 28 | `submissions/task_a/final/Project-MANAS_taskA.csv` | 806 | Gemma-4-12B, 3 epochs, two full-data fits, seeds 42 and 43, all 7,193 labelled rows |
+| B | Run 23 | `submissions/task_b/final/Project-MANAS_taskB.csv` | 396 | Gemma-4-12B, 4 epochs, four full-data fits, seeds 42--45, all 3,532 labelled rows |
+
+Run 28's source ZIP is retained locally as `RECOMMENDED_a28_gemma.zip`. Run 23's ZIP was
+generated in Kaggle, but the final CSV is the retained artifact. Run 29 (Task A) and Run
+30 (Task B) had slightly higher measured holdout numbers but were not selected for the
+final submission.
 
 MuRIL-era CodaBench results (Task B best 0.6410, Task A best 0.8188) are kept below as a
 record.
@@ -1286,7 +1301,10 @@ existing balanced weighting and reject square-root weighting.
 
 No ZIP was produced. Uploaded execution log: [`run31_gemma_class_weight_holdout.log`](../results/task_b/logs/run31_gemma_class_weight_holdout.log).
 
-### Final-submission plan, 2026-10-06
+### Historical final-submission plan, 2026-10-06
+
+The plan below was written before the final CSVs were selected. The authoritative final
+record is the 2026-10-07 section near the top of this document.
 
 There is no CodaBench scoring from here on. **One final submission, for Task A and Task B
 together**, made from models fine-tuned on all labelled data. Every choice is therefore
@@ -1350,8 +1368,49 @@ T4 x2.
   predicted more than 95% one class exits with code 4. `run_jobs` in every Gemma notebook
   then reruns the job with seed + 1000. Reused probabilities that are collapsed are
   skipped.
-- **Next:** Runs 29-32 test epochs, the definitions prompt, TAPT and learning rate on
-  Task A. Run 33 is the final fit.
+- **Next:** Run 36 is the direct full-data fit of Run 29's best measured recipe. Run 33
+  remains the optional four-seed fit that can incorporate any successful Runs 30-32
+  improvements; Run 35 is the separate TAPT diagnostic.
+
+### Task A Run 29 result, 2026-10-06 -- three epochs beats four
+
+The fixed 1,079-row holdout was used to compare the Run 28 three-epoch recipe with four
+epochs. Both seeds completed for both arms.
+
+| arm | macro-F1 | accuracy |
+|---|---:|---:|
+| 3-epoch base, seed 42 | 0.8563 | 0.8563 |
+| 3-epoch base, seed 43 | 0.8573 | 0.8573 |
+| **3-epoch base, two-seed blend** | **0.8610** | **0.8610** |
+| 4-epoch, two-seed blend | 0.8452 | 0.8452 |
+
+The 4-epoch blend was -0.0157 below the base, with 95% CI [-0.0333, +0.0011] and
+P(better) 0.04. Keep `EPOCHS = 3` for the final Task A recipe.
+
+### Task A Run 31 result, 2026-10-06 -- TAPT did not complete
+
+The baseline arm completed on the same holdout: seed 42 scored 0.8563, seed 43 scored
+0.8573, and the two-seed average scored **0.8610**. The TAPT arm failed before training
+with CUDA out-of-memory on a 14.56-GB T4, while bitsandbytes attempted to allocate another
+114 MB. Its automatic retry then failed because it appended the classifier-only
+`--eval-bs` argument, which `llm_tapt.py` does not accept. No TAPT adapter or TAPT
+classification score was produced, so Run 31 does not justify enabling TAPT in Run 33.
+
+The logged run cloned commit `428f733`, before the later memory-safe TAPT implementation.
+Notebook 31 is now patched to start TAPT at micro-batch 2 with logit chunks of 32 and to
+retry at micro-batch 1 with chunks of 16, without `--eval-bs`. A successful TAPT rerun is
+still pending. The holdout notebook now queues `base_s42` and `base_s43` only after TAPT
+succeeds; if TAPT fails, it does not spend compute training the baseline.
+
+### Task A Run 33 uploaded log — legacy four-seed full fit
+
+The uploaded `run33_gemma_full_4seed.log` is not a completed execution of the current
+TAPT version of `33_gemma_final_recipe.ipynb`. It cloned older commit `a99bd69`, skipped
+TAPT, trained four non-TAPT Gemma classifiers (seeds 42--45) for three epochs on all
+7,193 labelled rows, and wrote `RECOMMENDED_a33_gemma.zip` in Kaggle. Its test
+`predictions.csv` is preserved under `submissions/task_a/candidates/run33_gemma/`.
+Run 33 was not selected for the final submission; Task A Run 28 was selected instead.
+
 ### Run 23 result, 2026-10-05 -- four epochs, and a four-model Task B submission
 
 Run on commit `ae088e6`, which predates the collapse guard. Run 21's output was not
@@ -1433,7 +1492,6 @@ its gradients on top of everything the classifier holds. The changes:
 | no fallback (TAPT-only) | if TAPT cannot run, the final fits (Runs 25 and 33) stop with an error and write no ZIP, and the holdout runs (A31, B34) end with an error after reporting the base. A non-TAPT model is never silently substituted |
 
 Runs 25 and 33 now default to `TAPT = True`.
-
 ### Task A Run 34 result, 2026-10-06 -- 3 epochs confirmed; 4 epochs overfits Task A
 
 The twin of "Run 28 + Run 33 at 4 epochs" trained every member on the 6,114-row split and
@@ -1612,7 +1670,6 @@ R-Drop 0.5, all 3 epochs and all from the same adapter. Run on commit `360c131`,
   equal weight. Run 36's four holdout models also predicted the test set
   (`a36_holdout_models_test_probs.npy`). They trained on 85% of the rows and are optional
   extra members.
-
 ### Task B TAPT results, 2026-10-15 -- TAPT and R-Drop lift Task B past 0.70
 
 Runs 36-39 used commits `360c131` and `5668d8e`. TAPT ran 2 epochs (134-148 min) and
@@ -1698,4 +1755,3 @@ Task B), judged by what has been measured:
 
 **Conclusion.** Apart from Run 40, the recipes above are final. Every other remaining change
 is either within noise, does not fit the hardware, or overfits the holdout.
-

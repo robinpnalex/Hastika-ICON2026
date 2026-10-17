@@ -1,8 +1,11 @@
 # Task A final submission
 
+This is the Task A prediction file actually used for the final submission on
+2026-10-07.
+
 | file | what it is |
 |---|---|
-| `Project MANAS_taskA.csv` | the submitted predictions: `id,label`, 806 rows, one per id of `data/raw/hastika_binary_test.csv` |
+| `Project-MANAS_taskA.csv` | the submitted predictions: `id,label`, 806 rows, one per id of `data/raw/hastika_binary_test.csv` |
 | `RECOMMENDED_a28_gemma.zip` | the ZIP it was extracted from, byte-identical content |
 
 **Produced by** Task A Run 28, `notebooks/task_a/28_gemma_holdout_final.ipynb`, run on
@@ -36,5 +39,5 @@ variant (0.8313) and of a 3 + 4-epoch mix (0.8563).
 
 **Newer candidate (2026-10-14):** the TAPT Run 33 ZIP, four full-data TAPT models
 (`results/task_a/logs/run33_tapt_full.log`). Its recipe scored **0.8702** on the holdout,
-above this file's 0.8610. If a later submission is allowed, use that ZIP.
-
+above this file's 0.8610. It is documented as a newer research candidate, but it was not
+used for the final submission recorded here.

@@ -1,10 +1,11 @@
 # Submissions
 
-Layout: `submissions/task_a/<name>/` and `submissions/task_b/<name>/`. Each directory holds
-the exact ZIP plus its `predictions.csv` unpacked, so the contents are diffable in git. The
-ZIP is the artifact of record; the CSV is there to be read.
+Layout: `submissions/task_a/<name>/` and `submissions/task_b/<name>/`. Experiment
+directories usually hold the exact ZIP plus its unpacked `predictions.csv`; the final
+directories hold the exact prediction CSV used for submission and a README describing
+its source. The ZIP, when retained, is the reproducibility artifact.
 
-## The final submission (from 2026-10-05)
+## Final artifacts actually used (2026-10-07)
 
 There is no more CodaBench scoring. **One final submission is made for Task A and Task B
 together**, from models fine-tuned on all labelled rows: train plus the released labelled
@@ -19,12 +20,16 @@ The notebooks that produce it are listed in [`../docs/FINAL.md`](../docs/FINAL.m
 the final ZIPs exist, store them as `task_a/final/` and `task_b/final/`. Each gets the ZIP,
 its `predictions.csv` and a README naming the notebook, the commit and the holdout evidence.
 
-The current candidates, both in Kaggle outputs and not yet copied into this folder:
+The final prediction CSVs are organized as follows:
 
-| task | ZIP | what it is | holdout |
+| task | selected run | final artifact | holdout evidence |
 |---|---|---|---|
-| B | `RECOMMENDED_b22_gemma_3ep_2seeds.zip` (Run 22) | Gemma-4-12B, 3 epochs, 2 seeds, all 3,532 rows | 0.6792 |
-| A | **submitted:** `task_a/final/Project MANAS_taskA.csv`, from `RECOMMENDED_a28_gemma.zip` (Task A Run 28) | Gemma-4-12B, 3 epochs, 2 seeds, all 7,193 rows | 0.8563 |
+| A | Run 28 | [`task_a/final/Project-MANAS_taskA.csv`](task_a/final/Project-MANAS_taskA.csv), from `RECOMMENDED_a28_gemma.zip` | 0.8563 macro-F1 for seed 42; two full-data fits used |
+| B | Run 23 | [`task_b/final/Project-MANAS_taskB.csv`](task_b/final/Project-MANAS_taskB.csv), from the four-model `RECOMMENDED_b23_gemma.zip` run | 0.6872 macro-F1; four full-data fits used |
+
+The Run 23 ZIP was generated in Kaggle but the final CSV is the artifact retained here.
+Run 29's 0.8610 Task A holdout blend and Run 30's 0.6882 Task B holdout ensemble were
+not selected because their corresponding final-data artifacts were not used.
 
 The tables below are the CodaBench history of the MuRIL era, kept as a record.
 

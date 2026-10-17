@@ -5,13 +5,18 @@ uses the same convention. Two runs share one notebook only where one notebook pr
 both: `08_muril_tfidf_ensemble.ipynb` produced Runs 8 and 9.
 
 Upload one to Kaggle, set **Accelerator** to `GPU T4 x2` and **Internet**
-on, then **Save Version -> Save & Run All**. Each clones the `task-b` branch itself, so the
-notebook file is all you upload. Never run these interactively: the session dies with the
-browser tab and most of them run for hours.
+on, add a Kaggle secret named `HF_TOKEN` with Gemma access, then **Save Version -> Save &
+Run All**. Each clones the `task-b` branch itself, so the notebook file is all you upload.
+Never run these interactively: the session dies with the browser tab and most of them run
+for hours.
 
 What goes into the final submission, and which runs decide it, is in
 [`../FINAL.md`](../FINAL.md). Numbering rules for two people are in
 [`../COLLABORATION.md`](../COLLABORATION.md).
+
+**Final artifact used:** Task A Run 28, [`submissions/task_a/final/Project-MANAS_taskA.csv`](../../submissions/task_a/final/Project-MANAS_taskA.csv).
+Run 29 had the best measured holdout blend (0.8610), but its full-data reproduction was
+not run before submission.
 
 ## Current line: Gemma-4-12B (Runs 28-33)
 
@@ -24,11 +29,12 @@ probabilities are reused when attached, and they stop at 11 h. They are generate
 |---|---|---|---|---|
 | `20_translate_to_english.ipynb` | 20 | Sarvam-Translate to English, then hateBERT, vs SVM and MuRIL | done, dead: hateBERT 0.7275 vs SVM + MuRIL 0.8155 | ~4.8 h |
 | `28_gemma_holdout_final.ipynb` | 28 | Gemma-4-12B QLoRA vs char SVM and a 50/50 blend; full fits; three ZIPs | done: **0.8563** (seed 42) vs SVM 0.8117, +0.043 CI [+0.021, +0.067]; blend -0.007; seed 43 collapsed; `RECOMMENDED_a28_gemma.zip` | ~5.2 h |
-| `29_gemma_epochs.ipynb` | 29 | 4 epochs vs 3 | ready | ~5.5 h |
+| `29_gemma_epochs.ipynb` | 29 | 4 epochs vs 3 | done: 3-epoch two-seed base **0.8610**; 4-epoch blend **0.8452**, rejected | ~6.3 h |
 | `30_gemma_definitions_prompt.ipynb` | 30 | the organisers' Hate/Non-hate definitions in the prompt | ready | ~6 h |
-| `31_gemma_tapt.ipynb` | 31 | TAPT (LoRA next-token on training text + external corpus), then classification | ready | ~6.5 h |
+| `31_gemma_tapt.ipynb` | 31 | TAPT (LoRA next-token on training text + external corpus), then classification | attempted: TAPT OOM; baseline completed at **0.8610**; safer retry committed, rerun pending | ~3.4 h so far |
+| `31_gemma_tapt_full.ipynb` | 31-final | full-data TAPT adapter, then four Gemma classifiers on all 7,193 rows | ready; writes `RECOMMENDED_a31_gemma_tapt.zip`; run only after the TAPT holdout rerun is successful | ~6-9 h |
 | `32_gemma_lr.ipynb` | 32 | learning rate 2e-4 vs 1e-4 | ready | ~5 h |
-| `33_gemma_final_recipe.ipynb` | 33 | **the final Task A fit**: four seeds on all 7,193 rows, flags from Runs 29-32 | run last | ~5-8.5 h |
+| `33_gemma_final_recipe.ipynb` | 33 | current branch: TAPT final recipe; uploaded legacy log was a separate non-TAPT four-seed full fit | uploaded legacy fit completed and produced a Kaggle ZIP; not selected | ~5-8.5 h |
 | `34_final_holdout_check.ipynb` | 34 | holdout twin of the Task A final (Run 28 + Run 33): four-model combination vs Run 28's recipe | ready | ~5.6 h (~3.2 h with Run 28 attached) |
 | `35_tapt_final_holdout_twin.ipynb` | 35 | exact holdout twin of the TAPT submission (Run 33) | ready | ~8 h |
 | `36_tapt_rdrop_holdout_twin.ipynb` | 36 | TAPT + R-Drop vs TAPT on the holdout (twin of Run 37) | ready | ~8.5 h |
@@ -40,6 +46,11 @@ probabilities are reused when attached, and they stop at 11 h. They are generate
 
 Runs 29-32 are independent of one another. Run 33's defaults (Run 28's recipe) are
 already a safe final submission.
+
+The recorded final CSV remains Task A Run 28 under
+`submissions/task_a/final/Project-MANAS_taskA.csv`. The newer TAPT Run 33 and later
+bag/R-Drop runs are research candidates documented in the ledger; they were not part of
+that recorded submission.
 
 ## MuRIL era (Runs 1-27), superseded by Gemma and kept for reproducibility
 

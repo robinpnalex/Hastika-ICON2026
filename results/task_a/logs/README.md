@@ -15,6 +15,9 @@ depending on the original upload filenames.
 | `run20_translate_to_english_failed_ai4bharat.log` | Task A Run 20 translation setup, previous attempt | failed before training because current pip rejected IndicXlit's legacy Fairseq metadata; the notebook was subsequently patched to pin pip 24.0; no model or ZIP from this attempt |
 | `run20_translate_hatebert_holdout.log` | Task A Run 20: Sarvam-Translate -> hateBERT on the 1,079-row holdout | hateBERT 0.7275 vs MuRIL 0.7803 and SVM+MuRIL 0.8155; translation line closed |
 | `run28_gemma_holdout_full.log` | Task A Run 28: Gemma-4-12B QLoRA on the 1,079-row holdout, then full fits | seed 42 **0.8563** vs char SVM 0.8117 (+0.043, CI [+0.021, +0.067]); seed 43 collapsed (all Non-Hate); both full fits healthy; `RECOMMENDED_a28_gemma.zip` |
+| `run29_gemma_epochs.log` | Task A Run 29: three versus four Gemma epochs on the fixed holdout | completed; three-epoch two-seed blend **0.8610 / 0.8610**, four-epoch blend 0.8452; no final test artifact from this notebook |
+| `run31_gemma_tapt_holdout.log` | Task A Run 31: TAPT plus Gemma classification on the fixed holdout | TAPT failed with CUDA OOM; baseline completed at **0.8610 / 0.8610**; no TAPT score or ZIP |
+| `run33_gemma_full_4seed.log` | Uploaded legacy Task A Run 33 full-data Gemma fit | four non-TAPT seeds completed and `RECOMMENDED_a33_gemma.zip` was written in Kaggle; this log predates the current TAPT version of notebook 33 and was not selected for final submission |
 | `run25_char_svm_third_member_oof.log` | Task A Run 25: char-only TF-IDF as a third member, OOF | see `docs/EXPERIMENTS.md` |
 | `run26_transductive_derivable_labels_oof.log` | Task A Run 26: derivable-label diagnostic, OOF | see `docs/EXPERIMENTS.md` |
 | `run27_run25_validation_and_test.log` | Task A Run 27: Run 25 recipe, validation and test predictions | see `docs/EXPERIMENTS.md` |
