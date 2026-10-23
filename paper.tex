@@ -1,0 +1,338 @@
+\documentclass[10pt]{article}
+
+% Rough manuscript draft. Replace the generic format and bibliography with the
+% target venue's style once the submission venue is known.
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\taska}{Task A}
+\newcommand{\taskb}{Task B}
+
+\title{Parameter-Efficient Adaptation for Kannada--English Hate Speech Classification}
+\author{\todo{Author names and affiliations}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Code-mixed social media text presents a difficult classification setting when
+the dominant language is written in a non-standard Romanized form. We study
+binary hate-speech detection and six-way hate-category classification for
+Kannada--English YouTube comments, a setting in which Kannada is commonly
+transliterated into Latin script (Kanglish). Starting from character and word
+n-gram baselines and fine-tuned MuRIL encoders, we develop a parameter-efficient
+decoder-language-model classifier. The classifier loads Gemma-4-12B in 4-bit
+NF4 quantization, adapts selected attention and MLP projections with LoRA, and
+predicts labels from a learned linear head over the final prompt-token
+representation. On fixed stratified holdouts assembled from the released
+training and labelled validation data, the recorded Gemma submissions achieve
+macro-F1 scores of 0.8563 on the binary task and 0.6872 on the six-way task.
+Subsequent holdout experiments report higher scores after task-adaptive
+next-token pretraining (TAPT) and averaging independently adapted models, up to
+0.8721 and 0.7056, respectively. We describe the training and evaluation
+pipeline, its memory-aware implementation, and the distinction between
+submitted predictions and later experiments. These results are promising
+evidence for parameter-efficient domain adaptation on small code-mixed datasets;
+they do not establish test-set performance or a general systems advantage.
+\end{abstract}
+
+\section{Introduction}
+Online hate-speech moderation must handle language mixing, spelling variation,
+and the limited labelled data available for many languages. These challenges
+are pronounced for Kannada comments written in Latin characters and mixed with
+English. A word-level representation may treat closely related spellings as
+unrelated, while a pretrained model's tokenizer may fragment the transliterated
+Kannada text.
+
+This paper studies two HASTIKA-ICON-2026 classification tasks on Kannada--English
+YouTube comments. \taska{} predicts \texttt{Hate} or \texttt{Non-Hate}; \taskb{}
+assigns one of six categories: Gender, Geo-political, Others, Political,
+Religion, or Violence. We follow a progression from sparse character and word
+features, through MuRIL fine-tuning, to a quantized decoder language model with
+parameter-efficient adaptation. We also study task-adaptive pretraining on
+unlabelled in-domain text and probability averaging across independent runs.
+
+The project began as a competition system and accumulated multiple generations
+of experiments. We therefore distinguish the predictions retained as the
+competition submissions from later research candidates. The submitted Gemma
+systems were trained on all available labelled rows after model choices were
+made on fixed holdouts. Later TAPT results are holdout measurements only; the
+repository does not contain a scored test evaluation for them.
+
+\paragraph{Contributions.} This draft makes three empirical contributions:
+(1) it documents a controlled comparison of sparse, encoder, and parameter-
+efficient decoder approaches for Romanized Kannada hate-speech classification;
+(2) it describes a memory-conscious QLoRA and TAPT pipeline usable with limited
+GPU memory; and (3) it records the effects and uncertainty of domain adaptation
+and multi-run probability averaging on two related tasks. The implementation
+details are engineering choices for this application rather than a claim of a
+new general-purpose systems architecture.
+
+\section{Task and Data}
+The corpus consists of short Kannada--English YouTube comments. Kannada is
+predominantly written in Roman characters in the data, and comments may include
+English, emoji, URLs, mentions, repeated characters, and spelling variation.
+The dataset paper and annotation protocol should be cited here
+\cite{hastika_dataset}.
+
+The labelled data used for the final fitting runs combine the original training
+partition with a subsequently released labelled validation partition. After
+the project's duplicate handling, the final fitting counts recorded in the
+methods documentation are 7,193 rows for \taska{} and 3,532 for \taskb{}. The
+fixed model-selection holdouts contain 1,079 and 530 rows, respectively. The
+test inputs contain 806 binary-task comments and 395 six-way-task comments in
+the released files. Test labels were unavailable to this project.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabularx}{\linewidth}{lXr}
+\toprule
+Task & Labels & Labelled rows for final fitting \\
+\midrule
+\taska{} & Hate, Non-Hate & 7,193 \\
+\taskb{} & Gender, Geo-political, Others, Political, Religion, Violence & 3,532 \\
+\bottomrule
+\end{tabularx}
+\caption{Task definitions and labelled data counts recorded for the final fits. Counts
+reflect the project's preprocessing and duplicate handling; confirm them against the
+official dataset release before submission.}
+\label{tab:data}
+\end{table}
+
+\section{System Overview}
+The codebase separates shared preprocessing and validation utilities from model
+implementations, task-specific training code, experiment orchestration,
+notebooks, and retained results. The supported pipeline has four stages:
+input repair and normalization; optional unlabelled-text adaptation; supervised
+training; and probability-based prediction packaging. Training and inference
+preserve comment IDs, and the packaging utility checks that each required ID is
+present exactly once and that all labels belong to the task vocabulary.
+
+\subsection{Preprocessing}
+The released CSVs contain text affected by UTF-8/Latin-1 mojibake. The shared
+cleaner attempts to reverse this encoding issue, applies \texttt{ftfy}, decodes
+HTML entities, replaces URLs and user mentions with normalized markers, and
+collapses whitespace. For MuRIL, emoji can optionally be rendered as English
+descriptions because of limited tokenizer coverage. Gemma experiments use the
+native tokenizer and do not require this step.
+
+For labelled training data, identical cleaned comments with agreeing labels are
+collapsed to one row. Groups with conflicting labels are removed as ambiguous.
+This reduces repeated weight in the loss and prevents identical text from
+crossing a fold boundary. Prediction inputs retain every original ID, including
+duplicate comments, to satisfy the data interface.
+
+\subsection{Baselines and MuRIL}
+The sparse baseline combines word and character TF--IDF n-grams with a
+LinearSVC. Character features provide a strong reference for spelling and
+morphological variation. The neural encoder line uses MuRIL with a pooled
+classification head and, depending on the experiment, layer-wise learning-rate
+decay, top-layer reinitialization, fast-gradient-method perturbations, and
+exponential moving averages. For \taskb{}, class-weighted loss addresses the
+imbalance between the six labels. Task-adaptive masked-language-model training
+on Kannada text improved the earlier MuRIL system and motivated analogous
+adaptation for the decoder model.
+
+\subsection{Quantized decoder classifier}
+The later classifier uses Gemma-4-12B as a representation encoder rather than
+generating label strings. The backbone is loaded in 4-bit NF4 with double
+quantization and fp16 computation. LoRA adapters (rank 16, alpha 32, dropout
+0.05) are applied to the attention projections
+\texttt{q\_proj}, \texttt{k\_proj}, \texttt{v\_proj}, \texttt{o\_proj} and MLP
+projections \texttt{gate\_proj}, \texttt{up\_proj}, and \texttt{down\_proj}.
+Gradient checkpointing reduces activation storage. The large token-generation
+head is omitted during classification.
+
+Each example is placed in a short task-specific prompt ending in an answer cue
+(for example, \texttt{Category:}). Let $h_i$ be the final hidden state at the
+last non-padding prompt token for example $i$. The classifier computes
+\[
+  z_i = W\,\mathrm{Dropout}(h_i) + b,
+  \qquad p_i = \mathrm{softmax}(z_i),
+\]
+where $W$ and $b$ are learned from scratch. Training uses weighted cross-entropy
+with label smoothing 0.05. The standard LoRA and head learning rates are
+$10^{-4}$ and $5\times10^{-4}$, respectively; optimization uses AdamW, a cosine
+schedule with warmup, and an effective batch size of 16 through gradient
+accumulation. The task-specific epoch counts are three for \taska{} and four
+for \taskb{} in the recorded submission recipes.
+
+\subsection{Task-adaptive pretraining}
+The decoder TAPT stage continues next-token training on unlabelled in-domain
+comments and permitted external Kannada text, using LoRA on the same decoder
+projections as the classifier. The resulting adapter initializes the supervised
+stage. The code deduplicates text and can restrict TAPT inputs through explicit
+corpus paths; evaluation/test text must not be included in a clean inductive
+comparison. For Gemma, the large vocabulary projection is applied to chunks of
+hidden states so that the full token-logit tensor need not be held in memory at
+once. This implementation detail was added after an earlier TAPT attempt
+exceeded available GPU memory.
+
+\subsection{Training safeguards and ensembling}
+Variable-length examples are grouped into length-similar minibatches to reduce
+padding. Mixed precision, gradient accumulation, gradient clipping, and
+non-finite-loss checks support training on a single accelerator. A collapse
+guard checks the first-epoch predictions and terminates a run if it predicts one
+class for nearly all sampled training examples despite a non-degenerate class
+prior. Failed or collapsed runs are excluded from probability ensembles.
+
+For ensembles, each member writes probabilities in a documented class order.
+Members are averaged before the final argmax. The final combination utility
+weights each saved probability matrix by its number of constituent models,
+checks dimensions and probability sums, and rejects collapsed members. Earlier
+MuRIL/SVM ensembles used aligned out-of-fold predictions to estimate blend
+weights; the Gemma recipes use equal weighting rather than holdout-tuned weights.
+
+\section{Experimental Protocol}
+The primary metric is macro-averaged F1, with accuracy and per-class F1 as
+secondary measures. Macro-F1 gives each category equal weight, which is
+important for \taskb{}'s minority labels. The fixed holdouts were generated
+with stratification and a shared split seed, and their IDs are fingerprinted in
+the repository so notebook runs evaluate the same examples. Older MuRIL/SVM
+experiments also use five-fold out-of-fold predictions. OOF, fixed-holdout,
+and competition scores are reported separately because they are not directly
+comparable.
+
+For paired comparisons, the project resamples holdout examples with replacement
+and reports a percentile interval for the macro-F1 difference. The holdouts are
+small, especially for the minority categories, so intervals can be wide and
+small score differences are uncertain. Multiple model seeds are used to expose
+optimization variance; seed selection based on test predictions is not used.
+
+The final submitted Gemma runs fit on the combined labelled data after choices
+were made on the fixed holdouts. Later TAPT runs used matching holdout designs
+to compare adapted models, but their results must not be presented as test-set
+scores. The experiment history includes some exploratory transductive
+experiments; those are excluded from the clean method described here and should
+be individually identified if discussed.
+
+\section{Results}
+Table~\ref{tab:results} summarizes representative measurements documented in
+the repository. Within each task, the principal comparison uses the same fixed
+holdout. These figures are draft-level until each score is cross-checked against
+its notebook output and run log.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrl}
+\toprule
+Task & System & Holdout macro-F1 & Status \\
+\midrule
+\taska{} & Character SVM & 0.8117 & Baseline \\
+\taska{} & Gemma QLoRA, one seed & 0.8563 & Recorded submission recipe \\
+\taska{} & Gemma TAPT ensemble, later run & 0.8702 & Post-submission holdout \\
+\taska{} & TAPT and R-Drop mixture, later run & 0.8721 & Post-submission holdout \\
+\midrule
+\taskb{} & MuRIL & 0.6151 & Earlier holdout reference \\
+\taskb{} & Gemma QLoRA, four-model recipe & 0.6872 & Recorded submission recipe \\
+\taskb{} & Independent TAPT pair, later run & 0.7056 & Post-submission holdout \\
+\bottomrule
+\end{tabular}
+\caption{Representative macro-F1 measurements. Rows marked as submission recipes
+describe the model-selection evidence for the systems whose prediction artifacts were
+submitted; later TAPT rows are follow-up holdout experiments, not scored test results.
+Baseline protocols should be verified for exact split matching before publication.}
+\label{tab:results}
+\end{table}
+
+The recorded Gemma submission recipes improve substantially over the earlier
+MuRIL/SVM era in the fixed-holdout comparisons. Later experiments suggest that
+TAPT can provide additional gains, but the results also reveal sensitivity to
+the initialization and seed: two Task B TAPT pairs in the ledger differ by
+several macro-F1 points. This variation argues for reporting ensembles and
+uncertainty rather than relying on a single best run. Because these later scores
+were used during iterative experimentation on fixed holdouts, they should be
+treated as development evidence and confirmed on an untouched test set or a
+new independent split before making strong generalization claims.
+
+\section{Discussion}
+Three observations motivate the system design. First, character n-gram models
+remain useful baselines for transliterated text, where surface variation can
+fragment word-level evidence. Second, broad pretrained decoder models can
+produce stronger representations than the earlier encoder and sparse models in
+this setting, even when only a small LoRA parameter set and a linear head are
+trained. Third, domain adaptation and averaging appear complementary: TAPT
+teaches the model the corpus's spelling and code-mixing patterns, while
+independent fits reduce sensitivity to a particular initialization.
+
+These observations are task- and corpus-specific. They do not establish that a
+larger decoder is always preferable, nor do they isolate model scale from
+pretraining data, tokenizer behavior, and optimization. A stronger systems
+study would measure throughput, peak memory, energy or cost, and inference
+latency under controlled hardware and matched quality targets. The current
+repository records some runtime and memory diagnostics, but it was not designed
+as a controlled hardware benchmark.
+
+\section{Limitations and Ethics}
+The released test labels are not available in this repository, so we cannot
+report final test performance. The fixed holdouts are relatively small, and the
+experiment history contains many adaptive comparisons; the best observed score
+is likely optimistic. Several candidate models and experiment summaries are
+stored as notebooks or logs rather than as complete, locally retained
+checkpoints and prediction matrices. Exact reproducibility therefore requires
+the original model access, compatible software versions, hardware, and the
+relevant notebook outputs.
+
+Hate-speech labels encode annotation decisions and may be ambiguous without
+conversation context. The project drops exact duplicate texts with conflicting
+labels for training, but this does not resolve broader label subjectivity.
+Automated hate-speech classification can cause harm through false positives,
+false negatives, or uneven performance across communities and topics. The
+system should be treated as a research artifact and not as a stand-alone
+moderation decision-maker. A responsible deployment would require human review,
+community-informed error analysis, and evaluation across dialects, demographic
+groups, and changing language use.
+
+\section{Conclusion}
+We described a small-data classification pipeline for Kannada--English
+Romanized social-media text, progressing from character n-gram and MuRIL
+baselines to 4-bit QLoRA classification with Gemma-4-12B. The retained
+competition submissions provide a reproducible historical point of comparison,
+while later holdout experiments indicate that LoRA-based TAPT and independent
+model averaging may improve both tasks. The present evidence supports further
+evaluation of parameter-efficient domain adaptation; it does not yet establish
+general systems efficiency or performance on the unlabelled test set.
+
+\section*{Reproducibility Checklist}
+Before submission, complete the following items:
+\begin{itemize}
+  \item Confirm dataset and split counts, labels, and duplicate policy against the release.
+  \item Identify exact commits, notebook versions, model revisions, and software versions.
+  \item Reconcile README, final-submission, methods, and experiment-ledger status.
+  \item Verify every reported metric, interval, and baseline split from saved outputs.
+  \item Report GPU model, per-run wall time, peak memory, and inference cost if making systems claims.
+  \item Add a complete related-work discussion and verified bibliography.
+  \item Confirm licenses, external-corpus provenance, and model access conditions.
+\end{itemize}
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+\bibitem{hastika_dataset}
+\todo{Dataset paper authors}.
+\newblock \todo{Exact title of the HASTIKA dataset paper}.
+\newblock \todo{Venue and year}. Replace with the verified citation from
+\texttt{references/hastika\_dataset\_paper.pdf}.
+
+\bibitem{muril}
+\todo{MuRIL paper authors}.
+\newblock \todo{Exact MuRIL paper title, venue, and year}.
+
+\bibitem{qlora}
+\todo{QLoRA paper authors}.
+\newblock \todo{Exact QLoRA paper title, venue, and year}.
+
+\bibitem{lora}
+\todo{LoRA paper authors}.
+\newblock \todo{Exact LoRA paper title, venue, and year}.
+\end{thebibliography}
+
+\end{document}

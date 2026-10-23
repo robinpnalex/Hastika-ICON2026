@@ -278,6 +278,57 @@ final artifacts:
 The cross-task/test-derived-label line is also excluded on methodological and
 transductive grounds. It should not be presented as part of the clean final method.
 
+### 8.1 Complete idea-status inventory
+
+The following inventory makes the coverage explicit. “Measured” means that a controlled
+run produced a score; “prepared” means that a notebook or implementation exists but it
+was not used to select the submitted system; and “not built” means the idea remained a
+proposal.
+
+| idea | task(s) | status and paper treatment |
+|---|---|---|
+| MuRIL TAPT | A, B | **Measured**; positive representation-adaptation signal, especially in the earlier MuRIL OOF experiments |
+| External labelled corpus | A | **Measured** on the TF-IDF floor; rules-sensitive and not used in the final submission |
+| One versus two versus zero reinitialized layers | A, B | **Measured**; the best count was encoder/task dependent |
+| Five-seed averaging | A, B | **Measured**; reduces optimization variance but increases compute |
+| OOF threshold tuning | A | **Measured** on the SVM; later Gemma final used direct argmax rather than a tuned test threshold |
+| OOF blend-weight refitting | A | **Measured**; required when the MuRIL component changed |
+| R-Drop | A, B | **Measured**; often useful as a diverse ensemble member, not consistently superior alone |
+| Ten classifier epochs | A, B | **Screened/prepared** in the MuRIL funnel; later Gemma epoch comparisons selected 3 epochs for A and 4 for B |
+| MuRIL-large | A, B | **Measured/screened**, not selected for final submission |
+| Whole-word masking for TAPT | A, B | **Proposed, not completed** |
+| Self-distillation with OOF soft labels | A, B | **Proposed, not built** |
+| Independent TAPT encoders | A, B | **Measured later** through TAPT bags; post-submission research, not the recorded final artifacts |
+| Context-conditional decoding | B | **Prepared/proposed**; a TF-IDF nested signal existed, but it was not adopted for the submitted Gemma system |
+| XLM-R as a third ensemble member | A | **Prepared/downgraded** after weak diversity evidence; not used |
+| Pseudo-labelling released inputs | A, B | **Proposed but excluded** from the clean final method |
+| Supervised contrastive auxiliary loss | A, B | **Proposed, not built** |
+| Frozen MuRIL embeddings plus RBF SVM | A | **Measured and rejected** |
+| Vocabulary extension during TAPT | B | **Measured and rejected**; it reduced performance |
+| Auxiliary act/category head | B | **Measured and rejected** |
+| Focal loss | B | **Measured and rejected** |
+| Topic, mood, address, gazetteer and NER-style features | A, B | **Measured and rejected or inconclusive** |
+| Extra Tamil/Malayalam TAPT text | B | **Measured and rejected** |
+| Synthetic generated data | A | **Measured; gain inside noise**, not used |
+| Character normalization and transliteration-lite | A, B | **Measured; neutral or negative**, not used |
+| Stopword removal and stemming | A, B | **Checked and rejected** because they remove useful code-mixed or morphological signal |
+| Profanity/insult-density features | A | **Measured and rejected**; most errors contained no explicit profanity |
+| Character-only SVM | A | **Measured**; stronger as a standalone baseline, but not proven as a useful third ensemble member |
+| Cross-task-derived labels | A | **Measured as a transductive diagnostic**, excluded from the final method |
+| Translation to English plus hateBERT | A | **Measured and rejected**; translation damaged abusive-language cues |
+| LLM screening and Sarvam-1 | B | **Measured**; Gemma-4-12B was selected, Sarvam-1 was rejected |
+| Gemma plus SVM or MuRIL | A, B | **Measured**; improvements were absent or inside noise, so Gemma was used alone |
+| Gemma prompt definitions | A, B | **Measured/prepared**; no reliable replacement for the short prompt |
+| Gemma learning-rate change | A, B | **Prepared; not selected** |
+| Gemma LoRA rank and target-module capacity | B | **Prepared; not selected** |
+| Frozen Gemma backbone with head-only training | B | **Prepared ablation; not selected** |
+| Gemma TAPT and TAPT + R-Drop | A, B | **Measured after the recorded submission**; strong follow-up results, not the submitted artifacts |
+| Qwen3-8B second-family ensemble | A | **Prepared/pending**; not part of the recorded submission |
+
+This table is intentionally broader than the final-method narrative: a paper should use
+it to decide what belongs in the main ablation table, what belongs in an appendix, and
+what should be mentioned only as a rejected or unrun idea.
+
 ## 9. Exact final submission systems
 
 The repository records the actual prediction files used for submission separately from
